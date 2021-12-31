@@ -1,18 +1,27 @@
 package com.isport.brandapp.device.watch;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.isport.blelibrary.ISportAgent;
+import com.isport.blelibrary.bluetooth.callbacks.WatchW557GattCallBack;
 import com.isport.blelibrary.db.table.bracelet_w311.Bracelet_W311_AlarmModel;
 import com.isport.blelibrary.db.table.watch_w516.Watch_W560_AlarmModel;
 import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
@@ -32,14 +41,16 @@ import com.isport.brandapp.device.bracelet.braceletPresenter.AlarmPresenter;
 import com.isport.brandapp.device.bracelet.view.AlarmView;
 import com.isport.brandapp.device.dialog.BaseDialog;
 import com.isport.brandapp.device.watch.adapter.W560AlarmAdapter;
+import com.isport.brandapp.util.ClickUtils;
+import com.isport.brandapp.view.InputDialogView;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
+import androidx.annotation.NonNull;
 import bike.gymproject.viewlibray.ItemView;
-import bike.gymproject.viewlibray.dialog.InputDialogView;
 import bike.gymproject.viewlibray.pickerview.DatePickerView;
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonalertdialog.AlertDialogStateCallBack;
@@ -55,7 +66,9 @@ import brandapp.isport.com.basicres.service.observe.BleProgressObservable;
  * W560闹钟设置
  */
 public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, AlarmPresenter> implements AlarmView, View.OnClickListener, ItemView.OnItemViewCheckedChangeListener {
+
     private final static String TAG = ActivityWatchW560AlarmList.class.getSimpleName();
+
     private DeviceBean deviceBean;
     private int currentType;
     private String deviceId;
@@ -67,6 +80,61 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
     ListView listView;
     W560AlarmAdapter adapter;
 
+
+    //无闹钟时显示
+    private LinearLayout w560_alarm_layout_emty;
+    private TextView alarmStatusTv;
+
+
+    //输入闹钟名称的dialog
+    private InputDialogView inputDialogView;
+
+    //对应的操作 0：新增;1：修改;2：删除  默认为0x88为查询操作
+    private int alarmOperate = 0x88;
+    //临时的闹钟对象，用于对应的操作
+    private Watch_W560_AlarmModel tmpAlarmBean;
+
+
+
+    private final Handler handler = new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            if(msg.what == 0x00){
+                if(list.isEmpty())
+                    return;
+                saveAllAlarm(list);
+            }
+
+            if(msg.what == 0x01){
+                mActPresenter.deleteAllCommAlarm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
+              //  mActPresenter.getW560AllAlarm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
+            }
+        }
+    };
+
+
+    private void saveAllAlarm(ArrayList<Watch_W560_AlarmModel> lt){
+        ArrayList<Bracelet_W311_AlarmModel> alarmList = new ArrayList<>();
+        for(Watch_W560_AlarmModel watch_w560_alarmModel : lt){
+            Bracelet_W311_AlarmModel bracelet_w311_alarmModel = new Bracelet_W311_AlarmModel();
+
+            bracelet_w311_alarmModel.setId(watch_w560_alarmModel.getId());
+            bracelet_w311_alarmModel.setAlarmId(watch_w560_alarmModel.getIndex());
+            bracelet_w311_alarmModel.setIsOpen(watch_w560_alarmModel.getIsEnable());
+            bracelet_w311_alarmModel.setDeviceId(watch_w560_alarmModel.getDeviceId());
+            bracelet_w311_alarmModel.setRepeatCount(watch_w560_alarmModel.getRepeatCount());
+            bracelet_w311_alarmModel.setUserId(watch_w560_alarmModel.getUserId());
+            bracelet_w311_alarmModel.setMessageString(watch_w560_alarmModel.getMessageString());
+            bracelet_w311_alarmModel.setTimeString(watch_w560_alarmModel.getTimeString());
+            alarmList.add(bracelet_w311_alarmModel);
+        }
+
+        mActPresenter.saveAllAlarm(alarmList,TokenUtil.getInstance().getPeopleIdInt(this),deviceBean.deviceID);
+    }
+
+
+
     @Override
     protected int getLayoutId() {
         return R.layout.app_activity_w560_alarm_list;
@@ -74,9 +142,13 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
 
     @Override
     protected void initView(View view) {
-
+        alarmStatusTv = findViewById(R.id.alarmStatusTv);
+        w560_alarm_layout_emty = findViewById(R.id.w560_alarm_layout_emty);
+        listView = findViewById(R.id.listView);
         adapter = new W560AlarmAdapter(ActivityWatchW560AlarmList.this, R.layout.app_activity_w560_alarm_item, R.layout.app_activity_w560_alarm_item, list);
+        listView.setAdapter(adapter);
 
+        //开关按钮
         adapter.setOnItemEnableListener(new W560AlarmAdapter.OnItemEnableListener() {
             @Override
             public void onEnableAlarm(int index, boolean enabled) {
@@ -84,14 +156,13 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
                     Watch_W560_AlarmModel model = list.get(index);
                     model.setIsEnable(enabled);
                     adapter.notifyDataSetChanged();
-
                     // 发送指令
                     updateItem(model);
                 }
             }
         });
 
-        listView = findViewById(R.id.listView);
+
 
         // cell点击修改闹钟设置
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -99,6 +170,7 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position >= 0 && position < list.size()) {
                     Watch_W560_AlarmModel model = list.get(position);
+
                     Logger.myLog(TAG,"-----修改闹钟="+new Gson().toJson(model));
                     startActivity(model);
                 }
@@ -147,6 +219,8 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
                 .setOnClickListener(R.id.iv_watch_alarm_setting_repeat, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
+                                if(ClickUtils.isFastDoubleClick())
+                                    return;
                                 showReapeat(currentAlarmModel.getRepeatCount());
                                 // dialogInterface.cancel();
                             }
@@ -157,7 +231,8 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
                             public void onClick(DialogInterface dialog, int which) {
                                 // 修改闹钟名称
                                 // 修改闹钟名称
-                                InputDialogView inputDialogView = new InputDialogView(ActivityWatchW560AlarmList.this);
+                                if(inputDialogView == null)
+                                inputDialogView = new InputDialogView(ActivityWatchW560AlarmList.this);
                                 inputDialogView.show();
                                 inputDialogView.setInputTxt(currentAlarmModel.getName());
                                 inputDialogView.setTitleTv(R.string.watch_alarm_setting_name);
@@ -171,24 +246,6 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
                                         currentAlarmModel.setName(str == null ? getResources().getString(R.string.display_setting_alarm) : str);
                                     }
                                 });
-
-
-
-
-
-//                                final EditText inputName = new EditText(ActivityWatchW560AlarmList.this);
-//
-//                                AlertDialog.Builder builder = new AlertDialog.Builder(ActivityWatchW560AlarmList.this);
-//                                builder.setTitle(R.string.watch_alarm_setting_name).setView(inputName)
-//                                        .setNegativeButton(R.string.rope_challeg_cancel, null)
-//                                        .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-//                                            @Override
-//                                            public void onClick(DialogInterface dialog, int which) {
-//                                                alarmName.setContentText(inputName.getText().toString());
-//                                                currentAlarmModel.setName(inputName.getText().toString());
-//                                            }
-//                                        });
-//                                builder.show();
                             }
                         }
                 )
@@ -219,14 +276,16 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
                 }
                 if(currentAlarmModel.getName() == null)
                     currentAlarmModel.setName(getResources().getString(R.string.display_setting_alarm));
-                mActPresenter.updateW560Mode(currentAlarmModel);
+                currentAlarmModel.setIsEnable(true);
+                alarmOperate = 1;
+                showProgress("Loading...",false);
                 //这里需要去发送指令个硬件
                 String strtime = currentAlarmModel.getTimeString();
                 String[] hourMin = strtime.split(":");
                 ISportAgent.getInstance().requestBle(BleRequest.Watch_W560_SET_ALARM, currentAlarmModel.getIsEnable(), currentAlarmModel.getRepeatCount(), Integer.parseInt(hourMin[0]), Integer.parseInt(hourMin[1]), currentAlarmModel.getIndex(), currentAlarmModel.getName());
                 dialog.dismiss();
-
-                adapter.notifyDataSetChanged();
+                tmpAlarmBean = currentAlarmModel;
+                //adapter.notifyDataSetChanged();
             }
 
         });
@@ -534,6 +593,7 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
         PublicAlertDialog.getInstance().showDialog("", this.getString(R.string.ensure_delete), context, this.getString(R.string.common_dialog_cancel), this.getString(R.string.common_dialog_ok), new AlertDialogStateCallBack() {
                     @Override
                     public void determine() {
+                        alarmOperate = 2;
                         delItem(model);
                     }
 
@@ -555,18 +615,22 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
             return;
         }
         deleteItem((Watch_W560_AlarmModel) obj);
-        //删除item
+        //删除item  12 35 50 8D 04 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00
     }
 
     public void deleteItem(Watch_W560_AlarmModel model) {
-        mActPresenter.deletW560ArarmItem(model);
-
+        Logger.myLog(TAG,"-------删除闹钟="+model.toString());
         // 发送指令删除
         ISportAgent.getInstance().requestBle(BleRequest.Watch_W560_DELETE_ALARM, model.getIndex());
+        this.tmpAlarmBean = model;
+        showProgress("Loading...",false);
+//        mActPresenter.deletW560ArarmItem(model);
+      //  handler.sendEmptyMessageDelayed(0x01,1000);
     }
 
     @Override
     protected void initData() {
+
         getIntentData();
         titleBarView.setLeftIconEnable(true);
         titleBarView.setTitle(context.getResources().getString(R.string.watch_alarm_setting_str));
@@ -575,15 +639,29 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
         frameBodyLine.setVisibility(View.VISIBLE);
         ISportAgent.getInstance().registerListener(mBleReciveListener);
 
+        IntentFilter intentFilter = new IntentFilter(WatchW557GattCallBack.W560_ALARM_OPERATE_ACTION);
+        registerReceiver(broadcastReceiver,intentFilter);
+
+        titleBarView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                ISportAgent.getInstance().requestBle(BleRequest.Watch_W516_GET_ALARM);
+                return true;
+            }
+        });
+
         // 先删除本地闹钟
         mActPresenter.deleteW560AllAlarms(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
 
+        //mActPresenter.getW560AllAlarm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
         if (AppConfiguration.isConnected && AppConfiguration.hasSynced) {
-            mActPresenter.getW560AllAlarm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
+
 //            BleProgressObservable.getInstance().show();
             ISportAgent.getInstance().requestBle(BleRequest.Watch_W516_GET_ALARM);
         } else {
-            mActPresenter.getW560AllAlarm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
+            ToastUtil.init(this);
+            ToastUtil.showTextToast("手表未连接!");
+            //mActPresenter.getW560AllAlarm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
         }
     }
 
@@ -618,6 +696,7 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
             @Override
             public void onRightClicked(View view) {
                 if (list.size() < 5) {
+                    alarmOperate = 0;
                     showAddDiloag();
 
                 } else {
@@ -638,6 +717,8 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
                 .setOnClickListener(R.id.iv_watch_alarm_setting_repeat, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
+                                if(ClickUtils.isFastDoubleClick())
+                                    return;
                                 showReapeat(currentAlarmModel.getRepeatCount());
                                 // dialogInterface.cancel();
                             }
@@ -648,7 +729,8 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
                             public void onClick(DialogInterface dialog, int which) {
 
                                 // 修改闹钟名称
-                                InputDialogView inputDialogView = new InputDialogView(ActivityWatchW560AlarmList.this);
+                                if(inputDialogView == null)
+                                 inputDialogView = new InputDialogView(ActivityWatchW560AlarmList.this);
                                 inputDialogView.show();
                                 inputDialogView.setTitleTv(R.string.watch_alarm_setting_name);
                                 inputDialogView.setCancelBtnStr(getResources().getString(R.string.cancel));
@@ -662,23 +744,6 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
                                     }
                                 });
 
-
-
-
-
-//                                final EditText inputName = new EditText(ActivityWatchW560AlarmList.this);
-//                                AlertDialog.Builder builder = new AlertDialog.Builder(ActivityWatchW560AlarmList.this);
-//                                builder.setTitle(R.string.watch_alarm_setting_name).setView(inputName)
-//                                        .setNegativeButton(R.string.rope_challeg_cancel, null)
-//                                        .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-//                                            @Override
-//                                            public void onClick(DialogInterface dialog, int which) {
-//                                                dialog.dismiss();
-//                                                alarmName.setContentText(inputName.getText().toString());
-//                                                currentAlarmModel.setName(inputName.getText().toString());
-//                                            }
-//                                        });
-//                                builder.create().show();
                             }
                         }
                 )
@@ -717,12 +782,13 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
                         }
                     }
                 }
-                mActPresenter.saveW560AlarmItem(deviceId, TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), currentAlarmModel.getRepeatCount(), currentAlarmModel.getTimeString(), list.size(), currentAlarmModel.getName());
+
                 //这里需要去发送指令个硬件
                 String strtime = currentAlarmModel.getTimeString();
                 String[] hourMin = strtime.split(":");
                 ISportAgent.getInstance().requestBle(BleRequest.Watch_W560_ADD_ALARM, currentAlarmModel.getRepeatCount(), Integer.parseInt(hourMin[0]), Integer.parseInt(hourMin[1]), currentAlarmModel.getName());
                 dialog.dismiss();
+                tmpAlarmBean = currentAlarmModel;
             }
 
         });
@@ -739,10 +805,15 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ISportAgent.getInstance().unregisterListener(mBleReciveListener);
+        try {
+            ISportAgent.getInstance().unregisterListener(mBleReciveListener);
+            unregisterReceiver(broadcastReceiver);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
-    private BleReciveListener mBleReciveListener = new BleReciveListener() {
+    private final BleReciveListener mBleReciveListener = new BleReciveListener() {
         @Override
         public void onConnResult(boolean isConn, boolean isConnectByUser, BaseDevice baseDevice) {
 
@@ -757,7 +828,7 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
         public void receiveData(IResult mResult) {
             //Logger.myLog("HandlerContans.mDevcieAlarList2" + mResult);
             if (mResult != null)
-                Logger.myLog("HandlerContans.mDevcieAlarList2" + mResult.getType());
+                Logger.myLog(TAG,"-----HandlerContans.mDevcieAlarList2" + mResult.getType());
             switch (mResult.getType()) {
                 case IResult.SLEEP_BATTERY:
                     SleepBatteryResult mResult1 = (SleepBatteryResult) mResult;
@@ -766,11 +837,11 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
                 case IResult.DEVICE_ALARM_LIST:
                     BleProgressObservable.getInstance().hide();
                     Logger.myLog("HandlerContans.mDevcieAlarList w560");
-                    mActPresenter.getW560AllAlarm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
+                   // mActPresenter.getW560AllAlarm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
                     break;
-                case IResult.WATCH_W560_ALARM_SETTING:
+                case IResult.WATCH_W560_ALARM_SETTING:  //闹钟获取成功
                     //闹钟设置回调
-                    mActPresenter.getW560AllAlarm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
+                   // mActPresenter.getW560AllAlarm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
                     break;
                 default:
                     break;
@@ -818,25 +889,47 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
     public void Event(MessageEvent messageEvent) {
         switch (messageEvent.getMsg()) {
             case MessageEvent.isChange:
-                mActPresenter.getW560AllAlarm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
+              //  mActPresenter.getW560AllAlarm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
                 break;
             default:
                 break;
         }
     }
 
+
+    ArrayList<Watch_W560_AlarmModel> tmpList = new ArrayList<>();
     @Override
     public void successW560AllAlarmItem(ArrayList<Watch_W560_AlarmModel> watch_w560_alarmModels) {
+        tmpList.clear();
+        list.clear();
+        Logger.myLog(TAG,"---------successAllAlarmItem:" + new Gson().toJson(watch_w560_alarmModels)+"\n"+new Gson().toJson(list));
         if (watch_w560_alarmModels == null) {
+            alarmStatusTv.setVisibility(View.GONE);
+            adapter.notifyDataSetChanged();
+            listView.setVisibility(View.GONE);
+            w560_alarm_layout_emty.setVisibility(View.VISIBLE);
+            mActPresenter.deleteW560AllAlarms(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
+            handler.sendEmptyMessage(0x01);
+          //  mActPresenter.deleteAllCommAlarm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
             return;
         }
+        listView.setVisibility(View.VISIBLE);
+        w560_alarm_layout_emty.setVisibility(View.GONE);
+        alarmStatusTv.setVisibility(View.VISIBLE);
+        if(watch_w560_alarmModels.size()>5){
+            for(int i = 0;i<5;i++){
+                Watch_W560_AlarmModel watch_w560_alarmModel = watch_w560_alarmModels.get(i);
+                list.add(watch_w560_alarmModel);
+            }
+        }else{
+            list.addAll(watch_w560_alarmModels);
+        }
 
-        list.clear();
-        list.addAll(watch_w560_alarmModels);
-        Logger.myLog("successAllAlarmItem:" + watch_w560_alarmModels);
+      //  list.addAll(watch_w560_alarmModels);
 
-        listView.setAdapter(adapter);
-
+        adapter.notifyDataSetChanged();
+       // listView.setAdapter(adapter);
+        handler.sendEmptyMessage(0x00);
         titleBarView.setRightIconVisible(list.size() < 5 ? true : false);
     }
 
@@ -852,7 +945,7 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
 
     @Override
     public void successDelectAlarmItem() {
-        mActPresenter.getW560AllAlarm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
+       // mActPresenter.getW560AllAlarm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
     }
 
 
@@ -863,19 +956,71 @@ public class ActivityWatchW560AlarmList extends BaseMVPTitleActivity<AlarmView, 
                 model.setTimeString(w560.getTimeString());
                 model.setRepeatCount(w560.getRepeatCount());
             }
-            // 刷新本地数据库
-            mActPresenter.updateW560Mode(model);
+
             //这里需要去发送指令个硬件
             String strtime = model.getTimeString();
             String[] hourMin = strtime.split(":");
             if(model.getName() == null)
                 model.setName(getResources().getString(R.string.display_setting_alarm));
+            this.alarmOperate = 1;
             ISportAgent.getInstance().requestBle(BleRequest.Watch_W560_SET_ALARM, model.getIsEnable(), model.getRepeatCount(), Integer.parseInt(hourMin[0]), Integer.parseInt(hourMin[1]), model.getIndex(), model.getName());
+            this.tmpAlarmBean = model;
+            showProgress("Loading...",false);
+//            // 刷新本地数据库
+//            mActPresenter.updateW560Mode(model);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
+
+
+
+
+
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action == null)
+                return;
+            if(action.equals(WatchW557GattCallBack.W560_ALARM_OPERATE_ACTION)){
+                boolean isAlarmSuccess = intent.getBooleanExtra(WatchW557GattCallBack.W560_ALARM_KEY,false);
+                Logger.myLog(TAG,"-------操作状态="+isAlarmSuccess+"\n"+alarmOperate+"\n");
+                if(!isAlarmSuccess){
+                    ToastUtil.init(ActivityWatchW560AlarmList.this);
+                    ToastUtil.showTextToast("操作失败!");
+                    dismissProgressBar();
+                    return;
+                }
+
+                if(alarmOperate == 0x88){
+                    mActPresenter.getW560AllAlarm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
+                }
+
+                if(tmpAlarmBean == null)
+                    return;
+                dismissProgressBar();
+                Logger.myLog(TAG,"--+tmpAlarmBean.toString()="+tmpAlarmBean.toString());
+                if(alarmOperate == 0){  //新增
+                    mActPresenter.saveW560AlarmItem(deviceId, TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), tmpAlarmBean.getRepeatCount(), tmpAlarmBean.getTimeString(), list.size(), tmpAlarmBean.getName());
+                }
+
+                if(alarmOperate == 1){      //修改
+                    // 刷新本地数据库
+                    mActPresenter.updateW560Mode(tmpAlarmBean);
+                }
+
+                if(alarmOperate == 2){      //删除 ，删除后重新再从手表读一遍数据
+                    mActPresenter.deleteW560AllAlarms(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
+                    alarmOperate = 0x88;
+                    ISportAgent.getInstance().requestBle(BleRequest.Watch_W516_GET_ALARM);
+                    tmpAlarmBean = null;
+                }
+
+            }
+        }
+    };
 
 
 }

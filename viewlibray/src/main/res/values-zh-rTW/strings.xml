@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">viewlibray</string>
 
+
+    <string name="string_share_notinstall_desc">未安装该软件!</string>
     <string name="pickerview_year">年</string>//年
     <string name="pickerview_month">月</string>//月
     <string name="pickerview_day">日</string>//日

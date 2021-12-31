@@ -92,7 +92,7 @@
         <View
             android:id="@+id/view_cmd"
             android:layout_width="@dimen/dp100"
-            android:layout_height="@dimen/dp50"/>
+            android:layout_height="@dimen/dp50" />
 
         <RelativeLayout
             android:id="@+id/layout_common_head"

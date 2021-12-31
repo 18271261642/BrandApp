@@ -14,17 +14,19 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-
-import androidx.core.content.FileProvider;
+import android.widget.Toast;
 
 import com.blankj.utilcode.util.ScreenUtils;
 import com.isport.brandapp.basicres.R;
 import com.umeng.socialize.ShareAction;
+import com.umeng.socialize.UMShareAPI;
 import com.umeng.socialize.UMShareListener;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.media.UMImage;
 
 import java.io.File;
+
+import androidx.core.content.FileProvider;
 
 /**
  * created by wq on 2019/5/9
@@ -81,6 +83,10 @@ public class CommonPopupWindowFactory {
         iv_weibo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(!UMShareAPI.get(activity).isInstall(activity,SHARE_MEDIA.SINA)){
+                    Toast.makeText(activity, activity.getResources().getString(R.string.string_share_notinstall_desc), Toast.LENGTH_SHORT).show();
+                    return;
+                }
 //                new ShareAction(activity).setPlatform(SHARE_MEDIA.SINA)
 //                        .withMedia(ShareHelper.getUMweb(activity, shareBean))
 //                        .setCallback(mUMShareListener)

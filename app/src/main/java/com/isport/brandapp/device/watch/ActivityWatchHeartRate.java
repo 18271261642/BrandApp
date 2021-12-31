@@ -1,5 +1,6 @@
 package com.isport.brandapp.device.watch;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -170,6 +171,8 @@ public class ActivityWatchHeartRate extends BaseMVPTitleActivity<WatchHeartRateV
     private TextView tv_select_times;
     private AkrobatNumberTextView tv_select_hr_value;
 
+    private TextView heartIntervalTv;
+
 
     @Override
     protected int getLayoutId() {
@@ -187,7 +190,7 @@ public class ActivityWatchHeartRate extends BaseMVPTitleActivity<WatchHeartRateV
 
     @Override
     protected void initView(View view) {
-
+        heartIntervalTv = view.findViewById(R.id.heartIntervalTv);
 
         recHr = view.findViewById(R.id.rec_hr);
         tv_select_times = view.findViewById(R.id.tv_select_times);
@@ -399,11 +402,18 @@ public class ActivityWatchHeartRate extends BaseMVPTitleActivity<WatchHeartRateV
 
     }
 
+    @SuppressLint("SetTextI18n")
     private void getIntentValue() {
         deviceBean = (DeviceBean) getIntent().getSerializableExtra(JkConfiguration.DEVICE);
         if (deviceBean != null) {
             mCurrentDeviceId = deviceBean.deviceID;
             mCurrentType = deviceBean.currentType;
+
+            if(DeviceTypeUtil.isContainW81(mCurrentType)){
+                heartIntervalTv.setText(String.format(UIUtils.getString(R.string.activity_hr_history_exp),5)+"");
+            }else{
+                heartIntervalTv.setText(String.format(UIUtils.getString(R.string.activity_hr_history_exp),1)+"");
+            }
         } else {
             mCurrentDeviceId = "";
             mCurrentType = 0;
@@ -669,6 +679,15 @@ public class ActivityWatchHeartRate extends BaseMVPTitleActivity<WatchHeartRateV
 
     }
 
+    long lastClickTime;
+
+    public boolean isFastDoubleClick() {
+        long time = System.currentTimeMillis();
+        long timeD = time - lastClickTime;
+        lastClickTime = time;
+        return timeD <= 500;
+    }
+
     @Override
     protected void initEvent() {
         ISportAgent.getInstance().registerListener(mBleReciveListener);
@@ -686,7 +705,8 @@ public class ActivityWatchHeartRate extends BaseMVPTitleActivity<WatchHeartRateV
         titleBarView.setOnHistoryClickListener(new TitleBarView.OnHistoryClickListener() {
             @Override
             public void onHistoryClicked(View view) {
-
+                if(isFastDoubleClick())
+                    return;
                 setPopupWindow(ActivityWatchHeartRate.this, view);
 
                 int time = (int) (System.currentTimeMillis() / 1000);

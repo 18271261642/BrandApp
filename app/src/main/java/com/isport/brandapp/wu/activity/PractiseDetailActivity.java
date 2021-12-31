@@ -134,8 +134,6 @@ public class PractiseDetailActivity extends BaseActivity implements View.OnClick
 
 
 
-
-
     //距离柱状图
     private WeekBarChartView itemPractiseDistanceBarView;
     //卡路里曲线图
@@ -161,8 +159,89 @@ public class PractiseDetailActivity extends BaseActivity implements View.OnClick
         }
 
         Logger.myLog(TAG,"-----exInfo="+info.toString());
+        int type = Integer.parseInt(info.getExerciseType());
 
-        switch (Integer.valueOf(info.getExerciseType())) {
+        boolean isW560 = AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_W560) ;
+        if(isW560){
+            switch (type) {
+                case Constant.PRACTISE_TYPE_ALL:
+                case Constant.PRACTISE_TYPE_WALK:
+                    titleName = UIUtils.getString(R.string.string_w560_practise_out_walk);
+                    break;
+                case 2:
+                    titleName = UIUtils.getString(R.string.string_w560_practise_out_run);
+                    break;
+                case 3:
+                    titleName = UIUtils.getString(R.string.String_w560_practise_cycle);
+                    break;
+                case 4:
+                    titleName = UIUtils.getString(R.string.string_practise_indoor_walk);
+                    break;
+                case 5:
+                    titleName = UIUtils.getString(R.string.string_w560_practise_indoor_run);
+                    break;
+                case 6:
+                    titleName = "HIIT";
+                    break;
+                case 7:
+                    titleName = UIUtils.getString(R.string.string_practise_yoga);
+                    break;
+                case 8:
+                    titleName = UIUtils.getString(R.string.string_w560_practise_eliptical);
+                    break;
+                case 9:
+                    titleName = UIUtils.getString(R.string.string_practise_spinning);
+                    break;
+                case 10:
+                    titleName = UIUtils.getString(R.string.string_w560_practise_run);
+                    break;
+                case 11:
+                    titleName = UIUtils.getString(R.string.string_w560_practise_rowing);
+                    break;
+                case 12:
+                    titleName = UIUtils.getString(R.string.string_practise_other);
+                    break;
+
+            }
+
+            return;
+        }
+
+        boolean isW5xx = AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_W560B);
+        if(isW5xx){
+            switch (type) {
+                case Constant.PRACTISE_TYPE_ALL:
+                case Constant.PRACTISE_TYPE_WALK:
+                    titleName = UIUtils.getString(R.string.walk);
+                    break;
+                case 2:
+                    titleName = UIUtils.getString(R.string.run);
+                    break;
+                case 3:
+                    titleName = UIUtils.getString(R.string.ride);
+                    break;
+                case 8:
+                    titleName = UIUtils.getString(R.string.climbing);
+                    break;
+                case 7:
+                    titleName = UIUtils.getString(R.string.football);
+                    break;
+                case 6:
+                    titleName = UIUtils.getString(R.string.basketball);
+                    break;
+                case 9:
+                    titleName = UIUtils.getString(R.string.pingpang);
+                    break;
+                case 5:
+                    titleName = UIUtils.getString(R.string.badminton);
+                    break;
+            }
+
+            return;
+        }
+
+
+        switch (type) {
             case Constant.PRACTISE_TYPE_ALL:
             case Constant.PRACTISE_TYPE_WALK:
                 titleName = UIUtils.getString(R.string.walk);
@@ -170,18 +249,14 @@ public class PractiseDetailActivity extends BaseActivity implements View.OnClick
             case Constant.PRACTISE_TYPE_RUN:
                 titleName = UIUtils.getString(R.string.run);
                 break;
-            case Constant.PRACTISE_TYPE_ROPE_SKIP:
-                titleName = UIUtils.getString(R.string.rope_skip);
-                break;
             case Constant.PRACTISE_TYPE_RIDE:
                 titleName = UIUtils.getString(R.string.ride);
                 break;
-            case Constant.PRACTISE_TYPE_CLIMBING:
-                titleName = UIUtils.getString(R.string.climbing);
+            case Constant.PRACTISE_TYPE_ROPE_SKIP:
+                titleName = UIUtils.getString(R.string.rope_skip);
                 break;
             case Constant.PRACTISE_TYPE_BADMINTON:
                 titleName = UIUtils.getString(R.string.badminton);
-
                 break;
             case Constant.PRACTISE_TYPE_FOOTBALL:
                 titleName = UIUtils.getString(R.string.football);
@@ -189,10 +264,86 @@ public class PractiseDetailActivity extends BaseActivity implements View.OnClick
             case Constant.PRACTISE_TYPE_BASKETBALL:
                 titleName = UIUtils.getString(R.string.basketball);
                 break;
+//            case Constant.PRACTISE_TYPE_CLIMBING:
+//                moy_tv_climbing.setTypeface(Typeface.DEFAULT_BOLD);
+//                moy_tv_climbing.setTextColor(UIUtils.getColor(R.color.common_view_color));
+//                break;
             case Constant.PRACTISE_TYPE_PINGPANG:
                 titleName = UIUtils.getString(R.string.pingpang);
                 break;
+        }
 
+
+        if(AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_W560)){
+
+            switch (type) {
+                case Constant.PRACTISE_TYPE_ALL:
+                case Constant.PRACTISE_TYPE_WALK:
+                    titleName = UIUtils.getString(R.string.string_w560_practise_out_walk);
+                    break;
+                case 2:
+                    titleName = UIUtils.getString(R.string.string_w560_practise_out_run);
+                    break;
+                case 3:
+                    titleName = UIUtils.getString(R.string.String_w560_practise_cycle);
+                    break;
+                case 4:
+                    titleName = UIUtils.getString(R.string.string_practise_indoor_walk);
+                    break;
+                case 5:
+                    titleName = UIUtils.getString(R.string.string_w560_practise_indoor_run);
+                    break;
+                case 6:
+                    titleName = "HIIT";
+                    break;
+                case 7:
+                    titleName = UIUtils.getString(R.string.string_practise_yoga);
+                    break;
+                case 8:
+                    titleName = UIUtils.getString(R.string.string_w560_practise_eliptical);
+                    break;
+                case 9:
+                    titleName = UIUtils.getString(R.string.string_practise_spinning);
+                    break;
+                case 10:
+                    titleName = UIUtils.getString(R.string.string_w560_practise_run);
+                    break;
+                case 11:
+                    titleName = UIUtils.getString(R.string.string_w560_practise_rowing);
+                    break;
+                case 12:
+                    titleName = UIUtils.getString(R.string.string_practise_other);
+                    break;
+
+            }
+        }else{
+            switch (type) {
+                case Constant.PRACTISE_TYPE_ALL:
+                case Constant.PRACTISE_TYPE_WALK:
+                    titleName = UIUtils.getString(R.string.walk);
+                    break;
+                case 2:
+                    titleName = UIUtils.getString(R.string.run);
+                    break;
+                case 3:
+                    titleName = UIUtils.getString(R.string.ride);
+                    break;
+                case 8:
+                    titleName = UIUtils.getString(R.string.climbing);
+                    break;
+                case 7:
+                    titleName = UIUtils.getString(R.string.football);
+                    break;
+                case 6:
+                    titleName = UIUtils.getString(R.string.basketball);
+                    break;
+                case 9:
+                    titleName = UIUtils.getString(R.string.pingpang);
+                    break;
+                case 5:
+                    titleName = UIUtils.getString(R.string.badminton);
+                    break;
+            }
         }
 
         analysisW560View(info);
@@ -270,12 +421,12 @@ public class PractiseDetailActivity extends BaseActivity implements View.OnClick
             recyclerview_practise = findViewById(R.id.recyclerview_itme);
 
             //判断是否是w560
-            if(AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_W560)){
-                itemPractiseChartLayout.setVisibility(View.VISIBLE);
-            }else{
-                itemPractiseChartLayout.setVisibility(View.GONE);
-            }
-
+//            if(AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_W560)){
+//                itemPractiseChartLayout.setVisibility(View.VISIBLE);
+//            }else{
+//                itemPractiseChartLayout.setVisibility(View.GONE);
+//            }
+            itemPractiseChartLayout.setVisibility(View.GONE);
 
             getValue();
             recyclerview_practise.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
@@ -286,8 +437,6 @@ public class PractiseDetailActivity extends BaseActivity implements View.OnClick
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 
 
@@ -747,7 +896,7 @@ public class PractiseDetailActivity extends BaseActivity implements View.OnClick
                 }
 
                 int point = HeartRateConvertUtils.hearRate2Point(hrValue, HeartRateConvertUtils.getMaxHeartRate(age, sex));
-               // Logger.myLog("hrList.get(i)" + hrValue + "HeartRateConvertUtils.getMaxHeartRate(age):" + HeartRateConvertUtils.getMaxHeartRate(age, sex) + "age:" + age + "point:" + point);
+                Logger.myLog(TAG,"-----point="+point);
                 int color = UIUtils.getColor(R.color.common_white);
                 switch (point) {
                     case 0:
@@ -890,15 +1039,18 @@ public class PractiseDetailActivity extends BaseActivity implements View.OnClick
         return limint + anaerobic_exercise + aerobic_exercise + fat_burning_exercise + warm_up + leisure;
     }
 
+    boolean isW560 = AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_W560);
 
     //时长最小单位为分钟
     private void setSleepSummary(int limint, int anaerobic_exercise, int aerobic_exercise, int fat_burning_exercise, int warm_up, int leisure) {
-        view_limit.setData(new HourMinuteData(UIUtils.getColor(R.color.color_limit), UIUtils.getString(R.string.heart_limit), UIUtils.getString(R.string.no_data), DateUtil.getFormatTimehhmmss(limint), "1"));
-        view_anaerobic_exercise.setData(new HourMinuteData(UIUtils.getColor(R.color.color_anaerobic_exercise), UIUtils.getString(R.string.heart_anaerobic_exercise), UIUtils.getString(R.string.no_data), DateUtil.getFormatTimehhmmss(anaerobic_exercise), "1"));
-        view_aerobic_exercise.setData(new HourMinuteData(UIUtils.getColor(R.color.color_aerobic_exercise), UIUtils.getString(R.string.heart_aerobic_exercise), UIUtils.getString(R.string.no_data), DateUtil.getFormatTimehhmmss(aerobic_exercise), "1"));
-        view_fat_burning_exercise.setData(new HourMinuteData(UIUtils.getColor(R.color.color_fat_burning_exercise), UIUtils.getString(R.string.heart_fat_burning_exercise), UIUtils.getString(R.string.no_data), DateUtil.getFormatTimehhmmss(fat_burning_exercise), "1"));
-        view_warm_up.setData(new HourMinuteData(UIUtils.getColor(R.color.color_warm_up), UIUtils.getString(R.string.heart_warm_up), UIUtils.getString(R.string.no_data), DateUtil.getFormatTimehhmmss(warm_up), "1"));
-        view_leisure.setData(new HourMinuteData(UIUtils.getColor(R.color.color_leisure), UIUtils.getString(R.string.heart_leisure), UIUtils.getString(R.string.no_data), DateUtil.getFormatTimehhmmss(leisure), "1"));
+
+        Logger.myLog(TAG,"------limit="+limint+"\n"+anaerobic_exercise +"\n" +aerobic_exercise +"\n"+ fat_burning_exercise +"\n"+warm_up +"\n"+ leisure);
+        view_limit.setData(new HourMinuteData(UIUtils.getColor(R.color.color_limit), UIUtils.getString(R.string.heart_limit), UIUtils.getString(R.string.no_data), isW560 ?DateUtil.getFormatTimehhmmss(limint,0): DateUtil.getFormatTimehhmmss(limint), "1"));
+        view_anaerobic_exercise.setData(new HourMinuteData(UIUtils.getColor(R.color.color_anaerobic_exercise), UIUtils.getString(R.string.heart_anaerobic_exercise), UIUtils.getString(R.string.no_data), isW560 ?DateUtil.getFormatTimehhmmss(anaerobic_exercise,0):DateUtil.getFormatTimehhmmss(anaerobic_exercise), "1"));
+        view_aerobic_exercise.setData(new HourMinuteData(UIUtils.getColor(R.color.color_aerobic_exercise), UIUtils.getString(R.string.heart_aerobic_exercise), UIUtils.getString(R.string.no_data), isW560 ?DateUtil.getFormatTimehhmmss(aerobic_exercise,0):DateUtil.getFormatTimehhmmss(aerobic_exercise), "1"));
+        view_fat_burning_exercise.setData(new HourMinuteData(UIUtils.getColor(R.color.color_fat_burning_exercise), UIUtils.getString(R.string.heart_fat_burning_exercise), UIUtils.getString(R.string.no_data), isW560 ?DateUtil.getFormatTimehhmmss(fat_burning_exercise,0):DateUtil.getFormatTimehhmmss(fat_burning_exercise), "1"));
+        view_warm_up.setData(new HourMinuteData(UIUtils.getColor(R.color.color_warm_up), UIUtils.getString(R.string.heart_warm_up), UIUtils.getString(R.string.no_data), isW560 ?DateUtil.getFormatTimehhmmss(warm_up,0):DateUtil.getFormatTimehhmmss(warm_up), "1"));
+        view_leisure.setData(new HourMinuteData(UIUtils.getColor(R.color.color_leisure), UIUtils.getString(R.string.heart_leisure), UIUtils.getString(R.string.no_data), isW560 ?DateUtil.getFormatTimehhmmss(leisure,0):DateUtil.getFormatTimehhmmss(leisure), "1"));
     }
 
     /**

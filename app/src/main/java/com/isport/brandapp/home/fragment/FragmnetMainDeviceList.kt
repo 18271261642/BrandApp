@@ -147,7 +147,7 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
         override fun onConnResult(isConn: Boolean, isConnectByUser: Boolean, baseDevice: BaseDevice) {
 
             Logger.myLog(tg,"fragmentMainDeviceList isConn$isConn baseDevice=${baseDevice.toString()}")
-
+            AppConfiguration.braceletID = baseDevice.deviceName
             if (!isConn) {
                 AppConfiguration.isConnected = false
                 AppConfiguration.currentConnectDevice = null
@@ -157,9 +157,8 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
                     mMessageAdapter.notifyDataSetChanged()
                 }
             } else {
-                var deviceB = DeviceBean(baseDevice.getDeviceType(),baseDevice.getDeviceName())
-                AppConfiguration.deviceMainBeanList.put(baseDevice.deviceType,deviceB)
-
+//                var deviceB = DeviceBean(baseDevice.getDeviceType(),baseDevice.getDeviceName())
+//                AppConfiguration.deviceMainBeanList.put(baseDevice.deviceType,deviceB)
 
                 mDataList.forEach {
                     Logger.myLog(tg,"--------保存的集合="+it.toString())
@@ -180,6 +179,7 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
                 AppConfiguration.isConnected = isConn
                 AppConfiguration.currentConnectDevice = baseDevice!!
                 var bean = mDataList.findLast {
+                    Logger.myLog(tg,"--------baseDevice.deviceType="+baseDevice.deviceType)
                     it.deviceType == baseDevice.deviceType
                 }
                 //把连接状态都改成false 再去重新赋值现在连接的状态
@@ -355,8 +355,11 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
                 var deviceType = mDataList.get(position).deviceType
                 when (view.id) {
                     R.id.iv_setting -> {
+
+                        if(context == null)
+                            return
                         if (!mCurrentMessage!!.isConn) {
-                            if (mCurrentMessage!!.deviceType == JkConfiguration.DeviceType.BODYFAT) {
+                            if (mCurrentMessage!!.deviceType == JkConfiguration.DeviceType.BODYFAT) {   //体脂称
                                 val intent = Intent(context, ActivityDeviceSetting::class.java)
                                 intent.putExtra(JkConfiguration.DEVICE, AppConfiguration.deviceMainBeanList.get(deviceType))
                                 startActivity(intent)
@@ -372,9 +375,15 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
                         }
                         if (DeviceTypeUtil.isContainWatch(deviceType)) {   //手表设置页面
                             //if (AppConfiguration.hasSynced) {
-                            val intent2 = Intent(activity, ActivityWatchMain::class.java)
+                            val intent2 = Intent(context, ActivityWatchMain::class.java)
                             //bean.mac = ISportAgent.getInstance().currnetDevice.address
-                            intent2.putExtra(JkConfiguration.DEVICE, AppConfiguration.deviceMainBeanList.get(deviceType))
+
+                            Logger.myLog(tg,"--------手表设置="+Gson().toJson(AppConfiguration.deviceMainBeanList)+"\n"+AppConfiguration.deviceMainBeanList.get(deviceType).toString())
+                            var db = AppConfiguration.deviceMainBeanList[deviceType];
+                            if (db != null) {
+                                AppConfiguration.braceletID = db.getDeviceID()
+                            }
+                            intent2.putExtra(JkConfiguration.DEVICE, db )
                             startActivity(intent2)
                             /* } else {
                                 ToastUtils.showToast(activity, R.string.sync_data)
@@ -382,14 +391,14 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
                         } else if (DeviceTypeUtil.isContainWrishBrand(deviceType) || DeviceTypeUtil.isContaintW81(deviceType)) {
                             Logger.myLog(tg,"onDeviceItemListener11" + System.currentTimeMillis())
                             //if (AppConfiguration.hasSynced) {
-                            val intent2 = Intent(activity, ActivityBraceletMain::class.java)
+                            val intent2 = Intent(context, ActivityBraceletMain::class.java)
                             intent2.putExtra(JkConfiguration.DEVICE, AppConfiguration.deviceMainBeanList.get(deviceType))
                             startActivity(intent2)
                             /* } else {
                                 ToastUtils.showToast(context, R.string.sync_data)
                             }*/
                         } else if (deviceType == JkConfiguration.DeviceType.ROPE_SKIPPING) {   //跳绳设置
-                            startActivity(Intent(activity, RopeDeviceSettingActivity::class.java))
+                            startActivity(Intent(context, RopeDeviceSettingActivity::class.java))
                         } else if (deviceType == JkConfiguration.DeviceType.BODYFAT) {
                             val intent = Intent(context, ActivityDeviceSetting::class.java)
                             intent.putExtra(JkConfiguration.DEVICE, AppConfiguration.deviceMainBeanList.get(deviceType))
@@ -399,13 +408,13 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
                     R.id.mShadowLayout -> {
                         when (deviceType) {
                             JkConfiguration.DeviceType.ROPE_SKIPPING -> {   //跳绳页面
-                                startActivity(Intent(activity, RopeSkippingActivity::class.java))
+                                startActivity(Intent(context, RopeSkippingActivity::class.java))
                             }
                             JkConfiguration.DeviceType.BODYFAT -> {
-                                startActivity(Intent(activity, ScaleMainActivity::class.java))
+                                startActivity(Intent(context, ScaleMainActivity::class.java))
                             }
                             else -> {  //手表手环数据显示主页面
-                                startActivity(Intent(activity, DeviceMainActivity::class.java))
+                                startActivity(Intent(context, DeviceMainActivity::class.java))
                             }
 
 
@@ -658,11 +667,13 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
 
     fun updateItem(list: ArrayList<MainDeviceBean>?) {
 
-
         if (list != null && list.size > 0) {
             var baseDevice = ISportAgent.getInstance().currnetDevice;
             Logger.myLog(tg,"updateItem------baseDevice=" + baseDevice+"isConn="+AppConfiguration.isConnected)
             if (baseDevice != null) {
+//                var deviceBean = DeviceBean(baseDevice.deviceType,baseDevice.getDeviceName())
+//                AppConfiguration.braceletID = baseDevice.deviceName
+//                AppConfiguration.deviceMainBeanList.put(baseDevice.deviceType,deviceBean)
                 var bean = list.findLast {
                     it.deviceType == baseDevice.deviceType
                 }
@@ -691,7 +702,10 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
         Logger.myLog(tg,"----successGetDeviceListFormHttp="+deviceBeanHashMap.toString()+" "+Gson().toJson(list))
 
         AppConfiguration.deviceMainBeanList = deviceBeanHashMap
-        AppConfiguration.deviceBeanList = HashMap<Int, DeviceBean>()
+
+        Logger.myLog(tg,"----------httttpp="+Gson().toJson(AppConfiguration.deviceMainBeanList))
+
+//        AppConfiguration.deviceBeanList = HashMap<Int, DeviceBean>()
         if (AppConfiguration.deviceMainBeanList != null) {
 
             for (deviceType in AppConfiguration.deviceMainBeanList.keys) {
@@ -699,7 +713,8 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
                 if (deviceBean!!.currentType == JkConfiguration.DeviceType.ROPE_SKIPPING) {
                     continue
                 }
-                AppConfiguration.deviceBeanList.put(deviceType, deviceBean)
+                AppConfiguration.deviceBeanList[deviceType] = deviceBean
+                AppConfiguration.deviceMainBeanList[deviceType] = deviceBean
             }
         }
         Logger.myLog(tg,"getDeviceList" + AppConfiguration.deviceMainBeanList.toString() +" 22="+AppConfiguration.deviceBeanList.toString())
@@ -752,7 +767,7 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
         Logger.myLog("successGetDeviceListFormDB---=" + list?.size+" map="+Gson().toJson(deviceBeanHashMap)+" list="+Gson().toJson(list))
 
         AppConfiguration.deviceMainBeanList = deviceBeanHashMap
-        AppConfiguration.deviceBeanList = HashMap<Int, DeviceBean>()
+       // AppConfiguration.deviceBeanList = HashMap<Int, DeviceBean>()
 
         if (AppConfiguration.deviceMainBeanList != null) {
             for (deviceType in AppConfiguration.deviceMainBeanList.keys) {

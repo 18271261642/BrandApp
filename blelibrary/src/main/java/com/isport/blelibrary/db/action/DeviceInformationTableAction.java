@@ -61,10 +61,8 @@ public class DeviceInformationTableAction {
         }
         QueryBuilder<DeviceInformationTable> queryBuilder = BleAction.getDaoSession().queryBuilder(DeviceInformationTable.class);
         List<DeviceInformationTable> list = queryBuilder.list();
-        Logger.myLog(TAG,"---1--findDeviceInfoByDeviceId" + list);
         queryBuilder.where(DeviceInformationTableDao.Properties.DeviceId.eq(deviceId));
         list = queryBuilder.list();
-        Logger.myLog(TAG,"---2---findDeviceInfoByDeviceId" + list);
         if (list != null && list.size() > 0) {
             return list.get(0);
         } else {

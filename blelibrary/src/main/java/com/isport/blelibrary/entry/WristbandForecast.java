@@ -46,4 +46,16 @@ public class WristbandForecast {
     public void setUpdatetime(String updatetime) {
         this.updatetime = updatetime;
     }
+
+
+    @Override
+    public String toString() {
+        return "WristbandForecast{" +
+                "weatherId='" + weatherId + '\'' +
+                ", lowTemperature='" + lowTemperature + '\'' +
+                ", highTemperature='" + highTemperature + '\'' +
+                ", aqiValue='" + aqiValue + '\'' +
+                ", updatetime='" + updatetime + '\'' +
+                '}';
+    }
 }

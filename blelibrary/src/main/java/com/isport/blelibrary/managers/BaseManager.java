@@ -67,7 +67,7 @@ public class BaseManager extends W520Cmd {
     protected Handler timeOutHandler;
     protected Handler suceessHandler;
 
-    protected static long SYNC_TIMEOUT = 15000;
+    protected static long SYNC_TIMEOUT = 25 * 1000;
     protected static long times = 200;
 
 

@@ -3,6 +3,7 @@ package phone.gym.jkcq.com.socialmodule.report.ranking;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -43,6 +44,9 @@ public class RopeRankActivity extends BaseTitleActivity {
     private Button btn_launch;
     private String mTitles[] = {UIUtils.getString(R.string.rope_number), UIUtils.getString(R.string.rope_ranking_time)};
 
+    private TextView tv_content1;
+    private TextView tv_content2;
+
 
     private UserInfoBean mUserInfo;
 
@@ -56,6 +60,12 @@ public class RopeRankActivity extends BaseTitleActivity {
 
     @Override
     protected void initView(View view) {
+        tv_content1 = findViewById(R.id.tv_content1);
+        tv_content2 = findViewById(R.id.tv_content2);
+
+        tv_content1.setText(getResources().getString(R.string.see_friend_rope_rank));
+        tv_content2.setText(getResources().getString(R.string.friend_see_your_roperank));
+
         if (view != null) {
             ll_tab_rank = view.findViewById(R.id.ll_tab_rank);
             ll_launch = view.findViewById(R.id.ll_launch);

@@ -797,6 +797,7 @@ public class InDoorSportActivity extends BaseMVPActivity<InDoorSportView, InDoor
                     int step = 0;
                     try {
                         step = iSportStepInterface.getCurrentTimeSportStep();
+                        Log.e(TAG,"-----step=="+step);
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     } finally {

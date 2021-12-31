@@ -6,11 +6,11 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.isport.brandapp.R;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AppCompatDialog;
-
-import com.isport.brandapp.R;
 
 /**
  * 功能：dialog基类
@@ -242,6 +242,10 @@ public class BaseDialog extends AppCompatDialog implements DialogInterface {
 
         public BaseDialog show() {
             final BaseDialog dialog = create();
+            if(dialog.isShowing()){
+                dialog.dismiss();
+            }
+
             dialog.show();
             return dialog;
         }
@@ -252,6 +256,7 @@ public class BaseDialog extends AppCompatDialog implements DialogInterface {
         try {
             super.show();
         } catch (Exception ignored) {
+            ignored.printStackTrace();
         }
     }
 }

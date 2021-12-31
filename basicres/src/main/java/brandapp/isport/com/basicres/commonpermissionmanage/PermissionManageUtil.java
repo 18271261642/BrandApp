@@ -335,10 +335,15 @@ public class PermissionManageUtil {
     }
 
     public void goSetting() {
-        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package", mContext.getPackageName(), null);
-        intent.setData(uri);
-        mContext.startActivity(intent);
+        try {
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            Uri uri = Uri.fromParts("package", mContext.getPackageName(), null);
+            intent.setData(uri);
+            mContext.startActivity(intent);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     public static interface OnGetPermissionListener {

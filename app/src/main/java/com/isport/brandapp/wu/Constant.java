@@ -13,6 +13,11 @@ public class Constant {
     public static final int PRACTISE_TYPE_CLIMBING = 8;
     public static final int PRACTISE_TYPE_PINGPANG = 9;
 
+    public static final int PRACTISE_TYPE_SPINNING = 10;
+    public static final int PRACTISE_TYPE_HIKING = 11;
+    public static final int PRACTISE_TYPE_ROWING = 12;
+    public static final int PRACTISE_TYPE_OTHERS = 13;
+
 
     public static final int PRACTISE_TYPE_out = 1;
     public static final int PRACTISE_TYPE_bike = 2;

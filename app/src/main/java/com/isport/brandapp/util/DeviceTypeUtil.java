@@ -210,6 +210,7 @@ public class DeviceTypeUtil {
                 || type == JkConfiguration.DeviceType.Watch_W557
                 || type == JkConfiguration.DeviceType.Watch_W812B
                 || type == JkConfiguration.DeviceType.Watch_W560
+                || type == JkConfiguration.DeviceType.Watch_W560B
         ) {
             return true;
         } else {

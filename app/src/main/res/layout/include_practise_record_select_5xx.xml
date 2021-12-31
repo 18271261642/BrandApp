@@ -61,7 +61,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_text_light_green_bg"
                 android:gravity="center"
-                android:text="@string/walk"
+                android:text="@string/string_w560_practise_out_walk"
                 android:textColor="@color/common_tips_color"
                 android:textSize="@dimen/sp16" />
 
@@ -73,7 +73,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_text_light_green_bg"
                 android:gravity="center"
-                android:text="@string/run"
+                android:text="@string/string_w560_practise_out_run"
                 android:textColor="@color/common_tips_color"
                 android:textSize="@dimen/sp16" />
         </LinearLayout>
@@ -89,9 +89,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_gravity="center"
                 android:background="@drawable/shape_text_light_green_bg"
                 android:gravity="center"
-                android:text="@string/ride"
+                android:text="@string/String_w560_practise_cycle"
                 android:textColor="@color/common_tips_color"
                 android:textSize="@dimen/sp16" />
 
@@ -105,7 +106,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_text_light_green_bg"
                 android:gravity="center"
-                android:text="@string/badminton"
+                android:text="@string/string_w560_practise_indoor_walk"
                 android:textColor="@color/common_tips_color"
                 android:textSize="@dimen/sp16" />
 
@@ -116,7 +117,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_text_light_green_bg"
                 android:gravity="center"
-                android:text="@string/basketball"
+                android:text="@string/string_w560_practise_indoor_run"
                 android:textColor="@color/common_tips_color"
                 android:textSize="@dimen/sp16" />
         </LinearLayout>
@@ -135,7 +136,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_text_light_green_bg"
                 android:gravity="center"
-                android:text="@string/football"
+                android:text="HIIT"
                 android:textColor="@color/common_tips_color"
                 android:textSize="@dimen/sp16" />
 
@@ -147,7 +148,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_text_light_green_bg"
                 android:gravity="center"
-                android:text="@string/climbing"
+                android:text="@string/string_w560_practise_yoga"
                 android:textColor="@color/common_tips_color"
                 android:textSize="@dimen/sp16"
                 android:visibility="visible" />
@@ -160,7 +161,96 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_text_light_green_bg"
                 android:gravity="center"
-                android:text="@string/pingpang"
+                android:text="@string/string_w560_practise_eliptical"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp15"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:id="@+id/tv_spinning"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/string_w560_pracitse_spinning"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+
+            <TextView
+                android:id="@+id/tv_hiking"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/string_w560_practise_run"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16"
+                android:visibility="visible" />
+
+            <TextView
+                android:id="@+id/tv_rowing"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/string_w560_practise_rowing"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp15"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:id="@+id/tv_other"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/string_w560_practise_other"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+
+            <TextView
+
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16"
+                android:visibility="visible" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
                 android:textColor="@color/common_tips_color"
                 android:textSize="@dimen/sp16" />
         </LinearLayout>
@@ -170,5 +260,5 @@
     <View
         android:id="@+id/tempview_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></View>
+        android:layout_height="match_parent"/>
 </LinearLayout>

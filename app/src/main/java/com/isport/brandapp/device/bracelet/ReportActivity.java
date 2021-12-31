@@ -6,14 +6,12 @@ import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import com.isport.brandapp.App;
 import com.isport.brandapp.R;
 import com.isport.brandapp.bean.DeviceBean;
 import com.isport.brandapp.dialog.CommuniteDeviceSportDetailGuideDialog;
 import com.isport.brandapp.util.AppSP;
+import com.isport.brandapp.util.ClickUtils;
 import com.isport.brandapp.util.UserAcacheUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -22,6 +20,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Observable;
 
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import brandapp.isport.com.basicres.BaseActivity;
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonutil.AppUtil;
@@ -65,7 +65,7 @@ public class ReportActivity extends BaseActivity implements View.OnClickListener
             transaction.replace(R.id.content, fragmentList);
             transaction.commitAllowingStateLoss();
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
     }
@@ -142,6 +142,8 @@ public class ReportActivity extends BaseActivity implements View.OnClickListener
         ivCaleder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(ClickUtils.isFastDoubleClick())
+                    return;
                 EventBus.getDefault().post(new MessageEvent(MessageEvent.calender));
             }
         });

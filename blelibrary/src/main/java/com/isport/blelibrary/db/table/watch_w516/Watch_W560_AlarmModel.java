@@ -101,5 +101,18 @@ public class Watch_W560_AlarmModel {
     public Watch_W560_AlarmModel() {
     }
 
-
+    @Override
+    public String toString() {
+        return "Watch_W560_AlarmModel{" +
+                "id=" + id +
+                ", index=" + index +
+                ", isEnable=" + isEnable +
+                ", name='" + name + '\'' +
+                ", userId='" + userId + '\'' +
+                ", deviceId='" + deviceId + '\'' +
+                ", repeatCount=" + repeatCount +
+                ", timeString='" + timeString + '\'' +
+                ", messageString='" + messageString + '\'' +
+                '}';
+    }
 }

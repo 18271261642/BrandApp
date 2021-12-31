@@ -33,7 +33,7 @@ public class ArrayPickerView extends LinearLayout {
      */
     private boolean cyclic = true;
 
-    private List<String> listSource;
+    private List<String> listSource = new ArrayList<>();
 
     public ArrayPickerView(Context context) {
         this(context, null);
@@ -98,7 +98,8 @@ public class ArrayPickerView extends LinearLayout {
     }
 
     public void setData(ArrayList<String> items) {
-        listSource = items;
+        listSource.clear();
+        listSource.addAll(items);
         ArrayWheelAdapter arrayWheelAdapter = new ArrayWheelAdapter<String>(items);
         arrayWheelView.setAdapter(arrayWheelAdapter);
     }

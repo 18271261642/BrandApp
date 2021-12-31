@@ -107,5 +107,4 @@
         <item name="android:windowExitAnimation">@anim/pop_exit_anim</item>
     </style>
 
-
 </resources>

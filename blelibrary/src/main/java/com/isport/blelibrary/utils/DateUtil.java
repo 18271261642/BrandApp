@@ -142,6 +142,22 @@ public class DateUtil {
         return strHour + ":" + strMinute + ":00";
     }
 
+    //格式化 时，分，秒,W560锻炼数据为每15秒一个点
+    public static String getFormatTimehhmmss(long time,int invalid) {
+        Logger.myLog("TT","--11-time="+time);
+        time = time * 15;
+        Logger.myLog("TT","-22--time="+time);
+        long hour = time / 3600;
+        long minute = time / 60;
+        long seconde = time % 60;
+
+        String strHour = String.format("%02d", hour);
+        String strMinute = String.format("%02d", minute);
+        String strSecond = String.format("%02d",seconde);
+        return strHour + ":" + strMinute +":"+ strSecond;
+    }
+
+
     public static String getRopeFormatTimehhmmss(long time) {
 
         long sec = time % 60;

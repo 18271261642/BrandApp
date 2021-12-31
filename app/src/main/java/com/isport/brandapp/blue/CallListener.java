@@ -11,6 +11,8 @@ import android.util.Log;
 
 import com.isport.blelibrary.utils.Logger;
 
+import java.util.Locale;
+
 import androidx.core.app.ActivityCompat;
 
 
@@ -52,6 +54,9 @@ public class CallListener extends PhoneStateListener {
                 isHandup = true;
 //                if (incomingNumber != null && entry.isAllowCall()) {
                 if (!TextUtils.isEmpty(incomingNumber)) {
+                    String buildName = Build.MANUFACTURER;
+                    if(buildName!= null && buildName.toLowerCase(Locale.ROOT).equals("samsung"))
+                        return;
                     //来电了，响铃中
                     ContentUtils.sendCall(incomingNumber, context);
                 }

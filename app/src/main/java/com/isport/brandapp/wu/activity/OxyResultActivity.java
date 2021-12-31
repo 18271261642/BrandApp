@@ -232,7 +232,7 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
             }
 
         } catch (Exception e) {
-
+            e.printStackTrace();
         } finally {
             if (list.size() > 0) {
                 trendview_oxy.setdata(list, JkConfiguration.BODY_OXYGEN);
@@ -250,7 +250,7 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
 
     }
 
-    private BleReciveListener mBleReciveListener = new BleReciveListener() {
+    private final BleReciveListener mBleReciveListener = new BleReciveListener() {
 
         @Override
         public void onConnResult(boolean isConn, boolean isConnectByUser, BaseDevice baseDevice) {
@@ -283,7 +283,7 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
                                     break;
                             }
                         } catch (Exception e) {
-
+                            e.printStackTrace();
                         }
 
                         break;

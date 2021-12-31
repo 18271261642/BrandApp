@@ -35,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import androidx.core.content.FileProvider;
 import androidx.core.widget.NestedScrollView;
@@ -105,6 +106,7 @@ public class EditUserInfo extends BaseTitleActivity implements View.OnClickListe
     int sumCount = 200;
     NestedScrollView scroll;
 
+
     @Override
     protected int getLayoutId() {
         return R.layout.friend_activity_setting_user_info;
@@ -143,6 +145,7 @@ public class EditUserInfo extends BaseTitleActivity implements View.OnClickListe
     @Override
     protected void initData() {
         // LoadImageUtil.getInstance().load(EditUserInfo.this, R.drawable.friend_bg_homepage, ivBg);
+
 
         titleBarView.setRightIcon(R.drawable.icon_save_userinfo);
         titleBarView.setTitle(UIUtils.getString(R.string.edit_user_info));
@@ -723,6 +726,9 @@ public class EditUserInfo extends BaseTitleActivity implements View.OnClickListe
 
     @Override
     public void successOption() {
+
+
+
         finish();
 
     }
@@ -760,7 +766,7 @@ public class EditUserInfo extends BaseTitleActivity implements View.OnClickListe
         try {
             edtName.setSelection(StringUtil.isBlank(details.getNickName()) ? 0 : details.getNickName().length());
         } catch (Exception e) {
-
+            e.printStackTrace();
         } finally {
             itemBirthday.setContentText(details.getBirthday());
             itemWeight.setContentText(CommonDateUtil.formatInterger(Float.valueOf(details.getWeight())) + " kg");
@@ -891,6 +897,8 @@ public class EditUserInfo extends BaseTitleActivity implements View.OnClickListe
         Logger.e("itemHeight.getContentText() == " + itemHeight.getContentText());
         upgradeImagePresenter.saveUserInfo(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), gender, desUserName, itemHeight.getContentText(), itemWeight.getContentText
                 (), itemBirthday.getContentText(), desPrifile);
+
+
     }
 
 
@@ -1032,7 +1040,7 @@ public class EditUserInfo extends BaseTitleActivity implements View.OnClickListe
     }
 
     public String getTimeByyyyyMMddhhmmss(Long time) {
-        SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CANADA);
         Date date2 = new Date(time);
         return sdFormat.format(date2);
     }

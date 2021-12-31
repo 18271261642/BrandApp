@@ -1,7 +1,6 @@
 package com.isport.brandapp.blue;
 
 import android.accessibilityservice.AccessibilityService;
-import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
@@ -85,7 +84,7 @@ public class NotifService extends AccessibilityService {
         Log.e(TAG , "handleAccessibility "+event.getPackageName().toString());
         if (event.getEventType() == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
 
-            NotiManager.getInstance(this).handleNotification(event.getPackageName().toString(), (Notification) event.getParcelableData());
+//            NotiManager.getInstance(this).handleNotification(event.getPackageName().toString(), (Notification) event.getParcelableData());
         }
     }
 

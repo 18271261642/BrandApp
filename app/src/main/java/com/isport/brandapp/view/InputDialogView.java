@@ -1,15 +1,21 @@
-package bike.gymproject.viewlibray.dialog;
+package com.isport.brandapp.view;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.isport.brandapp.R;
+
+import java.util.Arrays;
 
 import androidx.appcompat.app.AppCompatDialog;
-import bike.gymproject.viewlibray.R;
+
 
 /**
  * Created by Admin
@@ -17,6 +23,7 @@ import bike.gymproject.viewlibray.R;
  */
 public class InputDialogView extends AppCompatDialog implements View.OnClickListener {
 
+    private static final String TAG = "InputDialogView";
 
     private TextView titleTv;
 
@@ -60,10 +67,22 @@ public class InputDialogView extends AppCompatDialog implements View.OnClickList
         }
 
         if(view.getId() == R.id.inputConfirmBtn){
-            String inputStr = inputEdit.getText().toString();
-            if(inputDialogListener != null)
-                inputDialogListener.inputData(inputStr);
-            dismiss();
+            try {
+                String inputStr = inputEdit.getText().toString().trim();
+
+                byte[] conByte = inputStr.getBytes("GBK");
+                Log.e(TAG,"-------输入长度="+conByte.length+"\n"+inputStr.trim()+"\n"+inputStr.length()+"\n"+ Arrays.toString(conByte));
+                if(conByte.length>14){
+                    Toast.makeText(getContext(),"超出长度",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                    if(inputDialogListener != null)
+                        inputDialogListener.inputData(inputStr);
+                dismiss();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
         }
     }
 

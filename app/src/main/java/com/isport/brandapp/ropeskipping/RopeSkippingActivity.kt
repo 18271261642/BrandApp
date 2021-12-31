@@ -249,7 +249,7 @@ internal class RopeSkippingActivity() : BaseMVPActivity<RopeSkippingView, RopeSk
         mDataList.add(RopeSkippingBean(R.drawable.icon_rope_time, UIUtils.getString(R.string.rope_time), R.drawable.shape_rope_ranking_bg, JkConfiguration.RopeSportType.Time))
         mDataList.add(RopeSkippingBean(R.drawable.icon_rope_free, UIUtils.getString(R.string.rope_free), R.drawable.shape_rope_ranking_bg, JkConfiguration.RopeSportType.Free))
         mDataList.add(RopeSkippingBean(R.drawable.icon_rope_change, UIUtils.getString(R.string.rope_change), R.drawable.shape_rope_ranking_bg, JkConfiguration.RopeSportType.Challenge))
-        mDataList.add(RopeSkippingBean(R.drawable.icon_rope_course, UIUtils.getString(R.string.rope_courese), R.drawable.shape_rope_ranking_bg, JkConfiguration.RopeSportType.Course))
+       // mDataList.add(RopeSkippingBean(R.drawable.icon_rope_course, UIUtils.getString(R.string.rope_courese), R.drawable.shape_rope_ranking_bg, JkConfiguration.RopeSportType.Course))
 
         mMessageAdapter = RopeSkippingAdapter(mDataList)
         recyclerview_ropeskipp.adapter = mMessageAdapter
@@ -399,7 +399,7 @@ internal class RopeSkippingActivity() : BaseMVPActivity<RopeSkippingView, RopeSk
     override fun onDestroy() {
         ISportAgent.getInstance().unregisterListener(mBleReciveListener)
         RopeNoDataObservable.getInstance().deleteObserver(this)
-        handler.removeCallbacks(null)
+       // handler.removeCallbacks(null)
         EventBus.getDefault().unregister(this)
         unregisterReceiver(broadcastReceiver)
         super.onDestroy()

@@ -24,10 +24,9 @@
         android:background="@color/white"
         android:padding="10dp"
         android:layout_margin="5dp"
+        android:maxLines="1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        android:hint="输入内容"/>
+        android:layout_height="wrap_content" />
 
 
     <LinearLayout
@@ -39,9 +38,12 @@
             android:id="@+id/inputCancelBtn"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:background="@color/white"
+            android:background="@drawable/progress_oxy_bg"
             android:textAllCaps="false"
+            android:gravity="center"
             android:layout_margin="@dimen/dp10"
+            android:padding="5dp"
+            android:textSize="18sp"
             android:layout_height="wrap_content"
             android:text="取消"/>
 
@@ -49,8 +51,11 @@
             android:id="@+id/inputConfirmBtn"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:background="@color/white"
+            android:background="@drawable/progress_oxy_bg"
             android:layout_margin="@dimen/dp10"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:padding="5dp"
             android:layout_height="wrap_content"
             android:text="确认"/>
 

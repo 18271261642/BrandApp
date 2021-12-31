@@ -1,6 +1,9 @@
 package com.isport.brandapp.device.watch;
 
 import android.content.DialogInterface;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -9,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.db.table.bracelet_w311.Bracelet_W311_AlarmModel;
 import com.isport.blelibrary.db.table.watch_w516.Watch_W560_AlarmModel;
@@ -33,6 +37,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
+import androidx.annotation.NonNull;
 import bike.gymproject.viewlibray.ItemView;
 import bike.gymproject.viewlibray.pickerview.DatePickerView;
 import brandapp.isport.com.basicres.BaseApp;
@@ -67,6 +72,42 @@ public class ActivityWatchW526AlarmList extends BaseMVPTitleActivity<AlarmView, 
 
 
     ArrayList<Bracelet_W311_AlarmModel> list = new ArrayList<>();
+
+
+    private final Handler handler = new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            if(msg.what == 0x00){
+                if(list.isEmpty())
+                    return;
+                saveAllAlarm(list);
+            }
+        }
+    };
+
+
+
+
+    private void saveAllAlarm(ArrayList<Bracelet_W311_AlarmModel> lt){
+        Logger.myLog(TAG,"-----ltttt="+new Gson().toJson(lt));
+//        ArrayList<Bracelet_W311_AlarmModel> alarmList = new ArrayList<>();
+//        for(Bracelet_W311_AlarmModel watch_w560_alarmModel : lt){
+//            Bracelet_W311_AlarmModel bracelet_w311_alarmModel = new Bracelet_W311_AlarmModel();
+//
+//            bracelet_w311_alarmModel.setId(watch_w560_alarmModel.getId());
+//            bracelet_w311_alarmModel.setAlarmId(watch_w560_alarmModel.getIndex());
+//            bracelet_w311_alarmModel.setIsOpen(watch_w560_alarmModel.getIsEnable());
+//            bracelet_w311_alarmModel.setDeviceId(watch_w560_alarmModel.getDeviceId());
+//            bracelet_w311_alarmModel.setRepeatCount(watch_w560_alarmModel.getRepeatCount());
+//            bracelet_w311_alarmModel.setUserId(watch_w560_alarmModel.getUserId());
+//            bracelet_w311_alarmModel.setMessageString(watch_w560_alarmModel.getMessageString());
+//            bracelet_w311_alarmModel.setTimeString(watch_w560_alarmModel.getTimeString());
+//            alarmList.add(bracelet_w311_alarmModel);
+//        }
+
+       // mActPresenter.saveAllAlarm(lt,TokenUtil.getInstance().getPeopleIdInt(this),deviceBean.deviceID);
+    }
 
     @Override
     protected int getLayoutId() {
@@ -245,6 +286,7 @@ public class ActivityWatchW526AlarmList extends BaseMVPTitleActivity<AlarmView, 
                     ToastUtil.showTextToast(BaseApp.getApp(), UIUtils.getString(R.string.alarm_tips_reapte));
                     return;
                 }
+                currentAlarmModel.setIsOpen(true);
                 mActPresenter.updateMode(currentAlarmModel);
                 //这里需要去发送指令个硬件
                 String strtime = currentAlarmModel.getTimeString();
@@ -610,7 +652,7 @@ public class ActivityWatchW526AlarmList extends BaseMVPTitleActivity<AlarmView, 
         ISportAgent.getInstance().unregisterListener(mBleReciveListener);
     }
 
-    private BleReciveListener mBleReciveListener = new BleReciveListener() {
+    private final BleReciveListener mBleReciveListener = new BleReciveListener() {
         @Override
         public void onConnResult(boolean isConn, boolean isConnectByUser, BaseDevice baseDevice) {
 
@@ -701,7 +743,7 @@ public class ActivityWatchW526AlarmList extends BaseMVPTitleActivity<AlarmView, 
         }
         list.clear();
         list.addAll(bracelet_w311_displayModel);
-        Logger.myLog("successAllAlarmItem:" + bracelet_w311_displayModel);
+        Logger.myLog(TAG,"-----successAllAlarmItem:" + bracelet_w311_displayModel);
         int len = list.size();
         if (len > 3) {
             len = 3;
@@ -728,6 +770,9 @@ public class ActivityWatchW526AlarmList extends BaseMVPTitleActivity<AlarmView, 
                 checkBoxes.get(i).setTag(model.getIsOpen() ? OPEN : CLOSE);
             }
         }
+
+
+        handler.sendEmptyMessage(0x00);
 
        /* List<AlarmEntry> listAlarmEntry = new ArrayList<>();
         for (int i = 0; i < bracelet_w311_displayModel.size(); i++) {

@@ -36,9 +36,9 @@ import com.isport.blelibrary.utils.ThreadPoolUtils;
 import com.isport.blelibrary.utils.Utils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -56,6 +56,10 @@ public class WatchW557GattCallBack extends BaseGattCallback {
     private static final String TAG = "WatchW557GattCallBack";
 
     //***********************************************已整理******************************************************//
+
+
+    public static final String W560_ALARM_OPERATE_ACTION = "com.isport.blelibrary.bluetooth.callbacks.w560_alarm";
+    public static final String W560_ALARM_KEY = "is_success";
 
 
     protected BlockingQueue<DataBean> cmds = new LinkedBlockingQueue<>();
@@ -98,7 +102,7 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                         case 2:
                             //syncTime();
                             break;
-                        case 3:
+                        case 3:   //进入OTA升级
                             writeTXCharacteristicItem(new byte[]{0x04, 0x00, (byte) 0xA1, (byte) 0xFE, 0x74, 0x69});
                             //sendHandler.sendEmptyMessageDelayed(0x01, PAIRTIMEOUT);//做一个15s的超时
                             break;
@@ -335,7 +339,10 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                         if (!Constants.isDFU) {
                             sendHandler.sendEmptyMessageDelayed(0X02, 3000);
                         }*/
-                    } else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x32 && Utils.byte2Int
                             (values[3]) == 0x00) {//02-FF-32-00
                         //设置通用后，去获取用户信息
@@ -343,7 +350,10 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                             bluetoothListener.onGetSettingSuccess();
                         }
 
-                    } else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x11 && Utils.byte2Int
                             (values[3]) == 0x00) {//02-FF-11-00
                         //进入和推出校准模式  校准时/分针返回
@@ -361,7 +371,11 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                             sendWhat = Order_null;
                             //syncTime();
                         }
-                    } else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x30 && Utils.byte2Int
                             (values[3]) == 0x00) {//02-FF-30-00
                         //发送时间返回，去获取用户信息
@@ -388,14 +402,20 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                                 bluetoothListener.onSyncTimeSuccess();
                             }*/
                         }
-                    } else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x33 && Utils.byte2Int
                             (values[3]) == 0x00) {//02-FF-33-00
                         //设置用户信息成功
                         if (bluetoothListener != null) {
                             bluetoothListener.onSettingUserInfoSuccess();
                         }
-                    } else if (Utils.byte2Int(values[0]) == 0x0B && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x0B && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x05) {//0B-FF-05
 //                          若设置内容为: brith day: 1981 年 12 月 12 日，female，体重 100kg，身高 170， 最大心率 190， 最低心率 60
 //                                * 0B-FF-05-BD-07-0C-0C-00-E8-03-AA-BE-3C
@@ -444,21 +464,36 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                             bluetoothListener.onGetUserInfoSuccess();
                         }
 
-                    } else if (Utils.byte2Int(values[0]) == 0x0F && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+                    /**
+                     * 获取设备状态，包括版本号等
+                     * 0F FF 01
+                     * [3][4] 备用字节
+                     * [5] = 总共有多少天24 小时数据
+                     * [6] = 0 – 心率未开启状态,
+                     *       1 – 心率测量中，手表不在手腕上
+                     *       2 – 心率测量中，手表在手腕上
+                     *       3 – 充电中
+                     * [7].BIT0: 0 – OHR sensor 正常    1： OHR sensor 异常
+                     * [7].BIT1: 0 – G sensor 正常      1： G sensor 异常
+                     * [7].BIT2: 0 – Flash 正常         1： Flash 异常
+                     * [7].BIT3: 0 – font Flash 正常    1： font Flash 异常
+                     * [8] = 1;                 // 硬件版本
+                     * [9~16] = V1.09;       // 软件版本
+                     */
+                    else if (Utils.byte2Int(values[0]) == 0x0F && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x01) {//  0F-FF-01
                         //设置设备状态
 //                        0F-FF-01-20-1C-07-00-00-32-30-30-2E-30-30-2E-30-32
 
+                        //手表中保存了几天的数据
+                        int dataDay = Utils.byte2Int(values[5]);
 
                         byte[] version = new byte[8];
-                        version[0] = values[9];
-                        version[1] = values[10];
-                        version[2] = values[11];
-                        version[3] = values[12];
-                        version[4] = values[13];
-                        version[5] = values[14];
-                        version[6] = values[15];
-                        version[7] = values[16];
+
+                        System.arraycopy(values,9,version,0,8);
                         byte[] versionV = new byte[1];
                         versionV[0] = values[8];
                         byte b = 12;
@@ -469,11 +504,25 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                         System.out.println(d);
                         byte[] booleanArray = Utils.getBooleanArray(values[7]);
                         byte[] booleanArrayG = Utils.getBooleanArray((byte) 0x04);
+
+
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for(Byte bt : version){
+                            stringBuilder.append(String.format("%02X", bt));
+                        }
+                        Log.e(TAG,"--------软件版本="+Arrays.toString(version)+" "+stringBuilder.toString()+"\n"+new String(version)+"\n"+hexStr2Str(stringBuilder.toString()));
+
+                        boolean is560 = (version[5] == 0 && version[6] == 0 && version[7] == 0);
+                        byte[] w560Byte = new byte[5];
+                        if(is560){
+                            System.arraycopy(version,0,w560Byte,0,5);
+                        }
+
                         Logger.myLog(TAG,"锻炼数据时间 == " + Utils.byteArrayToInt(new byte[]{values[4], values[3]}) + " " +
                                 "多少天24小时数据 == " + Utils.byte2Int(values[5]) + " 心率状态 == " + Utils
                                 .byte2Int(values[6]) + " 固件状态 == " + Utils.byte2Int(values[7]) + " 固件状态二进制 == " +
                                 Integer.toBinaryString((values[7] & 0xFF) + 0x100).substring(1) + " 固件版本" +
-                                " == " + new String(versionV) + " 软件版本 == " + new String(version) + " " +
+                                " == " + Utils.byte2Int(versionV[0]) + " 软件版本 == " + (is560 ? new String(w560Byte) :  hexStr2Str(stringBuilder.toString())) + " " +
                                 "二进制各个bit值 == " + Utils.byte2Int(booleanArray[0]) + " - " + Utils
                                 .byte2Int(booleanArray[1]) + " - " + Utils.byte2Int(booleanArray[2]) +
                                 "二进制各个bit值 == " + Utils.byte2Int(booleanArrayG[0]) + " - " + Utils
@@ -482,9 +531,8 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                                 .byte2Int(booleanArrayG[4]) + " - " + Utils.byte2Int(booleanArrayG[5]) + " - " + Utils
                                 .byte2Int(booleanArrayG[6]) + " - " + Utils
                                 .byte2Int(booleanArrayG[7]));
-                        Logger.myLog(TAG,"onCharacteristicRead***FirmwareVersion111 ***" + new String(version));
                         if (bluetoothListener != null)
-                            bluetoothListener.onGetDeviceVersion(new String(version));
+                            bluetoothListener.onGetDeviceVersion((is560?new String(w560Byte):hexStr2Str(stringBuilder.toString())));
                         if (!Constants.isDFU) {
                             sendHandler.sendEmptyMessageDelayed(0X02, 200);
                             if (bluetoothListener != null) {
@@ -493,7 +541,11 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                         }
 
 
-                    } else if (Utils.byte2Int(values[0]) == 0x0a && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x0a && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x04) {//09-FF-04
 
                         byte[] tempBtype = new byte[values.length];
@@ -526,13 +578,20 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                             bluetoothListener.onsetGeneral(tempBtype);
                         }
                         ParseData.saveGeneral(tempBtype, mBaseDevice);
-                    } else if (Utils.byte2Int(values[0]) == 0x01 && Utils.byte2Int(values[1]) == 0x15 && Utils.byte2Int
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x01 && Utils.byte2Int(values[1]) == 0x15 && Utils.byte2Int
                             (values[2]) == 0x01) {
                         Logger.myLog("设置拍照功能");
                         if (bluetoothListener != null) {
                             bluetoothListener.takePhoto();
                         }
-                    } else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x09) {
                         Logger.myLog("获取24小时心率状态成功");
                         W560HrSwtchObservable.getInstance().noDataUpdate(values[3] == 1 ? true : false);
@@ -540,14 +599,22 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                             bluetoothListener.onGetSettingSuccess();
                         }
                         ParseData.save24HrSwitch(mBaseDevice.deviceName, values[3]);
-                    } else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x38) {
                         Logger.myLog("设置目标步数成功");
                         if (bluetoothListener != null) {
                             bluetoothListener.onGetSettingSuccess();
                         }
                         //获取目标步数成功
-                    } else if (Utils.byte2Int(values[0]) == 0x04 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x04 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x0C) {
 
                         if (bluetoothListener != null) {
@@ -562,7 +629,11 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                             }
                         }
                         //设置目标步数成功
-                    } else if (Utils.byte2Int(values[0]) == 0x05 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x05 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x0C) {
                         // W560目标获取成功
                         if (bluetoothListener != null) {
@@ -593,7 +664,11 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                             }
                         }
 
-                    } else if (Utils.byte2Int(values[0]) == 0x08 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x08 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x02) {//08 FF 02
                         if (bluetoothListener != null) {
                             bluetoothListener.onGetSettingSuccess();
@@ -607,7 +682,11 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                                 +Utils.byte2Int(values[7]) + "点" +
                                 +Utils.byte2Int(values[8]) + "分" +
                                 +Utils.byte2Int(values[9]) + "秒");
-                    } else if (Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int(values[2]) == 0x07) {//12-FF-07
+                    }
+
+
+                    //闹钟
+                    else if (Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int(values[2]) == 0x07) {//12-FF-07
                         if (bluetoothListener != null) {
                             bluetoothListener.onGetSettingSuccess();
                         }
@@ -659,22 +738,37 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                         byte[] tempByte = ParseData.getTempByte(values);
                         ParseData.saveW526Alarm(tempByte, mBaseDevice);
 
-                    } else if (Utils.byte2Int(values[1]) == 0x35) {
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x12 && Utils.byte2Int(values[1]) == 0x35) {
                         Logger.myLog(TAG,"获取W560闹钟设置成功");
                         byte[] tempByte = ParseData.getTempByte(values);
                         ParseData.saveW560Alarm(tempByte, mBaseDevice);
 
-                    } else if (Utils.byte2Int(values[0]) == 0x02 &&
+                    }
+
+                    //闹钟操作返回，操作成功或失败
+                    else if (Utils.byte2Int(values[0]) == 0x02 &&
                             Utils.byte2Int(values[1]) == 0xFF &&
-                            Utils.byte2Int(values[2]) == 0x35 &&
-                            Utils.byte2Int(values[3]) == 0x00) {
+                            Utils.byte2Int(values[2]) == 0x35 ) {
+
+                        //0成功，1失败
+                        boolean isSuccess =  Utils.byte2Int(values[3]) == 0x00;
+                        Intent intent = new Intent();
+                        intent.setAction(W560_ALARM_OPERATE_ACTION);
+                        intent.putExtra(W560_ALARM_KEY,isSuccess);
+                        mContext.sendBroadcast(intent);
                         // W560闹钟操作完成
                         Logger.myLog(TAG,"W560闹钟操作完成");
                         if (bluetoothListener != null) {
                             bluetoothListener.onW560AlarmSettingSuccess();
                         }
 
-                    } else if (Utils.byte2Int(values[0]) == 0x06 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x06 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x06) {//0A-FF-06
                         if (bluetoothListener != null) {
                             bluetoothListener.onGetSettingSuccess();
@@ -684,23 +778,39 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                         ParseData.saveW526Disturb(tempByte, mBaseDevice);
 
 //
-                    } else if (Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+
+                    else if (Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x10) {
                         Logger.myLog(TAG,"设置消息成功" + "index:" + Utils.byte2Int(values[0]));
                         if (bluetoothListener != null) {
                             bluetoothListener.onGetSettingSuccess();
                         }
-                    } else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x34 && Utils.byte2Int
                             (values[3]) == 0x00) {//02-FF-34-00
                         //设置睡眠监测成功
                         Logger.myLog(TAG,"设置睡眠监测成功");
-                    } else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x31 && Utils.byte2Int
                             (values[3]) == 0x00) {//02-FF-31-00
                         //设置久坐提醒成功
                         Logger.myLog("设置久坐提醒成功");
-                    } else if (Utils.byte2Int(values[0]) == 0x06 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x06 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x08) {
                         if (bluetoothListener != null) {
                             bluetoothListener.onGetSettingSuccess();
@@ -709,7 +819,10 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                         byte[] tempByte = ParseData.getTempByte(values);
                         ParseData.saveW526RaiseHand(tempByte, mBaseDevice);
                         //获取抬腕亮屏设置设置
-                    } else if (Utils.byte2Int(values[0]) == 0x03 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x03 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x0b) {
                         if (bluetoothListener != null) {
                             bluetoothListener.onGetSettingSuccess();
@@ -718,13 +831,18 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                         Logger.myLog(TAG,"获取背光设置成功 == " + Utils.byte2Int(values[3]) + "背光亮度等级----" + Utils.byte2Int(values[4]) + "为背光时间");
                         byte[] tempByte = ParseData.getTempByte(values);
                         ParseData.saveBackLight(tempByte, mBaseDevice);
-                    } else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+                    else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x1A) {
                         Logger.myLog("设置心率开关成功 == ");
                         if (bluetoothListener != null) {
                             bluetoothListener.onGetSettingSuccess();
                         }
-                    } else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x0a) {
                         //获取表盘设置
                         if (bluetoothListener != null) {
@@ -734,7 +852,10 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                         Logger.myLog("获取表盘设置成功 == " + Utils.byte2Int(values[3]) + "分钟");
                         byte[] tempByte = ParseData.getTempByte(values);
                         ParseData.saveWatchFace(tempByte, mBaseDevice);
-                    } else if (Utils.byte2Int(values[0]) == 0x06 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x06 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x03) {//06-FF-03-C8
                         //获取久坐提醒
                         if (bluetoothListener != null) {
@@ -743,7 +864,10 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                         Logger.myLog("获取久坐提醒成功 == " + Utils.byte2Int(values[3]) + "分钟");
                         byte[] tempByte = ParseData.getTempByte(values);
                         ParseData.saveSedentaryTime(tempByte, mBaseDevice);
-                    } else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x0f) {//02-FF-0f
                         Logger.myLog("获取体温校准");
 
@@ -751,7 +875,10 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                             bluetoothListener.onSuccessTempSub(values[3]);
                         }
 
-                    } else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x0E) {
 
                         if (settingSuccessListener != null) {
@@ -764,7 +891,10 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                         if (settingSuccessListener != null) {
                             settingSuccessListener.sendOnceHrSuccess(values[3]);
                         }
-                    } else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x40 && Utils.byte2Int
                             (values[3]) == 0x04) {//02-FF-40-04
                         //没有24小时数据
@@ -773,7 +903,10 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                         if (bluetoothListener != null) {
                             bluetoothListener.onSyncSuccess();
                         }
-                    } else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x40 && Utils.byte2Int
                             (values[3]) == 0x00) {//02-FF-40-00
                         //没有24小时数据
@@ -789,6 +922,8 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                         //清除所有24小时数据
                         Logger.myLog("清除所有24小时数据成功");
                     }
+
+
                     //同步跳绳总数据
                     else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x24) {
@@ -835,6 +970,8 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                             //没有数据不需要进行
                         }
                     }
+
+
                     //同步跳绳的心率&频次
                     else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x26) {
@@ -853,7 +990,10 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                             //没有数据不需要进行
                         }
 
-                    } else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x42 && Utils.byte2Int
                             (values[3]) == 0x00) {//有数据 02-FF-42-00，
                         //有锻炼数据
@@ -866,7 +1006,10 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                         }
                         mPractiseHDATA.clear();
 
-                    } else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int
                             (values[2]) == 0x42 && Utils.byte2Int
                             (values[3]) == 0x04) {//无数据 02-FF-42-04
                         //无锻炼数据
@@ -876,18 +1019,25 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                         if (bluetoothListener != null) {
                             bluetoothListener.onSyncSuccessPractiseData(-1);
                         }
-                    } else if (Utils.byte2Int(values[0]) == 0x03 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int(values[2]) == 0x12) {
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x03 && Utils.byte2Int(values[1]) == 0xFF && Utils.byte2Int(values[2]) == 0x12) {
                         if (bluetoothListener != null) {
                             Logger.myLog("天气设置成功 ");
                             bluetoothListener.onGetSettingSuccess();
                         }
-                    } else if (Utils.byte2Int(values[0]) == 0x01 && Utils.byte2Int(values[1]) == 0x17 && Utils.byte2Int
+                    }
+
+
+                    else if (Utils.byte2Int(values[0]) == 0x01 && Utils.byte2Int(values[1]) == 0x17 && Utils.byte2Int
                             (values[2]) == 01) {
                         Logger.myLog(TAG,"onStartSyncPractiseData");
                         if (bluetoothListener != null) {
                             bluetoothListener.onStartSyncPractiseData(0);
                         }
                     }
+
                     //单次温度返回
                     else if (Utils.byte2Int(values[0]) == 0x03 && Utils.byte2Int(values[1]) == 0x3A && Utils.byte2Int
                             (values[2]) == 01) {
@@ -901,6 +1051,7 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                     else if (Utils.byte2Int(values[0]) == 0x01 && Utils.byte2Int(values[1]) == 0x13) {
                         //HandlerCommand.handleMusicController(mContext, values);
                     }
+
                     //单次心率测量返回
                     else if (Utils.byte2Int(values[0]) == 0x01 && Utils.byte2Int(values[1]) == 0x51) {
                         if (bluetoothListener != null) {
@@ -908,6 +1059,8 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                             bluetoothListener.onSuccessOneHrData(Utils.byte2Int(values[2]));
                         }
                     }
+
+
                     //单次血压返回
                     else if (Utils.byte2Int(values[0]) == 0x02 && Utils.byte2Int(values[1]) == 0x3c) {
                         if (bluetoothListener != null) {
@@ -915,6 +1068,8 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                             bluetoothListener.onBloodData(Utils.byte2Int(values[2]), Utils.byte2Int(values[3]));
                         }
                     }
+
+
                     //单次血氧返回
                     else if (Utils.byte2Int(values[0]) == 0x01 && Utils.byte2Int(values[1]) == 0x3e) {
                         if (bluetoothListener != null) {
@@ -923,6 +1078,7 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                             bluetoothListener.onOxyData(temp);
                         }
                     }
+
 
                     //01 0X18 01   天气预报无数据通知
                     else if (Utils.byte2Int(values[0]) == 0x01 && Utils.byte2Int(values[1]) == 0x18 && Utils.byte2Int
@@ -1138,7 +1294,7 @@ public class WatchW557GattCallBack extends BaseGattCallback {
                         }
                     }
                 } catch (Exception e) {
-
+                    e.printStackTrace();
                     //  Logger.myLog(e.toString());
                 }
 
@@ -1337,23 +1493,23 @@ public class WatchW557GattCallBack extends BaseGattCallback {
      * 07-30-E2-07-0C-0D-0E-0F-10
      * 应答：02-FF-30-00
      */
-    public void syncTime() {
-        if (isConnected) {
-            Calendar instance = Calendar.getInstance();
-            char[] year = String.format("%04x", instance.get(Calendar.YEAR)).toCharArray();
-            int month = instance.get(Calendar.MONTH);
-            int day = instance.get(Calendar.DAY_OF_MONTH);
-            int hour = instance.get(Calendar.HOUR_OF_DAY);
-            int minute = instance.get(Calendar.MINUTE);
-            int second = instance.get(Calendar.SECOND);
-            Logger.myLog(String.format("%02X ", Utils.uniteBytes(year[2], year[3])) + "***" + String.format("%02X ",
-                    Utils.uniteBytes(year[0], year[1])));
-            byte[] cmds = new byte[]{0x07, 0x30, Utils.uniteBytes(year[2], year[3]), Utils.uniteBytes(year[0],
-                    year[1]),
-                    (byte) (month + 1), (byte) day, (byte) hour, (byte) minute, (byte) second};
-            writeTXCharacteristicItem(cmds);
-        }
-    }
+//    public void syncTime() {
+//        if (isConnected) {
+//            Calendar instance = Calendar.getInstance();
+//            char[] year = String.format("%04x", instance.get(Calendar.YEAR)).toCharArray();
+//            int month = instance.get(Calendar.MONTH);
+//            int day = instance.get(Calendar.DAY_OF_MONTH);
+//            int hour = instance.get(Calendar.HOUR_OF_DAY);
+//            int minute = instance.get(Calendar.MINUTE);
+//            int second = instance.get(Calendar.SECOND);
+//            Logger.myLog(TAG,"--------同步时间==="+String.format("%02X ", Utils.uniteBytes(year[2], year[3])) + "***" + String.format("%02X ",
+//                    Utils.uniteBytes(year[0], year[1])));
+//            byte[] cmds = new byte[]{0x07, 0x30, Utils.uniteBytes(year[2], year[3]), Utils.uniteBytes(year[0],
+//                    year[1]),
+//                    (byte) (month + 1), (byte) day, (byte) hour, (byte) minute, (byte) second};
+//            writeTXCharacteristicItem(cmds);
+//        }
+//    }
 
     /**
      * 获取用户信息
@@ -1622,4 +1778,25 @@ public class WatchW557GattCallBack extends BaseGattCallback {
 
         return cmds.poll();
     }
+
+
+    public static String hexStr2Str(String hexStr) {
+        try {
+            String str = "0123456789ABCDEF";
+            char[] hexs = hexStr.toCharArray();
+            byte[] bytes = new byte[hexStr.length() / 2];
+            int n;
+            for (int i = 0; i < bytes.length; i++) {
+                n = str.indexOf(hexs[2 * i]) * 16;
+                n += str.indexOf(hexs[2 * i + 1]);
+                bytes[i] = (byte) (n & 0xff);
+            }
+            return new String(bytes, StandardCharsets.UTF_8);
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
 }

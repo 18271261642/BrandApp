@@ -12,13 +12,16 @@ import android.util.Log;
 import com.crrepa.ble.conn.type.CRPBleMessageType;
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.db.action.watch_w516.Watch_W516_NotifyModelAction;
+import com.isport.blelibrary.db.action.watch_w516.Watch_W516_SleepAndNoDisturbModelAction;
 import com.isport.blelibrary.db.table.watch_w516.Watch_W516_NotifyModel;
+import com.isport.blelibrary.db.table.watch_w516.Watch_W516_SleepAndNoDisturbModel;
 import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
 import com.isport.blelibrary.deviceEntry.interfaces.IDeviceType;
 import com.isport.blelibrary.utils.BleRequest;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
+import com.isport.brandapp.util.DateTimeUtils;
 import com.isport.brandapp.util.DeviceTypeUtil;
 
 import androidx.core.app.ActivityCompat;
@@ -52,10 +55,35 @@ public class ContentUtils {
                 if (TextUtils.isEmpty(name)) {
                     name = incomingNumber;
                 }
-                if(device.getDeviceType() == IDeviceType.TYPE_WATCH_W560 || device.getDeviceType() == IDeviceType.TYPE_WATCH_W560B){
+                if(device.getDeviceType() == IDeviceType.TYPE_WATCH_W560 ){
                     ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, name, UIUtils.getString(R.string.incomingNumber), 29);
                     return;
                 }
+
+                if(device.getDeviceType() == IDeviceType.TYPE_WATCH_W560B){
+                    Watch_W516_SleepAndNoDisturbModel watchDNDBean = Watch_W516_SleepAndNoDisturbModelAction.findWatch_W516_SleepAndNoDisturbModelyDeviceId(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), device.getDeviceName());
+                    //没有设置勿扰模式
+                    if(watchDNDBean ==null){
+                        ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, name, UIUtils.getString(R.string.incomingNumber), 1);
+                        return;
+                    }
+                    //勿扰模式未打开
+                    if(!watchDNDBean.getOpenNoDisturb()){
+                        ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, name, UIUtils.getString(R.string.incomingNumber), 1);
+                        return;
+                    }
+                    //开始时间和结束时间
+                    String startTime = watchDNDBean.getNoDisturbStartTime();
+                    String endTime = watchDNDBean.getNoDisturbEndTime();
+
+                    //判断是否在区间内
+                    if(DateTimeUtils.isComparisonWith(startTime,endTime))
+                        return;
+                    ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, name, UIUtils.getString(R.string.incomingNumber), 1);
+                    return;
+                }
+
+
                 ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, name, UIUtils.getString(R.string.incomingNumber), 1);
                 // ISportAgent.getInstance().requestBle(BleRequest.bracelet_send_phone, incomingNumber, ContentUtils.contactNameByNumber(context, incomingNumber));
             } else if (DeviceTypeUtil.isContainWatch(deviceType)) {

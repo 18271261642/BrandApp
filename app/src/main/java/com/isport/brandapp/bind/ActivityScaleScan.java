@@ -247,7 +247,7 @@ public class ActivityScaleScan extends BaseMVPTitleActivity<ScaleScanView, Scale
         ISportAgent.getInstance().registerListener(mBleReciveListener);
     }
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();

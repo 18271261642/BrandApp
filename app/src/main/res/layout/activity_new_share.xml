@@ -123,7 +123,7 @@
                         android:layout_height="@dimen/dp75"
                         android:layout_centerInParent="true"
                         android:scaleType="fitXY"
-                        android:src="@drawable/bg_share_step_small_2"/>
+                        android:src="@drawable/bg_share_step_small_2" />
 
                     <ImageView
                         android:id="@+id/iv_sure2"

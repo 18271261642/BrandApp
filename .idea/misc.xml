@@ -3,6 +3,20 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Android/.gradle/caches/transforms-1/files-1.1/jetified-alicloud-android-feedback-3.2.0.aar/6d5c3b78c295436cdb2affff1c21dd05/res/drawable/ali_feedback_common_back_btn_bg.xml" value="0.24166666666666667" />
+        <entry key="..\:/Android/.gradle/caches/transforms-1/files-1.1/jetified-alicloud-android-feedback-3.2.0.aar/6d5c3b78c295436cdb2affff1c21dd05/res/drawable/ali_feedback_icon_redpoint.xml" value="0.24166666666666667" />
+        <entry key="..\:/Android/.gradle/caches/transforms-1/files-1.1/jetified-alicloud-android-feedback-3.2.0.aar/6d5c3b78c295436cdb2affff1c21dd05/res/drawable/ali_feedback_popup_bg.xml" value="0.24166666666666667" />
+        <entry key="..\:/Android/.gradle/caches/transforms-1/files-1.1/jetified-alicloud-android-feedback-3.2.0.aar/6d5c3b78c295436cdb2affff1c21dd05/res/drawable/ali_feedback_progress_bar_states.xml" value="0.24166666666666667" />
+        <entry key="..\:/Android/.gradle/caches/transforms-1/files-1.1/jetified-facebook-common-5.15.3.aar/90484bb57f005da54194b9528d8c45ea/res/drawable/com_facebook_auth_dialog_background.xml" value="0.21302083333333333" />
+        <entry key="..\:/Android/.gradle/caches/transforms-1/files-1.1/jetified-facebook-common-5.15.3.aar/90484bb57f005da54194b9528d8c45ea/res/drawable/com_facebook_auth_dialog_cancel_background.xml" value="0.21302083333333333" />
+        <entry key="..\:/Android/.gradle/caches/transforms-1/files-1.1/jetified-facebook-common-5.15.3.aar/90484bb57f005da54194b9528d8c45ea/res/drawable/com_facebook_auth_dialog_header_background.xml" value="0.21302083333333333" />
+        <entry key="..\:/Android/.gradle/caches/transforms-1/files-1.1/jetified-facebook-common-5.15.3.aar/90484bb57f005da54194b9528d8c45ea/res/drawable/com_facebook_button_background.xml" value="0.21302083333333333" />
+        <entry key="..\:/Android/.gradle/caches/transforms-1/files-1.1/jetified-facebook-common-5.15.3.aar/90484bb57f005da54194b9528d8c45ea/res/drawable/com_facebook_button_icon.xml" value="0.21302083333333333" />
+        <entry key="..\:/Android/.gradle/caches/transforms-1/files-1.1/jetified-facebook-common-5.15.3.aar/90484bb57f005da54194b9528d8c45ea/res/drawable/com_facebook_button_like_background.xml" value="0.21302083333333333" />
+        <entry key="..\:/Android/.gradle/caches/transforms-1/files-1.1/jetified-facebook-common-5.15.3.aar/90484bb57f005da54194b9528d8c45ea/res/drawable/com_facebook_favicon_blue.xml" value="0.21302083333333333" />
+        <entry key="..\:/Android/.gradle/caches/transforms-1/files-1.1/jetified-facebook-common-5.15.3.aar/90484bb57f005da54194b9528d8c45ea/res/layout/com_facebook_activity_layout.xml" value="0.1408514492753623" />
+        <entry key="..\:/Android/.gradle/caches/transforms-1/files-1.1/jetified-facebook-common-5.15.3.aar/90484bb57f005da54194b9528d8c45ea/res/layout/com_facebook_device_auth_dialog_fragment.xml" value="0.1408514492753623" />
+        <entry key="..\:/Android/.gradle/caches/transforms-1/files-1.1/jetified-facebook-common-5.15.3.aar/90484bb57f005da54194b9528d8c45ea/res/layout/com_facebook_login_fragment.xml" value="0.1408514492753623" />
         <entry key="..\:/Android/.gradle/caches/transforms-1/files-1.1/jetified-facebook-share.aar/b2cb64878047092b4cefca312676281d/res/drawable/com_facebook_button_send_background.xml" value="0.1" />
         <entry key="..\:/StudioWorkPlace/BALL/Ba/BrandApp/app/src/main/res/drawable/item_comm_main_layout.xml" value="0.25729166666666664" />
         <entry key="..\:/StudioWorkPlace/BALL/Ba/BrandApp/app/src/main/res/drawable/rope_bg_shap.xml" value="0.25729166666666664" />
@@ -40,12 +54,120 @@
         <entry key="..\:/StudioWorkPlace/BALL/Ba/BrandApp/socialmodule/src/main/res/layout/activity_sport_rank.xml" value="0.24114583333333334" />
         <entry key="..\:/StudioWorkPlace/BALL/Ba/BrandApp/socialmodule/src/main/res/layout/friend_activity_personalpagehome_test.xml" value="0.264" />
         <entry key="..\:/StudioWorkPlace/BALL/Ba/BrandApp/socialmodule/src/main/res/layout/friend_activity_setting_user_info.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/drawable-hdpi/ic_permission_ble_img.xml" value="0.2361111111111111" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/drawable/app_checkbox_style.xml" value="0.25729166666666664" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/drawable/app_main_head_mengceng.xml" value="0.25729166666666664" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/drawable/app_week_pop_shape.xml" value="0.25729166666666664" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/drawable/bg_loading_dialog.xml" value="0.25729166666666664" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/drawable/ic___.xml" value="0.25729166666666664" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/drawable/ic___192.xml" value="0.25729166666666664" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/drawable/ic____1_.xml" value="0.25729166666666664" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/drawable/ic_____.xml" value="0.25729166666666664" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/drawable/ic_permission_camera_img.xml" value="0.2361111111111111" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/drawable/ic_permission_gps_img.xml" value="0.2361111111111111" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/drawable/item_comm_main_layout.xml" value="0.25729166666666664" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/drawable/shape_hr_color_2.xml" value="0.25729166666666664" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/drawable/shape_scan_bg_watch.xml" value="0.25729166666666664" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/activity_dfu_noti.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/activity_home_rope_skpping.xml" value="0.24114583333333334" />
         <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/activity_layout_test2.xml" value="0.14492753623188406" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/activity_log.xml" value="0.2375" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/activity_measusre.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/activity_new_share.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/activity_once_hr_result.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/activity_practise_record.xml" value="0.2375" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/activity_practise_record_detail.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/activity_real_rope_skpping.xml" value="0.2" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/activity_report.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/activity_rope_report.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/activity_show_permission_layout.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/activity_sport_end_layout.xml" value="0.11727456940222898" />
         <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/activity_test1_layout.xml" value="0.14492753623188406" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_all_device_bind.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_bind.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_bracelet_alarm_setting.xml" value="0.2375" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_bracelet_main.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_chart_sleepace_dem.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_device_setting.xml" value="0.2375" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_login.xml" value="0.2" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_rope_device_setting.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_rope_web.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_scale_main.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_scale_report.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_scan.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_set_temp_sub.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_setting.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_user_agreement.xml" value="0.18333333333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_w526_alarm_list.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_w560_alarm_item.xml" value="0.2375" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_w560_alarm_list.xml" value="0.2375" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_watch_alarm_setting.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_watch_dem.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_watch_disturb_setting.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_watch_heart_rate.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_watch_heart_rate_ing.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_watch_litter_sleep.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_watch_main.xml" value="0.2375" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_watch_sleep.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_wristband_alarm_list.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_activity_wristband_thrid_message_setting.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_fragment_data_head.xml" value="0.2375" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_fragment_data_new.xml" value="0.2375" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_fragment_device.xml" value="0.215625" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_fragment_hr_head.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_fragment_left_sport.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_fragment_new_mine.xml" value="0.2375" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_fragment_rope_month.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_indoor_sport_layout.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_pop_week.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/app_view_circlebar.xml" value="0.2375" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/dialog_heart_strong.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/dialog_unbind_devicet.xml" value="0.2171875" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/include_practise_record_select.xml" value="0.2375" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/include_practise_record_select_5xx.xml" value="0.264" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/include_practise_record_w560.xml" value="0.264" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/include_share_heartrate.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/include_share_rope.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/item_bind_device_list.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/item_item_practise_record.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/item_main_deivce_list.xml" value="0.2375" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/item_practise_moy_layout.xml" value="0.2" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/item_share_item.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/show_privacy_dialog_view.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/view_input_dialog.xml" value="0.22552083333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/app/src/main/res/layout/view_main_head_data.xml" value="0.2" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/basicres/src/main/res/layout/app_pop_bottom_temp.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/basicres/src/main/res/layout/app_pop_date.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/basicres/src/main/res/layout/common_dialog_load.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/basicres/src/main/res/layout/common_sync_dialog_load.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/basicres/src/main/res/layout/pop_bottom_temp.xml" value="0.196875" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/basicres/src/main/res/layout/sharing_interface.xml" value="0.18333333333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/socialmodule/src/main/res/layout/activity_sport_rank.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/socialmodule/src/main/res/layout/friend_activity_personalpagehome_test.xml" value="0.2375" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/socialmodule/src/main/res/layout/friend_activity_setting_user_info.xml" value="0.2375" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/socialmodule/src/main/res/layout/friend_app_activity_image_show.xml" value="0.24114583333333334" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/train/src/main/res/layout/activity_exit_train.xml" value="0.2375" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/drawable/checkbox_style.xml" value="0.23802083333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/drawable/progress_bg.xml" value="0.23802083333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/drawable/progress_oxy_bg.xml" value="0.23802083333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/drawable/progress_oxy_value.xml" value="0.23802083333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/drawable/progress_vedio_bg.xml" value="0.23802083333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/drawable/sel_week_nor.xml" value="0.23802083333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/drawable/sel_week_yes.xml" value="0.23802083333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/drawable/selector_sleep.xml" value="0.23802083333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/drawable/shape_common_white_bg.xml" value="0.23802083333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/drawable/shape_device_guide_bg.xml" value="0.23802083333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/drawable/shape_device_white_10_bg.xml" value="0.23802083333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/drawable/shape_gray_bg.xml" value="0.23802083333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/drawable/shape_oval_bg.xml" value="0.23802083333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/drawable/shape_oval_gray_bg.xml" value="0.23802083333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/drawable/shape_watch_data_bg.xml" value="0.23802083333333332" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/layout/view_input_dialog.xml" value="0.221875" />
+        <entry key="..\:/StudioWorkPlace/BO/BrandApp/viewlibray/src/main/res/layout/view_picker_array.xml" value="0.24114583333333334" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

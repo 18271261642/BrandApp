@@ -57,6 +57,23 @@
 
 
     <bike.gymproject.viewlibray.ItemView
+        android:id="@+id/logoutItemView"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_height"
+        android:layout_below="@id/itemview_about"
+        android:layout_marginTop="@dimen/dp15"
+        android:background="@drawable/shape_btn_white_20_bg"
+        android:onClick="onClick"
+        app:contentSize="@dimen/sp16"
+        app:itemText="注销账号"
+        app:itemviewTitleSize="@dimen/sp16"
+        app:showArrow="true"
+        app:showBottomLine="true"
+        app:showCheckModel="false"
+        app:showRemind="false" />
+
+
+    <bike.gymproject.viewlibray.ItemView
         android:id="@+id/log"
         android:layout_width="match_parent"
         android:layout_height="@dimen/item_height"

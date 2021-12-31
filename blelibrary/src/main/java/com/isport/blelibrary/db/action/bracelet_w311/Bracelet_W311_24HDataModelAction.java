@@ -301,7 +301,7 @@ public class Bracelet_W311_24HDataModelAction {
             /* Bracelet_W311_24HDataModel bracelet_w311_24HDataModel = new Bracelet_W311_24HDataModel();
             bracelet_w311_24HDataModel.setDateStr(dateStr);
             return bracelet_w311_24HDataModel;*/
-
+   //18682008982
         }
     }
 

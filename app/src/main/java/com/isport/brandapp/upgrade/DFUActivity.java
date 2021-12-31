@@ -83,6 +83,9 @@ import no.nordicsemi.android.dfu.DfuServiceListenerHelper;
 import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 import phone.gym.jkcq.com.commonres.commonutil.Arith;
 
+/**
+ * 固件升级页面
+ */
 public class DFUActivity extends BaseMVPTitleActivity<DeviceUpgradeView, DevcieUpgradePresent> implements View.OnClickListener, WearView, DeviceUpgradeView {
 
 
@@ -235,7 +238,7 @@ public class DFUActivity extends BaseMVPTitleActivity<DeviceUpgradeView, DevcieU
             iv_device_type_icon.setImageResource(R.drawable.icon_w560_pic);
         } else if (deviceType == JkConfiguration.DeviceType.ROPE_SKIPPING) {
             upgradeDeviceName = Constants.ROPE_S002_FILTER;
-            iv_device_type_icon.setImageResource(R.drawable.icon_w560_pic);
+            iv_device_type_icon.setImageResource(R.drawable.icon_scan_rope);
         }
         if (TextUtils.isEmpty(version)) {
             tvVesion.setVisibility(View.GONE);
@@ -519,6 +522,7 @@ public class DFUActivity extends BaseMVPTitleActivity<DeviceUpgradeView, DevcieU
     private void getVersionOrBattery() {
         //是W516的设备信息
         if (DeviceTypeUtil.isContainWatch(deviceType) || DeviceTypeUtil.isContainW81(deviceType) || DeviceTypeUtil.isContainRope(deviceType)) {
+
             DeviceInformationTable deviceInfoByDeviceId = DeviceInformationTableAction.findDeviceInfoByDeviceId
                     (deviceName);
             if (deviceInfoByDeviceId != null) {
@@ -1174,15 +1178,15 @@ public class DFUActivity extends BaseMVPTitleActivity<DeviceUpgradeView, DevcieU
 
             } else {
 
-                Logger.myLog(TAG,"------固件版本="+serviceVersion+"currV="+currentVersion);
+                Logger.myLog(TAG,"------固件版本="+serviceVersion+"currV="+currentVersion+" "+serviceVersion.contains(currentVersion));
 
                 if(serviceVersion.toLowerCase(Locale.ROOT).contains("v")){
                     serviceVersion = serviceVersion.replace("v","").trim();
                 }
-                if(currentVersion.toLowerCase(Locale.ROOT).contains("v")){
-                    currentVersion = currentVersion.replace("v","").trim();
-                }
-                if (serviceVersion.equals(currentVersion)) {
+//                if(currentVersion.toLowerCase(Locale.ROOT).contains("v")){
+//                    currentVersion = currentVersion.replace("v","").trim();
+//                }
+                if (serviceVersion.equals(currentVersion) || serviceVersion.contains(currentVersion)) {
                     //if (false) {
                     //已经是最新版本
                     setShowUpdateContent(true);

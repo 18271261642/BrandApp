@@ -266,7 +266,7 @@ public class DeviceListPresenter extends BasePresenter<DeviceListView> {
                                 mainDeviceBean.setDeviceRes(R.drawable.icon_main_device_list_w560);
                                 break;
                             case JkConfiguration.DeviceType.Watch_W560:
-                                mainDeviceBean.setDeviceRes(R.drawable.icon_main_device_list_w560);
+                                mainDeviceBean.setDeviceRes(R.drawable.icon_main_device_w560);
                                 break;
                             case JkConfiguration.DeviceType.ROPE_SKIPPING:
                                 mainDeviceBean.setDeviceRes(R.drawable.icon_main_device_list_s002);

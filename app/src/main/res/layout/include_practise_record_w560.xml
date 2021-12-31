@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_practise_select"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp60"
+        android:gravity="center_vertical"
+        android:layout_marginRight="@dimen/dp15"
+        android:orientation="vertical">
+
+        <ImageView
+
+            android:id="@+id/iv_select_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:src="@drawable/icon_practise_recode" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp15"
+        android:layout_marginTop="@dimen/dp15"
+        android:layout_marginRight="@dimen/dp15"
+        android:background="@drawable/shape_btn_white_20_bg"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/dp15"
+        android:paddingTop="@dimen/dp15"
+        android:paddingRight="@dimen/dp15"
+        android:paddingBottom="@dimen/dp30">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_all_560"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/all"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+
+            <TextView
+                android:id="@+id/tv_walk_560"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/walk"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+
+            <TextView
+                android:id="@+id/tv_run_560"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/run"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp15"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_ride_560"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/ride"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+
+
+            <TextView
+                android:id="@+id/tv_badminton_560"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_marginRight="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/badminton"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+
+            <TextView
+                android:id="@+id/tv_basketball_560"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/basketball"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp15"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:id="@+id/tv_football_560"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/football"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+
+            <TextView
+                android:id="@+id/tv_climbing_560"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/climbing"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16"
+                android:visibility="visible" />
+
+            <TextView
+                android:id="@+id/tv_pingpang_560"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/pingpang"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/tempview_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</LinearLayout>

@@ -4,8 +4,6 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.AdapterView;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
 import com.isport.blelibrary.interfaces.BleReciveListener;
@@ -41,6 +39,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonrecyclerview.FullyLinearLayoutManager;
 import brandapp.isport.com.basicres.commonrecyclerview.RefreshRecyclerView;
@@ -235,9 +234,9 @@ public class ActivityBindWrishBrand extends BaseMVPTitleActivity<BindBaseView, B
         list.add(new DeviceBean(JkConfiguration.DeviceType.BRAND_W311, String.format(UIUtils.getString(R.string.detail_wristband), Constants.BRAND_W311N_FILTER), R.drawable.icon_w311n, 1));
         list.add(new DeviceBean(JkConfiguration.DeviceType.Brand_W520, String.format(UIUtils.getString(R.string.detail_wristband), Constants.BRAND_520_FILTER), R.drawable.icon_w520, 2));
         list.add(new DeviceBean(JkConfiguration.DeviceType.Brand_W814, String.format(UIUtils.getString(R.string.detail_wristband), Constants.BRAND_814_FILTER), R.drawable.icon_scan_w814, 3));
-        if (AppConfiguration.deviceBeanList != null) {
-            for (int deviceType : AppConfiguration.deviceBeanList.keySet()) {
-                DeviceBean deviceBean = AppConfiguration.deviceBeanList.get(deviceType);
+        if (AppConfiguration.deviceMainBeanList != null) {
+            for (int deviceType : AppConfiguration.deviceMainBeanList.keySet()) {
+                DeviceBean deviceBean = AppConfiguration.deviceMainBeanList.get(deviceType);
                 if (deviceBean.currentType == JkConfiguration.DeviceType.BRAND_W307J) {
                     hasBrand = true;
                     updateList(0, deviceBean);
@@ -263,7 +262,7 @@ public class ActivityBindWrishBrand extends BaseMVPTitleActivity<BindBaseView, B
 
     private void onItemClickAction(int position) {
         mDeviceBean = list.get(position);
-        if (AppConfiguration.deviceBeanList != null && AppConfiguration.deviceBeanList.size() > 0) {
+        if (AppConfiguration.deviceMainBeanList != null && AppConfiguration.deviceMainBeanList.size() > 0) {
             //已经有绑定的设备列表
             if (Utils.isEmpty(mDeviceBean.deviceName)) {
                 if (DeviceTypeUtil.isContainBrand() || DeviceTypeUtil.isContainW81() || DeviceTypeUtil.isContainWatch()) {

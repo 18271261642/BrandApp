@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_practise_select"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp60"
+        android:layout_marginRight="@dimen/dp15"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <ImageView
+
+            android:id="@+id/iv_select_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:src="@drawable/icon_practise_recode" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp15"
+        android:layout_marginTop="@dimen/dp15"
+        android:layout_marginRight="@dimen/dp15"
+        android:background="@drawable/shape_btn_white_20_bg"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/dp15"
+        android:paddingTop="@dimen/dp15"
+        android:paddingRight="@dimen/dp15"
+        android:paddingBottom="@dimen/dp30">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/moy_tv_all"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/all"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+
+            <TextView
+                android:id="@+id/moy_tv_walk"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/walk"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+
+            <TextView
+                android:id="@+id/moy_tv_run"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/run"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp15"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/moy_tv_ride"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/ride"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+
+            <TextView
+                android:id="@+id/moy_tv_rope_skip"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/rope_skip"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+
+            <TextView
+                android:id="@+id/moy_tv_badminton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/badminton"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp15"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/moy_tv_basketball"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/basketball"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+
+            <TextView
+                android:id="@+id/moy_tv_football"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/football"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/climbing"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16"
+                android:visibility="invisible" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/moy_layout_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp15"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/moy_tv_pingpang"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/pingpang"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/football"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16"
+                android:visibility="invisible" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp15"
+                android:layout_weight="1"
+                android:background="@drawable/shape_text_light_green_bg"
+                android:gravity="center"
+                android:text="@string/climbing"
+                android:textColor="@color/common_tips_color"
+                android:textSize="@dimen/sp16"
+                android:visibility="invisible" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/moy_tempview_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</LinearLayout>

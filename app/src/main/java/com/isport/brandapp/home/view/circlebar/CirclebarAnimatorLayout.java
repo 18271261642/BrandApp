@@ -1,7 +1,9 @@
 package com.isport.brandapp.home.view.circlebar;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import com.isport.brandapp.util.AppSP;
 import java.text.DecimalFormat;
 
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
+import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonutil.UIUtils;
 import brandapp.isport.com.basicres.commonutil.ViewMultiClickUtil;
 
@@ -32,8 +35,8 @@ public class CirclebarAnimatorLayout extends RelativeLayout {
     int currentType;
     int progreesVaule;
     float goalValue;
-
-
+    private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
+    private final DecimalFormat dft = new DecimalFormat("#");
 
     public CirclebarAnimatorLayout(Context context) {
         this(context, null);
@@ -102,27 +105,57 @@ public class CirclebarAnimatorLayout extends RelativeLayout {
         currentTargetStep = target;
         if (tvStepTarget != null) {
             if(goalType == 0){  //步数目标
+                Drawable drawable = getResources().getDrawable(R.drawable.icon_main_step_tage);
+                // 这一步必须要做，否则不会显示。
+                drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+                        drawable.getMinimumHeight());
+                tvStepTarget.setCompoundDrawables(null,null,null,drawable);
                 tvStepTarget.setText(String.format(UIUtils.getString(R.string.fragment_data_target), target + ""));
+                updateProgress(currentStep, currentTargetStep);
             } else if(goalType == 1){   //距离目标
-                tvStepTarget.setText(String.format(UIUtils.getString(R.string.fragment_data_target_distance), (target /1000)+ ""));
+                Drawable drawable = getResources().getDrawable(R.drawable.icon_main_distance_tage);
+                // 这一步必须要做，否则不会显示。
+                drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+                        drawable.getMinimumHeight());
+                tvStepTarget.setCompoundDrawables(null,null,null,drawable);
+
+                tvStepTarget.setText(String.format(UIUtils.getString(R.string.fragment_data_target_distance), (target/1000+ "")));
+                updateProgress(currentStep, target);
             }else if(goalType == 2){    //卡路里目标
-                tvStepTarget.setText(String.format(UIUtils.getString(R.string.fragment_data_target_calorie), (target/1000) + ""));
+                Drawable drawable = getResources().getDrawable(R.drawable.icon_main_kcal_tage);
+                // 这一步必须要做，否则不会显示。
+                drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+                        drawable.getMinimumHeight());
+                tvStepTarget.setCompoundDrawables(null,null,null,drawable);
+                tvStepTarget.setText(String.format(UIUtils.getString(R.string.fragment_data_target_calorie), (target + "")));
+                updateProgress(currentStep, target);
             }
 
         }
-        Logger.myLog("setSportTarget: currentStep" + currentStep + ",currentTargetStep:" + currentTargetStep);
-        updateProgress(currentStep, currentTargetStep);
     }
 
-    private final DecimalFormat decimalFormat = new DecimalFormat("#");
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private void setTxtDrawable(){
+        // 使用代码设置drawableleft
+         Drawable drawable = getResources().getDrawable(R.drawable.icon_main_step_tage);
+        // 这一步必须要做，否则不会显示。
+        drawable.setBounds(0, 0, drawable.getMinimumWidth(),
+                drawable.getMinimumHeight());
+
+    }
+
+
+
 
     public void setSportStep(float step) {
         currentStep = step;
+        int goalType = AppSP.getInt(BaseApp.getApp(),AppSP.DEVICE_GOAL_KEY,0);
         if (tvSportstep != null) {
             if (step == -1) {
                 tvSportstep.setText(UIUtils.getString(R.string.no_data));
             } else {
-                tvSportstep.setText(decimalFormat.format(step) + "");
+                tvSportstep.setText(goalType != 1 ? dft.format(step) : step + "");
             }
         }
     }
@@ -157,20 +190,14 @@ public class CirclebarAnimatorLayout extends RelativeLayout {
             target = 6000;
         }
         if (view != null) {
-            int precent = 0;
-            if (step < 1) {
-                precent = 0;
-            } else {
-                precent = (int) (1.0f * step / target * 100);
+            float precent = 0;
 
-                if (precent <= 1) {
-                    precent = 1;
-                } else if (precent >= 100) {
-                    precent = 100;
-                }
+            int goalType = AppSP.getInt(getContext(),AppSP.DEVICE_GOAL_KEY,0);
+
+            precent =  (1.0f * step /(goalType == 1 ? target / 1000 : target) * 100 );
+            if (precent >= 100) {
+                precent = 100;
             }
-
-            Logger.myLog("setSportTarget: step" + step + ",target:" + target + ",precent:" + precent);
             view.setProgress(precent);
             view.invalidate();
         } else {

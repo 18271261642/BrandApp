@@ -97,7 +97,7 @@ public class LocationHelp {
 
                         EventBus.getDefault().post(new MessageEvent(MessageEvent.update_location));
 
-
+                        mLocationClient.stopLocation();
                     } else {
 
                         EventBus.getDefault().post(new MessageEvent(MessageEvent.update_location_error));

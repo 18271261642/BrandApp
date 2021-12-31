@@ -2,6 +2,7 @@ package com.isport.brandapp.device.watch;
 
 import android.Manifest;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.provider.Settings;
 import android.text.SpannableString;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.db.action.DeviceInformationTableAction;
 import com.isport.blelibrary.db.parse.ParseData;
@@ -37,7 +39,6 @@ import com.isport.blelibrary.utils.SyncCacheUtils;
 import com.isport.blelibrary.utils.TimeUtils;
 import com.isport.brandapp.App;
 import com.isport.brandapp.AppConfiguration;
-import com.isport.brandapp.home.bean.http.WatchSleepDayData;
 import com.isport.brandapp.R;
 import com.isport.brandapp.banner.recycleView.utils.ToastUtil;
 import com.isport.brandapp.bean.DeviceBean;
@@ -73,7 +74,9 @@ import com.isport.brandapp.device.watch.view.DeviceBackLightTimeAndScrenLeveView
 import com.isport.brandapp.device.watch.view.WatchView;
 import com.isport.brandapp.dialog.UnBindDeviceDialog;
 import com.isport.brandapp.dialog.UnbindStateCallBack;
+import com.isport.brandapp.home.bean.http.WatchSleepDayData;
 import com.isport.brandapp.login.ActivityLogin;
+import com.isport.brandapp.login.ShowPermissionActivity;
 import com.isport.brandapp.upgrade.bean.DeviceUpgradeBean;
 import com.isport.brandapp.upgrade.present.DevcieUpgradePresent;
 import com.isport.brandapp.upgrade.view.DeviceUpgradeView;
@@ -91,6 +94,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import androidx.core.app.ActivityCompat;
 import bike.gymproject.viewlibray.ItemDeviceSettingView;
 import bike.gymproject.viewlibray.WatchTypeDataView;
 import brandapp.isport.com.basicres.ActivityManager;
@@ -192,7 +196,7 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
         Logger.myLog(TAG,"isOpenPageNotityState:" + isOpenPageNotityState + ",isOpenOnPausePageNotityState:" + isOpenOnPausePageNotityState);
 
         //重新启动服务器接收消息
-        if (isOpenPageNotityState == false && isOpenOnPausePageNotityState == true) {
+        if (!isOpenPageNotityState && isOpenOnPausePageNotityState) {
             NotificationService.toggleNotificationListenerService(this);
             isOpenPageNotityState = true;
         }
@@ -200,10 +204,12 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
 
 //        ISportAgent.getInstance().registerListener(mBleReciveListener);
 
-
         requstData(currentType);
 
     }
+
+
+
 
 
     private void setWatchBattery(int watchBattery) {
@@ -331,7 +337,7 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
         titleBarView.setTitle(deviceBean.deviceName);
         ivWatchDefaultSetting.setContentText(deviceBean.deviceName);
 
-        Logger.myLog("deviceBean == " + deviceBean.toString());
+
         getVersionOrBattery();
         //电话和信息
         heartRatePresenter.getMessageCallState(deviceBean.deviceName, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
@@ -341,6 +347,7 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
 
     private void getIntentData() {
         deviceBean = (DeviceBean) getIntent().getSerializableExtra(JkConfiguration.DEVICE);
+        Logger.myLog(TAG,"deviceBean == " + deviceBean.toString());
         if (deviceBean != null) {
             currentType = deviceBean.currentType;
         }
@@ -401,6 +408,13 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
         ivWatchCallRemind.setOnCheckedChangeListener(this);
         ivWatchMsgSetting.setOnCheckedChangeListener(this);
 
+//        ivWatchMsgSetting.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View view) {
+//                context.startActivity(new Intent(context, Test2Activity.class));
+//                return true;
+//            }
+//        });
 
         ivWatchMsgSetting.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -411,6 +425,13 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
                 }catch (Exception e){
                     e.printStackTrace();
                 }
+            }
+        });
+
+        ivWatchCallRemind.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(ActivityWatchMain.this, ShowPermissionActivity.class));
             }
         });
 
@@ -429,6 +450,7 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
             }
         });
 
+        //设置距离目标
         ivWatchDistanceTarget.setOnContentClickListener(new ItemDeviceSettingView.OnContentClickListener() {
             @Override
             public void onContentClick() {
@@ -735,7 +757,7 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
             //使用指导
             case R.id.iv_braclet_play:
                 Intent guideintent = new Intent(context, PlayW311Activity.class);
-                guideintent.putExtra(JkConfiguration.DEVICE, deviceBean.deviceType);
+                guideintent.putExtra(JkConfiguration.DEVICE, deviceBean.currentType);
                 startActivity(guideintent);
                 break;
 
@@ -765,12 +787,15 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
                 break;
             //闹钟设置
             case R.id.iv_watch_alarm_setting:
+
+                Logger.myLog(TAG,"------闹钟="+deviceBean.toString()+"\n"+deviceBean.deviceType);
+
                 if (deviceBean != null) {
                     if (deviceBean.deviceType == JkConfiguration.DeviceType.Watch_W560) {
                         Intent intent3 = new Intent(context, ActivityWatchW560AlarmList.class);
                         intent3.putExtra("deviceBean", deviceBean);
                         startActivity(intent3);
-                    } else if (DeviceTypeUtil.isContainW55X(deviceBean.deviceType)) {
+                    } else if (DeviceTypeUtil.isContainW55X(deviceBean.currentType)) {
                         Intent intent3 = new Intent(context, ActivityWatchW526AlarmList.class);
                         intent3.putExtra("deviceBean", deviceBean);
                         startActivity(intent3);
@@ -818,7 +843,7 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
                     ToastUtils.showToast(context, UIUtils.getString(R.string.app_disconnect_device));
                 }
                 break;
-            case R.id.iv_watch_stable_version:
+            case R.id.iv_watch_stable_version:   //固件升级
 
                 BaseDevice device = ISportAgent.getInstance().getCurrnetDevice();
                 if (device != null) {
@@ -848,6 +873,9 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
 //                                        }
                             Constants.isSyncUnbind = true;
                             BaseDevice device = ISportAgent.getInstance().getCurrnetDevice();
+
+
+                            Logger.myLog(TAG,"--------解绑="+new Gson().toJson(device));
                             if (device != null) {
                                 int currentDevice = device.deviceType;
                                 if (DeviceTypeUtil.isContainWatch(currentDevice)) {
@@ -886,8 +914,8 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
 
     private void unBindDevice(DeviceBean deviceBean, boolean dirct) {
         isDerictUnBind = true;
-        currentType = deviceBean.deviceType;
-        Logger.myLog("点击去解绑 == " + currentType);
+        currentType = deviceBean.currentType;
+        Logger.myLog("点击去解绑 == " + currentType+"\n"+deviceBean.toString());
         //解绑前断连设备
         mActPresenter.unBind(deviceBean, dirct);
     }
@@ -920,8 +948,11 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
                     ivWatchCallRemind.setChecked(!isChecked);
                     return;
                 }
-                checkPhonePerssion(isChecked);
-                // setCallSwitchState(isChecked);
+
+                ivWatchCallRemind.setChecked(isChecked);
+                updateNotifySettingCall(isChecked);
+              //  checkPhonePerssion(isChecked);
+                 //setCallSwitchState(isChecked);
                 break;
             case R.id.iv_watch_msg_setting:
                 if (!AppConfiguration.isConnected) {
@@ -955,7 +986,7 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
     private void updateNotifySettingCall(boolean callSwitch) {
         if (AppConfiguration.isConnected) {
             ParseData.saveW516CallMessageRemind(deviceBean.deviceName, TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), callSwitch, 0);
-            stateBean.isCall = callSwitch;
+            stateBean.setCall(callSwitch);
             ISportAgent.getInstance().requestBle(BleRequest.Watch_W516_GENERAL, stateBean.isHrState, stateBean.isCall, stateBean.isMessage, stateBean.tempUnitl);
         } else {
             ToastUtils.showToast(context, UIUtils.getString(R.string.app_disconnect_device));
@@ -1093,13 +1124,20 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
     }
 
     private void checkPhonePerssion(boolean isCheak) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ANSWER_PHONE_CALLS},0x00 );
+        }
+
+        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CALL_PHONE,Manifest.permission.READ_CALL_LOG},0x01);
+
         //READ_PHONE_STATE
         //READ_CALL_LOG
         //CALL_PHONE
         //READ_CONTACTS
-        if (!mRxPermission.isGranted(Manifest.permission.READ_PHONE_STATE) || !mRxPermission.isGranted(Manifest.permission.READ_CALL_LOG)
-                || !mRxPermission.isGranted(Manifest.permission.CALL_PHONE)
-                || !mRxPermission.isGranted(Manifest.permission.READ_CONTACTS)) {
+        // || !mRxPermission.isGranted(Manifest.permission.READ_CALL_LOG)
+        //                || !mRxPermission.isGranted(Manifest.permission.CALL_PHONE)
+        //                || !mRxPermission.isGranted(Manifest.permission.READ_CONTACTS)
+        if (!mRxPermission.isGranted(Manifest.permission.READ_PHONE_STATE) || !mRxPermission.isGranted(Manifest.permission.CALL_PHONE)) {
 
             PermissionManageUtil permissionManage = new PermissionManageUtil(this);
             permissionManage.requestPermissionsGroup(new RxPermissions(this),
@@ -1114,6 +1152,7 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
 
                         @Override
                         public void onGetPermissionNo() {
+                            ivWatchCallRemind.setChecked(false);
                             updateNotifySettingCall(false);
                             ToastUtil.showTextToast(ActivityWatchMain.this, UIUtils.getString(R.string.location_permissions));
                         }
@@ -1125,6 +1164,8 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
     }
 
     public boolean isHaveCallPremission() {
+
+
         RxPermissions mRxPermission = new RxPermissions(this);
         if (!mRxPermission.isGranted(Manifest.permission.READ_PHONE_STATE) || !mRxPermission.isGranted(Manifest.permission.READ_CALL_LOG)
                 || !mRxPermission.isGranted(Manifest.permission.CALL_PHONE)
@@ -1137,7 +1178,7 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
 
     public boolean isHaveMessagePremission() {
         RxPermissions mRxPermission = new RxPermissions(this);
-        if (!mRxPermission.isGranted(Manifest.permission.RECEIVE_SMS) || !NotificationService.isEnabled(this)) {
+        if (!mRxPermission.isGranted(Manifest.permission.READ_SMS) || !NotificationService.isEnabled(this)) {
             return false;
         } else {
             return true;
@@ -1190,10 +1231,11 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
     public void setMessageSwitchState(boolean isChecked) {
         ivWatchMsgSetting.setChecked(false);
         //先请求SMS权限 RECEIVE_SMS  不论时拒绝还是同意都不做操作，应该设置为关闭状态
+        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_CONTACTS,Manifest.permission.READ_SMS},0x00);
         PermissionManageUtil permissionManage1 = new PermissionManageUtil(context);
         RxPermissions mRxPermission1 = new RxPermissions(this);
-        if (!mRxPermission1.isGranted(Manifest.permission.RECEIVE_SMS)) {
-            permissionManage1.requestPermissions(mRxPermission1, Manifest.permission.RECEIVE_SMS,
+        if (!mRxPermission1.isGranted(Manifest.permission.READ_SMS)) {
+            permissionManage1.requestPermissions(mRxPermission1, Manifest.permission.READ_SMS,
                     UIUtils.getString(R.string.permission_location3), new
                             PermissionManageUtil.OnGetPermissionListener() {
 
@@ -1365,12 +1407,17 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
 
 
     public void requstData(int currentType) {
+        Logger.myLog(TAG,"---AppConfiguration.braceletID="+AppConfiguration.braceletID);
+
+
         deviceGoalStepPresenter.getDeviceGoalStep(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), AppConfiguration.braceletID);
         deviceGoalDistancePresenter.getDeviceGoalDistance(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), AppConfiguration.braceletID);
         deviceGoalCaloriePresenter.getDeviceGoalCalorie(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), AppConfiguration.braceletID);
         if (currentType == JkConfiguration.DeviceType.WATCH_W516) {
 
         } else if (DeviceTypeUtil.isContainW55X(currentType)) {
+            //获取560的闹钟
+            //ISportAgent.getInstance().requestBle(BleRequest.Watch_W516_GET_ALARM);
             liftWristPresenter.getLiftWristBean(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceBean.deviceID);
             alarmPresenter.getAllAralm(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), AppConfiguration.braceletID);
             deviceBackLightTimeAndScreenLevePresenter.getDeviceBackLightAndScreenLeve(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), AppConfiguration.braceletID);
@@ -1403,6 +1450,7 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
     @Override
     public void successGetGoalDistance(int distance) {
         ivWatchDistanceTarget.setContentText(distance + " " + UIUtils.getString(R.string.unit_meters));
+        JkConfiguration.WATCH_GOAL_DISTANCE = distance;
     }
 
     //设置距离目标
@@ -1415,19 +1463,19 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
                 ISportAgent.getInstance().requsetW311Ble(BleRequest.device_target_distance, distance);
             }
         }
-        JkConfiguration.WATCH_GOAL = distance;
         JkConfiguration.WATCH_GOAL_DISTANCE = distance;
         EventBus.getDefault().post(new MessageEvent(MessageEvent.UPDATE_WATCH_TARGET));
     }
 
     @Override
     public void successGetGoalCalorie(int calorie) {
-        JkConfiguration.WATCH_GOAL = calorie;
+        JkConfiguration.WATCH_GOAL_CALORIE = calorie;
         ivWatchCalorieTarget.setContentText(calorie + " " + UIUtils.getString(R.string.unit_kcal));
     }
 
     @Override
     public void successSaveGoalCalorie(int calorie) {
+        JkConfiguration.WATCH_GOAL_CALORIE = calorie;
         if (AppConfiguration.isConnected) {
             ISportAgent.getInstance().setCalorieTarget(calorie);
             if (currentType == JkConfiguration.DeviceType.Watch_W560) {
@@ -1436,12 +1484,12 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
             }
         }
 
-        JkConfiguration.WATCH_GOAL_CALORIE = calorie;
         EventBus.getDefault().post(new MessageEvent(MessageEvent.UPDATE_WATCH_TARGET));
     }
 
     @Override
     public void successAllAlarmItem(ArrayList<Bracelet_W311_AlarmModel> bracelet_w311_displayModel) {
+        Logger.myLog(TAG,"------查询闹钟="+new Gson().toJson(bracelet_w311_displayModel));
         if (bracelet_w311_displayModel == null || bracelet_w311_displayModel.size() == 0) {
             ivWatchAlarmSetting.setContentText(UIUtils.getString(R.string.display_no_count));
         } else {
@@ -1507,7 +1555,7 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
     @Override
     public void successState(StateBean stateBean) {
         this.stateBean = stateBean;
-        Logger.myLog("getMsgSwitch== " + stateBean.isMessage + " getCallSwitch== " + stateBean.isCall);
+        Logger.myLog(TAG,"getMsgSwitch== " + stateBean.toString() );
         //这里需要去判断权限如果没有权限就关闭
         if (stateBean.tempUnitl.equals("0")) {
             iv_watch_temperature.setContentText(UIUtils.getString(R.string.temperature_degree_centigrade));
@@ -1520,11 +1568,12 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
         } else {
             ivWatchMsgSetting.setChecked(false);
         }
-        if (isHaveCallPremission()) {
-            ivWatchCallRemind.setChecked(stateBean.isCall);
-        } else {
-            ivWatchCallRemind.setChecked(false);
-        }
+        ivWatchCallRemind.setChecked(stateBean.isCall());
+//        if (isHaveCallPremission()) {
+//            ivWatchCallRemind.setChecked(stateBean.isCall);
+//        } else {
+//            ivWatchCallRemind.setChecked(false);
+//        }
 
         if (!NotificationService.isEnabled(this)) {
             isOpenPageNotityState = false;

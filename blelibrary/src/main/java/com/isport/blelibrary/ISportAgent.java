@@ -169,6 +169,9 @@ public class ISportAgent extends BaseAgent {
 
     public void requestBle(int requestType, Object... requsetParams) {
         switch (requestType) {
+            case -1:
+                getW560ExerciseData((Integer) requsetParams[0]);
+                break;
             case 0x01:
                 testSendAppTypeMessage((int)requsetParams[0],(String)requsetParams[1],(String)requsetParams[2]);
                 break;
@@ -402,21 +405,26 @@ public class ISportAgent extends BaseAgent {
                 Logger.myLog("Watch_W516_GET_DAILY_RECORD" + (String) requsetParams[0]);
                 String todayYYYYMMDD = TimeUtils.getTodayYYYYMMDD();
                 String string = (String) requsetParams[0];
-                if (TimeUtils.isToday(string)) {
-                    // get_daily_record(0, true);
-                    SyncProgressObservable.getInstance().sync(DeviceTimesUtil.getTime(1, 1), false);
-                    get_daily_record(0);//获取昨天数据，先解析
-                } else {
-                    int gapCount = TimeUtils.getGapCount(string, todayYYYYMMDD, "yyyy-MM-dd");
-                    if (gapCount > 7) {
-                        SyncProgressObservable.getInstance().sync(DeviceTimesUtil.getTime(8, 1), false);
-                        get_daily_record(7);//获取昨天数据，先解析
 
-                    } else {
-                        SyncProgressObservable.getInstance().sync(DeviceTimesUtil.getTime(gapCount + 1, 1), false);
-                        get_daily_record(gapCount);//获取昨天数据，先解析
-                    }
-                }
+                SyncProgressObservable.getInstance().sync(DeviceTimesUtil.getTime(1, 1), false);
+                //get_daily_record(1);//获取昨天数据，先解析
+                get_daily_record(1);//获取昨天数据，先解析
+
+//                if (TimeUtils.isToday(string)) {
+//                    // get_daily_record(0, true);
+//                    SyncProgressObservable.getInstance().sync(DeviceTimesUtil.getTime(1, 1), false);
+//                    get_daily_record(1);//获取昨天数据，先解析
+//                } else {
+//                    int gapCount = TimeUtils.getGapCount(string, todayYYYYMMDD, "yyyy-MM-dd");
+//                    if (gapCount > 7) {
+//                        SyncProgressObservable.getInstance().sync(DeviceTimesUtil.getTime(8, 1), false);
+//                        get_daily_record(7);//获取昨天数据，先解析
+//
+//                    } else {
+//                        SyncProgressObservable.getInstance().sync(DeviceTimesUtil.getTime(gapCount + 1, 1), false);
+//                        get_daily_record(gapCount);//获取昨天数据，先解析
+//                    }
+//                }
                 //计算开始同步的时间
 
                 break;

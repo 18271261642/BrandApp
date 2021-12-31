@@ -14,7 +14,6 @@ import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 import com.isport.brandapp.banner.recycleView.utils.ToastUtil;
 
-import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.BaseTitleActivity;
 import brandapp.isport.com.basicres.commonalertdialog.AlertDialogStateCallBack;
 import brandapp.isport.com.basicres.commonalertdialog.PublicAlertDialog;
@@ -23,6 +22,10 @@ import brandapp.isport.com.basicres.commonview.TitleBarView;
 import brandapp.isport.com.basicres.commonview.UserDialogSetting;
 import brandapp.isport.com.basicres.commonview.UserDialogView;
 
+
+/**
+ * 温度校准
+ */
 public class ActivityTempSubActivity extends BaseTitleActivity implements UserDialogView {
     TextView tv_save;
     TextView tv_value;
@@ -179,7 +182,7 @@ public class ActivityTempSubActivity extends BaseTitleActivity implements UserDi
                     case IResult.DEVICE_SEND_CMD:
                         DeviceSendCmdResult mRsult = (DeviceSendCmdResult) mResult;
                         if (mRsult.isSuccess() == 0) {
-                            ToastUtil.showTextToast(BaseApp.getApp(), UIUtils.getString(R.string.save_success));
+                            //ToastUtil.showTextToast(BaseApp.getApp(), UIUtils.getString(R.string.save_success));
                             finish();
                         } else {
                             //ToastUtil.showTextToast(BaseApp.getApp(), UIUtils.getString(R.string.sa));

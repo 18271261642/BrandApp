@@ -33,14 +33,14 @@
       android:layout_marginTop="15dp"
       android:textStyle="bold"
       android:padding="3dp"
-      android:text="Bonlala权限使用详情"/>
+      android:text="@string/string_permiss_title"/>
 
  <TextView
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
      android:padding="3dp"
      android:layout_marginStart="15dp"
-     android:text="为保证APP的正常使用,请开启以下权限"/>
+     android:text="@string/string_permiss_desc"/>
 
 
  <!--蓝牙功能使用-->
@@ -68,13 +68,13 @@
           android:textSize="18sp"
           android:layout_marginStart="10dp"
           android:padding="3dp"
-          android:text="使用蓝牙功能"/>
+          android:text="@string/string_permiss_ble"/>
 
       <TextView
           app:layout_constraintTop_toBottomOf="@id/permissionBleTitleTv"
           app:layout_constraintLeft_toRightOf="@id/permissionBleImg"
           style="@style/PermissionCommBotDescStyle"
-          android:text="需要使用手机蓝牙功能连接蓝牙手表"/>
+          android:text="@string/string_permiss_ble_desc"/>
 
 
      <ImageView
@@ -109,13 +109,13 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/permissionGPSImg"
                style="@style/PermissionCommTopTitleStyle"
-                android:text="使用GPS功能"/>
+                android:text="@string/string_permiss_gps"/>
 
             <TextView
                 app:layout_constraintTop_toBottomOf="@id/permissionGPSTitleTv"
                 app:layout_constraintLeft_toRightOf="@id/permissionGPSImg"
                 style="@style/PermissionCommBotDescStyle"
-                android:text="跑步和搜索蓝牙手表需要打开手机GPS开关"/>
+                android:text="@string/string_permiss_gps_desc"/>
 
 
             <ImageView
@@ -149,13 +149,13 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/permissionLocalImg"
                 style="@style/PermissionCommTopTitleStyle"
-                android:text="位置权限使用"/>
+                android:text="@string/string_permiss_local"/>
 
             <TextView
                 app:layout_constraintTop_toBottomOf="@id/permissionLocalTitleTv"
                 app:layout_constraintLeft_toRightOf="@id/permissionLocalImg"
                 style="@style/PermissionCommBotDescStyle"
-                android:text="跑步运动获取高精度位置信息"/>
+                android:text="@string/string_permiss_local_desc"/>
 
 
             <ImageView
@@ -189,13 +189,13 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/permissionCameraImg"
                 style="@style/PermissionCommTopTitleStyle"
-                android:text="相机权限使用"/>
+                android:text="@string/string_permiss_camera"/>
 
             <TextView
                 app:layout_constraintTop_toBottomOf="@id/permissionCameraTitleTv"
                 app:layout_constraintLeft_toRightOf="@id/permissionCameraImg"
                 style="@style/PermissionCommBotDescStyle"
-                android:text="使用相机拍摄图片作为头像"/>
+                android:text="@string/string_permiss_camera_desc"/>
 
 
             <ImageView
@@ -230,13 +230,13 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/permissionSDImg"
                 style="@style/PermissionCommTopTitleStyle"
-                android:text="文件读写权限使用"/>
+                android:text="@string/string_permiss_file"/>
 
             <TextView
                 app:layout_constraintTop_toBottomOf="@id/permissionSDTitleTv"
                 app:layout_constraintLeft_toRightOf="@id/permissionSDImg"
                 style="@style/PermissionCommBotDescStyle"
-                android:text="相机拍照保存从相册选择图片作为头像"/>
+                android:text="@string/string_permiss_file_desc"/>
 
 
             <ImageView
@@ -269,13 +269,13 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/permissionPhoneStatusImg"
                 style="@style/PermissionCommTopTitleStyle"
-                android:text="电话权限的使用"/>
+                android:text="@string/string_permiss_phone"/>
 
             <TextView
                 app:layout_constraintTop_toBottomOf="@id/permissionPhoneStatusTitleTv"
                 app:layout_constraintLeft_toRightOf="@id/permissionPhoneStatusImg"
                 style="@style/PermissionCommBotDescStyle"
-                android:text="消息提醒功能来电提醒手表查看当前来电状态"/>
+                android:text="@string/string_permiss_phone_desc"/>
 
 
             <ImageView
@@ -308,13 +308,13 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/permissionContactImg"
                 style="@style/PermissionCommTopTitleStyle"
-                android:text="联系人、通讯录权限的使用"/>
+                android:text="@string/string_permiss_contact"/>
 
             <TextView
                 app:layout_constraintTop_toBottomOf="@id/permissionContactTitleTv"
                 app:layout_constraintLeft_toRightOf="@id/permissionContactImg"
                 style="@style/PermissionCommBotDescStyle"
-                android:text="来电时，手表可以显示姓名和手机号"/>
+                android:text="@string/string_permiss_contact_desc"/>
 
 
             <ImageView
@@ -333,7 +333,7 @@
         android:id="@+id/showPermissionBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="确认"
+        android:text="@string/confirm"
         android:stateListAnimator="@null"
         android:background="@drawable/item_comm_main_layout"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -34,9 +34,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="104dp"
                 android:layout_centerHorizontal="true"
-                android:text="666"
+                android:text="0"
                 android:textColor="@color/common_view_color"
-                android:textSize="86dp"/>
+                android:textSize="86dp" />
 
             <RelativeLayout
                 android:id="@+id/layout_top_value"
@@ -50,7 +50,7 @@
                     android:id="@+id/tv_top_value"
                     android:layout_width="wrap_content"
                     android:layout_height="104dp"
-                    android:text="666666"
+                    android:text="0"
                     android:textColor="@color/common_item_bar_line_color"
                     android:textSize="86dp"/>
             </RelativeLayout>

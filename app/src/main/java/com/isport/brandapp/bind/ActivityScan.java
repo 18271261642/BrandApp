@@ -515,6 +515,7 @@ public class ActivityScan extends BaseMVPTitleActivity<ScanBaseView, ScanPresent
                 BleProgressObservable.getInstance().show(UIUtils.getString(R.string.app_isconnecting), false);
             }
         } else {
+            AppSP.putInt(BaseApp.getApp(),AppSP.DEVICE_GOAL_KEY,0);
             //否则走绑定的逻辑
             //mActPresenter.select_device_state(baseDevice);
             mActPresenter.bindDevice(baseDevice);

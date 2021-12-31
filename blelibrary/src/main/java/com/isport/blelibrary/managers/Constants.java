@@ -52,13 +52,19 @@ public class Constants {
 
     public static HashMap<String,Integer> msgTypeMap = new HashMap<>();
 
+
+    //W560B消息推送标号
+    public static HashMap<String,Integer> w560BTypeMap = new HashMap<>();
+
+
     //SMS  1
-    //信息 三星手机信息
-    private static final String SAMSUNG_MSG_PACKNAME = "com.samsung.android.messaging";
-    private static final String SAMSUNG_MSG_SRVERPCKNAME = "com.samsung.android.communicationservice";
+    //信息 三星手机信息 com.samsung.android.messaging
+    public static final String SAMSUNG_MSG_PACKNAME = "com.samsung.android.messaging";
+    public static final String SAMSUNG_MSG_SRVERPCKNAME = "com.samsung.android.communicationservice";
     public static final String MSG_PACKAGENAME = "com.android.mms";//短信系统短信包名
-    private static final String SYS_SMS = "com.android.mms.service";//短信 --- vivo Y85A
-    private static final String XIAOMI_SMS_PACK_NAME = "com.xiaomi.xmsf";
+    public static final String SYS_SMS = "com.android.mms.service";//短信 --- vivo Y85A
+    public static final String XIAOMI_SMS_PACK_NAME = "com.xiaomi.xmsf";
+    //com.google.android.apps.messaging
     public static final String SMS_PACKAGE_NAME = "com.google.android.apps.messaging";
     //一加手机短信包名
     public static final String SMS_ONEPLUS_PACK_NAME = "com.oneplus.mms";
@@ -135,7 +141,7 @@ public class Constants {
     public static final String YT_MUSIC_APP_NAME = "com.google.ios.youtubemusic";
     public static final String OAL_APP_NAME = "olacabs.olacabs";
     public static final String QQ_APP_NAME = "com.tencent.mqq";
-    public static final String WECHAT_APP_NAME = "com.tencent.xin";
+    public static final String WECHAT_APP_NAME = "com.tencent.mm";
 
     //Youtubemusic 31
     public static final String YOUTUBE_MUSIC_PACK_NAME = "com.google.android.apps.youtube.music";
@@ -154,7 +160,35 @@ public class Constants {
     public static final String WECHAT_APP_NAME2= "com.tencent.mm";
 
 
+    //短信的map
+    public static HashMap<String,Integer> smsMap = new HashMap<>();
 
+    static {
+        smsMap.put(SMS_PACKAGE_NAME,1); //短信
+        smsMap.put(SAMSUNG_MSG_PACKNAME,1);
+        smsMap.put(SAMSUNG_MSG_SRVERPCKNAME,1);
+        smsMap.put(MSG_PACKAGENAME,1);
+        smsMap.put(XIAOMI_SMS_PACK_NAME,1);
+        smsMap.put(SMS_ONEPLUS_PACK_NAME,1);
+    }
+
+
+    static {
+        w560BTypeMap.put(SMS_PACKAGE_NAME,1); //短信
+        w560BTypeMap.put(SAMSUNG_MSG_PACKNAME,1);
+        w560BTypeMap.put(SAMSUNG_MSG_SRVERPCKNAME,1);
+        w560BTypeMap.put(MSG_PACKAGENAME,1);
+        w560BTypeMap.put(XIAOMI_SMS_PACK_NAME,1);
+        w560BTypeMap.put(SMS_ONEPLUS_PACK_NAME,1);
+
+
+        //qq
+        w560BTypeMap.put(QQ_APP_NAME2,4);
+        w560BTypeMap.put(QQ_APP_NAME,4);
+        w560BTypeMap.put(QQ_FAST_PACK_NAME,4);
+        //微信
+        w560BTypeMap.put(WECHAT_APP_NAME2,3);
+    }
 
     static {
         //短信

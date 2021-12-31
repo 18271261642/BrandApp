@@ -217,19 +217,20 @@ public class BaseAgent {
             Logger.myLog(TAG,"scanFilter:" + scanFilter + "name:" + name + "name.contains(scanFilter):" + name.contains(scanFilter));
 
 
-            if (name.contains(scanFilter) || scanFilter.equals("all")) {
+            if ( name.contains(scanFilter) || scanFilter.equals("all") || (scanFilter.equals(Constants.WATCH_560_FILTER) && name.contains("FT_ReflexSW"))) {
                 if (createDevice == null) {
                     createDevice = new CreateDevice();
                 }
                 return createDevice.createDevcie(name, address, scanFilter, isDFUMode);
             } else {
 
-                if(name.contains("FT_ReflexSW")){
-                    if (createDevice == null) {
-                        createDevice = new CreateDevice();
-                    }
-                    return createDevice.createDevcie(name, address, scanFilter, isDFUMode);
-                }
+//                //560
+//                if(name.contains("FT_ReflexSW") && scanFilter.equals(Constants.WATCH_560_FILTER)){
+//                    if (createDevice == null) {
+//                        createDevice = new CreateDevice();
+//                    }
+//                    return createDevice.createDevcie(name, address, scanFilter, isDFUMode);
+//                }
 
                 if (name.contains(scanFilter) && name.contains(Constants.BRAND_FILTER)) {
                     if (createDevice == null) {
@@ -579,7 +580,7 @@ public class BaseAgent {
     }
 */
 
-    private final static long SCAN_DURATION = 20000;
+    private final static long SCAN_DURATION = 20 * 1000;
     Handler handler = new Handler(Looper.getMainLooper());
     int connectingPosition = -1;
     boolean scanning = false;
@@ -622,7 +623,7 @@ public class BaseAgent {
     CreateDevice createDevice;
 
     public BaseDevice getBondDevice(String name, String address) {
-        if(name.contains("FT_ReflexSW")){
+        if(name.contains("FT_ReflexSW") && scanFilter.equals(Constants.WATCH_560_FILTER)){
             if (createDevice == null) {
                 createDevice = new CreateDevice();
             }
@@ -1411,8 +1412,32 @@ public class BaseAgent {
             if (currentDevice instanceof Watch516Device) {
                 ((Watch516Device) currentDevice).get_exercise_data();
             }
+            if(currentDevice instanceof W560BDevice){
+                ((W560BDevice) currentDevice).get_exercise_data();
+            }
+
+            if(currentDevice instanceof W560Device){
+                ((W560Device) currentDevice).get_exercise_data();
+            }
         }
     }
+
+
+
+    public void getW560ExerciseData(int num){
+        if(mBaseManager != null && mBaseManager.getCurrentDevice() != null){
+            BaseDevice baseDevice = mBaseManager.getCurrentDevice();
+            if( baseDevice instanceof W560BDevice){
+                ((W560BDevice) baseDevice).getExerciseData(num);
+            }
+
+            if(baseDevice instanceof W560Device){
+                ((W560Device) baseDevice).getExerciseData(num);
+            }
+        }
+    }
+
+
 
     /**
      * 清除锻炼数据
@@ -2181,6 +2206,21 @@ public class BaseAgent {
             else if(baseDevice instanceof W560BDevice){
                 ((W560BDevice) baseDevice).sendW526Messge(title,msg,type);
             }
+            if(baseDevice instanceof W557Device){
+                ((W557Device) baseDevice).sendW526Messge(title,msg,type);
+            }
+
+            if(baseDevice instanceof W812Device){
+                ((W812Device) baseDevice).sendMessage(title+":"+msg,type);
+            }
+            if(baseDevice instanceof W813Device){
+                ((W813Device) baseDevice).sendMessage(title+":"+msg,type);
+            }
+
+            if(baseDevice instanceof W817Device){
+                ((W817Device) baseDevice).sendMessage(title+":"+msg,type);
+            }
+
         }
     }
 
@@ -2571,6 +2611,10 @@ public class BaseAgent {
             } else if (currentDevice instanceof W560Device) {
                 ((W560Device) currentDevice).setWeather(weather, list);
             }
+
+            else if(currentDevice instanceof W560BDevice){
+                ((W560BDevice) currentDevice).setWeather(weather,list);
+            }
         }
     }
 
@@ -2592,8 +2636,9 @@ public class BaseAgent {
 
 
             if (currentDevice instanceof W560Device ) {
+                ((W560Device) currentDevice).get_general();
                 Log.e("currentDevice", "W560Device" + currentDevice);
-                ((W560Device) currentDevice).getRealHrSwitch();
+                //((W560Device) currentDevice).getRealHrSwitch();
             } else if (currentDevice instanceof W557Device) {
                 ((W557Device) currentDevice).getRealHrSwitch();
             } else if (currentDevice instanceof W812BDevice) {

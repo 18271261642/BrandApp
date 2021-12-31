@@ -10,12 +10,13 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -26,6 +27,7 @@ import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -52,15 +54,12 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.umeng.socialize.UMAuthListener;
 import com.umeng.socialize.UMShareAPI;
 import com.umeng.socialize.bean.SHARE_MEDIA;
-
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.Arrays;
 import java.util.Map;
-
 import brandapp.isport.com.basicres.ActivityManager;
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonbean.BaseBean;
@@ -93,8 +92,8 @@ public class ActivityLogin extends BaseMVPActivity<LoginBaseView, LoginPresenter
     private TextView tvProtol, tvPrimary;
     private Integer RC_SIGN_IN = 9001;
 
-
-    private ImageButton loginFacebook;
+    private FrameLayout faceBookLayout;
+    private LoginButton loginFacebook;
     private ImageButton loginTwitter;
     private CallbackManager mCallbackManager;
 
@@ -130,7 +129,7 @@ public class ActivityLogin extends BaseMVPActivity<LoginBaseView, LoginPresenter
     @Override
     protected void initView(View view) {
 
-
+        faceBookLayout = findViewById(R.id.faceBookLayout);
         AppSP.putString(context, AppSP.WATCH_MAC, "");
         timer = findViewById(R.id.timer);
         tv_email_tab = findViewById(R.id.tv_email_tab);
@@ -152,7 +151,20 @@ public class ActivityLogin extends BaseMVPActivity<LoginBaseView, LoginPresenter
         checkBox = findViewById(R.id.check_open);
         tvRadioPhone = findViewById(R.id.tv_phone);
         tvRadioEmail = findViewById(R.id.tv_home_email);
+
+        loginFacebook.setLoginText("");
+        loginFacebook.setLogoutText("");
+
+
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                checkBox.setChecked(isChecked);
+            }
+        });
+
         if (App.getApp().isUSA()) {
+            faceBookLayout.setVisibility(View.VISIBLE);
             btnLoginWechat.setVisibility(View.GONE);
             btnLoginqq.setVisibility(View.GONE);
             tvRadioEmail.setChecked(true);
@@ -208,6 +220,7 @@ public class ActivityLogin extends BaseMVPActivity<LoginBaseView, LoginPresenter
             btnLoginqq.setVisibility(View.VISIBLE);
             loginFacebook.setVisibility(View.GONE);
             loginTwitter.setVisibility(View.GONE);
+            faceBookLayout.setVisibility(View.GONE);
         }
 
     }
@@ -529,6 +542,7 @@ public class ActivityLogin extends BaseMVPActivity<LoginBaseView, LoginPresenter
             case R.id.login_weixin:
                 loginByWeChat();
                 break;
+            case R.id.faceBookLayout:
             case R.id.login_facebook:
                 loginByFacebook();
                 break;
@@ -541,7 +555,7 @@ public class ActivityLogin extends BaseMVPActivity<LoginBaseView, LoginPresenter
             case R.id.timer:
                 getPhoneCode();
                 break;
-            case R.id.btn_login://TODO 登录
+            case R.id.btn_login:
                 login();
                 break;
             case R.id.privacy_agreement:
@@ -977,6 +991,13 @@ public class ActivityLogin extends BaseMVPActivity<LoginBaseView, LoginPresenter
 
 
     private void login() {
+        if(!checkBox.isChecked()){
+            ToastUtils.showToast(this,"请同意隐私权限和政策!");
+            return;
+        }
+
+
+
         String strEtValue, strCode;
         strCode = etCode.getText().toString().trim();
         if (tvRadioPhone.isChecked()) {

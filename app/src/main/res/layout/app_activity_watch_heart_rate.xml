@@ -466,6 +466,7 @@
                 </phone.gym.jkcq.com.socialmodule.shadow.ShadowLayout>
 
                 <TextView
+                    android:id="@+id/heartIntervalTv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/shape_btn_white_20_bg"

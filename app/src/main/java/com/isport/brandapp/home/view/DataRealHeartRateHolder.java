@@ -312,7 +312,7 @@ public class DataRealHeartRateHolder extends CustomHolder<String> {
 
             //   layout_data.setVisibility(isConn ? View.VISIBLE : View.GONE);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
     }

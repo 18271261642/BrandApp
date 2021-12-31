@@ -29,6 +29,8 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class WatchSleepPresenter extends BasePresenter<WatchSleepView> {
 
+    private static final String TAG = "WatchSleepPresenter";
+
     private final W516Model iw516Model;
     private final IW311DataModel iw311DataModel;
     private final WatchSleepView view;
@@ -95,7 +97,7 @@ public class WatchSleepPresenter extends BasePresenter<WatchSleepView> {
      * 获取最近一次有数据的WatchSleepDayData
      */
     public void getWatchLastData(String deviceId, String userId, Integer deviceType) {
-        Logger.myLog("getWatchLastData");
+        Logger.myLog(TAG,"getWatchLastData-==="+deviceId+" "+userId+" "+deviceType);
         Observable.create(new ObservableOnSubscribe<WatchSleepDayData>() {
             @Override
             public void subscribe(ObservableEmitter<WatchSleepDayData> emitter) throws Exception {
@@ -119,6 +121,7 @@ public class WatchSleepPresenter extends BasePresenter<WatchSleepView> {
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).as(view.bindAutoDispose()).subscribe(new BaseObserver<WatchSleepDayData>(BaseApp.getApp(), false) {
             @Override
             public void onNext(WatchSleepDayData watchSleepDayData) {
+                Logger.myLog(TAG,"------watchSleepDayData="+watchSleepDayData.toString());
                 if (view != null) {
                     view.successDayDate(watchSleepDayData);
                 }
@@ -149,7 +152,7 @@ public class WatchSleepPresenter extends BasePresenter<WatchSleepView> {
      * @param strYearAndMonth
      */
     public void getMonthDataStrDate(String strYearAndMonth, int deviceType, String deviceId, String userId) {
-        Logger.myLog("查询这个月的数据 == " + strYearAndMonth);
+        Logger.myLog(TAG,"---查询这个月的数据 == " + strYearAndMonth);
         Observable.create(new ObservableOnSubscribe<ArrayList<String>>() {
             @Override
             public void subscribe(ObservableEmitter<ArrayList<String>> emitter) throws Exception {
@@ -162,7 +165,7 @@ public class WatchSleepPresenter extends BasePresenter<WatchSleepView> {
                     strDates = iw81DeviceDataModel.getSleepMonthData(strYearAndMonth, userId, deviceId);
                 }
 
-                Logger.myLog("getMonthDataStrDate:"+strDates);
+                Logger.myLog(TAG,"----getMonthDataStrDate:"+strDates);
                 if (strDates == null) {
                     strDates = new ArrayList<>();
                 }

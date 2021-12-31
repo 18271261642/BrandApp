@@ -9,6 +9,7 @@
     android:paddingRight="@dimen/dp15">
 
     <TextView
+        android:id="@+id/alarmStatusTv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -24,6 +25,38 @@
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+
+    <LinearLayout
+        android:id="@+id/w560_alarm_layout_emty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.3" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/icon_emty_alarm"
+            android:drawablePadding="20dp"
+            android:gravity="center"
+            android:text="@string/add_alarm_emty_tips"
+            android:textColor="@color/common_text_color"
+            android:textSize="@dimen/sp15" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5" />
+
+    </LinearLayout>
 
 </LinearLayout>
 

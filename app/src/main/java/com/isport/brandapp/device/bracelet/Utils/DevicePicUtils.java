@@ -57,7 +57,7 @@ public class DevicePicUtils {
                 ivWatch.setImageResource(R.drawable.icon_w560_pic);
                 break;
             case JkConfiguration.DeviceType.Watch_W560:
-                ivWatch.setImageResource(R.drawable.icon_w560_pic);
+                ivWatch.setImageResource(R.drawable.icon_device_w560);
                 break;
 
         }

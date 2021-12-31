@@ -1,10 +1,15 @@
 <resources>
     <string name="common_app_name">basicres</string>
+
+
+
+
     <string name="common_please_wait">请稍候....</string>
     <string name="common_sync">正在同步数据</string>
     <string name="common_please_check_that_your_network_is_connected">网络未连接</string>
     <string name="common_dialog_cancel">取消</string>
     <string name="common_dialog_ok">确定</string>
+
 
     <string name="permission_photograph">请允许访问拍照功能以便您能正常使用扫一扫和相机功能</string>
     <string name="permission_contacts">请允许访问通讯录权限以便您能将联系人保存到通讯录</string>

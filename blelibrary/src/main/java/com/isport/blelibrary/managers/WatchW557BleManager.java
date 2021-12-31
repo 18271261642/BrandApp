@@ -77,6 +77,8 @@ import com.isport.blelibrary.utils.SyncCacheUtils;
 import com.isport.blelibrary.utils.TimeUtils;
 import com.isport.blelibrary.utils.Utils;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -370,6 +372,7 @@ public class WatchW557BleManager extends BaseManager {
                         ParseData.saveOrUpdateDeviceInfo(mDeviceInformationTable, 0);
                         // getDeviceVersion();//获取版本号
                         mGattCallBack.clearQueuryData();
+                        //同步时间
                         mGattCallBack.addQueuryData(new DataBean(w526Cmd.syncTime(), SETTING_CMD_TIMEOUT, false));
                         sendHandler.sendEmptyMessageDelayed(HandlerContans.mSenderSetting, 1000);
                         getStateCount = 0;
@@ -725,7 +728,7 @@ public class WatchW557BleManager extends BaseManager {
                             syncHandler.removeCallbacksAndMessages(null);
                             // TODO: 2019/3/4 超时的回调，接着请求
                             mHandler.sendEmptyMessage(0x13);
-                            Logger.myLog("同步超时，第" + mCurrentDay);
+                            Logger.myLog(TAG,"同步超时，第" + mCurrentDay);
                             /*if (mFailedTimes < 3) {
                                 mFailedTimes++;
                                 get_daily_record(mCurrentDay, false);
@@ -752,7 +755,7 @@ public class WatchW557BleManager extends BaseManager {
                             if (mCurrentDay == 0) {
                                 //同步成功
                                 SyncProgressObservable.getInstance().hide();
-                                Logger.myLog("同步成功");
+                                Logger.myLog(TAG,"同步成功");
                                 mHandler.sendEmptyMessage(0x12);
                             } else {
                                 //接着同步
@@ -954,6 +957,9 @@ public class WatchW557BleManager extends BaseManager {
                             //比较上次同步的日期是否距离今天大于7天,如果，大于7天，从7(最开始)开始请求;如果不是则从间隔的天数开始请求;
                             //每次请求完毕,存储同步完成的dateStr,作为下次请求的开始
                             //
+
+                            Logger.myLog(TAG,"----------同步天数="+string);
+
                             mHandler.sendEmptyMessage(0x15);
                             if (TimeUtils.isToday(string)) {
                                 get_daily_record(0, true);
@@ -1005,8 +1011,43 @@ public class WatchW557BleManager extends BaseManager {
                         case HandlerContans.mSenderGetDisturb:
                             getW526Disturb();
                             break;
-                        case HandlerContans.mSenderSetWeather:
+                        case HandlerContans.mSenderSetWeather:    //设置天气
                             if (Constants.wristbandWeather != null) {
+
+                                if(mGattCallBack.mBaseDevice != null){
+                                    if(mGattCallBack.mBaseDevice.getDeviceType() == IDeviceType.TYPE_WATCH_W560){
+
+                                        List<WristbandForecast> tmpW =  Constants.wristbandWeather.getForecast15Days();
+                                        List<WristbandForecast> w560BWeather = new ArrayList<>();
+                                        for(WristbandForecast wristbandForecast : tmpW){
+
+                                            String weatherId = wristbandForecast.getWeatherId();
+                                            int weatherTag =  Constants.W81WeatherConfig.get(weatherId);
+                                            //560的云
+                                            if(weatherTag == 0 || weatherTag == 1 || weatherTag == 2 || weatherTag == 7){
+                                                wristbandForecast.setWeatherId("FOGGY"); //1
+                                            }
+
+                                            if(weatherTag == 5){  //晴 0
+                                                wristbandForecast.setWeatherId("CLOUDY");
+                                            }
+
+                                            if(weatherTag == 3 || weatherTag == 4){  //雨 3
+                                                wristbandForecast.setWeatherId("RAINY");
+                                            }
+
+                                            if(weatherTag == 2){ //风 2
+                                                wristbandForecast.setWeatherId("OVERCAST");
+                                            }
+
+                                            w560BWeather.add(wristbandForecast);
+                                        }
+                                        setCmdW526Weather(Constants.wristbandWeather.getCondition(), w560BWeather);
+                                        return;
+                                    }
+                                }
+
+
                                 setCmdW526Weather(Constants.wristbandWeather.getCondition(), Constants.wristbandWeather.getForecast15Days());
                             }
                             break;
@@ -1181,7 +1222,7 @@ public class WatchW557BleManager extends BaseManager {
         @Override
         public void onGetDeviceVersion(String version) {
             timeOutHandler.removeMessages(HandlerContans.mDeviceStateFail);
-            Logger.myLog("getDeviceVersionxxxxxxxxx" + version);
+            Logger.myLog("getDeviceVersionxxxxxxxxx" + version+"\n"+ StringUtils.substringBefore(version,"�"));
             Message message = new Message();
             Bundle bundle = new Bundle();
             bundle.putSerializable("DeviceVersion", new WatchVersionResult(version));
@@ -1384,7 +1425,7 @@ public class WatchW557BleManager extends BaseManager {
             if (index == -1) {
                 mHandler.sendEmptyMessageDelayed(HandlerContans.mDevcieExecise, 1000);
             } else {
-                mGattCallBack.addQueuryData(new DataBean(w526Cmd.getExerciseData(index + 1), PRACTISE_CMD_TIMEOUT, false));
+             mGattCallBack.addQueuryData(new DataBean(w526Cmd.getExerciseData(index + 1), PRACTISE_CMD_TIMEOUT, false));
                 if (btListener != null)
                     btListener.onGetSettingSuccess();
             }
@@ -1860,7 +1901,12 @@ public class WatchW557BleManager extends BaseManager {
             }
             //开始同步超时
             syncHandler.sendEmptyMessageDelayed(0x00, SYNC_TIMEOUT);
-            mGattCallBack.writeTXCharacteristicItem(send_get_daily_record(day));
+
+            boolean isNull = mGattCallBack.getQueuryLenth() == 0 ? true : false;
+          //  mGattCallBack.addQueuryData(new DataBean(send_get_daily_record(1), SETTING_CMD_TIMEOUT, false));
+            mGattCallBack.addQueuryData(new DataBean(send_get_daily_record(day), SETTING_CMD_TIMEOUT, false));
+            sendQueryData(isNull);
+           // mGattCallBack.writeTXCharacteristicItem(send_get_daily_record(day));
         }
     }
 
@@ -2034,7 +2080,6 @@ public class WatchW557BleManager extends BaseManager {
 
         if (mGattCallBack != null && w526Cmd != null) {
             boolean isNull = mGattCallBack.getQueuryLenth() == 0 ? true : false;
-
             // mGattCallBack.writeTXCharacteristicItem(send_set_general(open24HeartRate, isCall, isMessage));
             if (Constants.W81WeatherConfig.containsKey(wristbandData.getWeatherId())) {
                 todayWeather = Constants.W81WeatherConfig.get(wristbandData.getWeatherId());
@@ -2076,6 +2121,22 @@ public class WatchW557BleManager extends BaseManager {
                         }
                         //  todayWeather = Constants.W81WeatherConfig.get(wristbandData.getWeatherId());
                         // todayWeather = i+1;
+                    }else{
+                        if(todayWeather == 0 || todayWeather == 1 || todayWeather == 2 || todayWeather == 7){
+                            todayWeather = 1;
+                        }
+
+                        if(todayWeather == 5){  //晴 0
+                            todayWeather = 0;
+                        }
+
+                        if(todayWeather == 3 || todayWeather == 4){  //雨 3
+                            todayWeather = 3;
+                        }
+
+                        if(todayWeather == 2){ //风 2
+                            todayWeather = 2;
+                        }
                     }
                     todayhightTemp = TextUtils.isEmpty(forecast1.getHighTemperature()) ? 0 : Integer.parseInt(forecast1.getHighTemperature());
                     todaylowTemp = TextUtils.isEmpty(forecast1.getLowTemperature()) ? 0 : Integer.parseInt(forecast1.getLowTemperature());
@@ -2502,6 +2563,13 @@ public class WatchW557BleManager extends BaseManager {
         boolean isNull = mGattCallBack.getQueuryLenth() == 0;
         Logger.myLog(TAG,"---isNull="+isNull);
         sendQueryData(true);
+    }
+
+
+    public void getExceData(int num){
+        boolean isNull = mGattCallBack.getQueuryLenth() == 0 ? true : false;
+        mGattCallBack.addQueuryData(new DataBean(w526Cmd.getExerciseData(num), PRACTISE_CMD_TIMEOUT, false));
+        sendQueryData(isNull);
     }
 
 }

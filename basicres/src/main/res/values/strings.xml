@@ -1,5 +1,7 @@
 <resources>
     <string name="common_app_name">basicres</string>
+
+
     <string name="common_please_wait">Loading....</string>
     <string name="common_sync">Synchronizing data</string>
     <string name="common_please_check_that_your_network_is_connected">Unconnected network</string>

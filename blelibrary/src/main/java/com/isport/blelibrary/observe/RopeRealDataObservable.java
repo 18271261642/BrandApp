@@ -81,6 +81,8 @@ public class RopeRealDataObservable extends Observable {
             ropeRealDataBean.setCal(cal);
 
             ropeRealDataBean.setCountdownMin(Utils.byte2Int(data[12]));
+            if(data.length<12)
+                return;
             ropeRealDataBean.setCountdownSec(Utils.byte2Int(data[13]));
             int countdown = (Utils.byte2Int(data[15]) << 8) + Utils.byte2Int(data[14]);
             ropeRealDataBean.setCountdown(countdown);

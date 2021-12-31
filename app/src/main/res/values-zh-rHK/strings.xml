@@ -3,6 +3,37 @@
     /**app**/
     <string name="app_name">奔啦啦</string>//iSport健康管家
 
+
+    <string name="string_permiss_title">奔啦啦權限使用說明</string>
+    <string name="string_permiss_desc">為保證APP的正常使用,請開啟以下權限</string>
+    <string name="string_permiss_ble">使用藍牙功能</string>
+    <string name="string_permiss_ble_desc">需要使用手機藍牙功能連接藍牙手錶</string>
+    <string name="string_permiss_gps">使用GPS功能</string>
+    <string name="string_permiss_gps_desc">地圖跑步軌跡記錄和搜索藍牙手錶需要打開手機GPS開關</string>
+    <string name="string_permiss_local">位置權限使用</string>
+    <string name="string_permiss_local_desc">跑步運動獲取高精度位置信息</string>
+    <string name="string_permiss_camera">相機權限使用</string>
+    <string name="string_permiss_camera_desc">使用相機拍攝圖片作為頭像</string>
+    <string name="string_permiss_file">文件讀寫權限使用</string>
+    <string name="string_permiss_file_desc">相機拍照保存從相冊選擇圖片作為頭像</string>
+    <string name="string_permiss_phone">電話權限的使用</string>
+    <string name="string_permiss_phone_desc">消息提醒功能來電提醒手錶查看當前來電狀態</string>
+    <string name="string_permiss_contact">聯繫人、通訊錄權限的使用</string>
+    <string name="string_permiss_contact_desc">來電時，手錶可以顯示姓名和手機號</string>
+
+    <string name="string_w560_practise_out_walk">户外走</string>
+    <string name="string_w560_practise_out_run">户外跑</string>
+    <string name="String_w560_practise_cycle">骑行</string>
+    <string name="string_w560_practise_indoor_walk">室内走</string>
+    <string name="string_w560_practise_indoor_run">室内跑</string>
+    <string name="string_w560_practise_yoga">瑜伽</string>
+    <string name="string_w560_practise_eliptical">椭圆机</string>
+    <string name="string_w560_pracitse_spinning">动感单车</string>
+    <string name="string_w560_practise_run">徒步</string>
+    <string name="string_w560_practise_rowing">划船</string>
+    <string name="string_w560_practise_other">其它</string>
+
+
     <string name="string_share_rank_txt">全网第 %1$s 人完成挑战  %2$s</string>
     <string name="string_share_share">分享</string>
     <string name="string_challenge_numbers">挑戰個數</string>

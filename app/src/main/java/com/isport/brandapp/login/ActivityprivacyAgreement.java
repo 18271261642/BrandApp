@@ -150,9 +150,9 @@ public class ActivityprivacyAgreement extends BaseTitleActivity {
         webSettings.setDomStorageEnabled(true);
 
         // 开启应用程序缓存
-        webSettings.setAppCacheEnabled(true);
-        webSettings.setSupportZoom(true);
-        webSettings.setBuiltInZoomControls(true);
+        webSettings.setAppCacheEnabled(false);
+        webSettings.setSupportZoom(false);
+        webSettings.setBuiltInZoomControls(false);
         webSettings.setLayoutAlgorithm(LayoutAlgorithm.SINGLE_COLUMN);
         String appCacheDir = this.getApplicationContext().getDir("cache", Context.MODE_PRIVATE).getPath();
         webSettings.setAppCachePath(appCacheDir);

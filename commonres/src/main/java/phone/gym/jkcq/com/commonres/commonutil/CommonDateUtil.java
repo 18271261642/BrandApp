@@ -56,7 +56,7 @@ public class CommonDateUtil {
     }
 
     public static String formatTwoPoint(float value) {
-        String result = String.format("%.2f", Math.round(value * 100) / 100f);
+        String result = String.format("%.2f", value);
         // String result2 = String.format("%.2f", 3.145);
 
     /*    DecimalFormat format = new DecimalFormat("0.00");

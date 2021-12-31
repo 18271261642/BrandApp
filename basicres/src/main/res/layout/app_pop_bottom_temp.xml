@@ -37,7 +37,6 @@
                 android:layout_centerVertical="true"
                 android:layout_marginRight="@dimen/dp15"
                 android:gravity="center"
-                android:onClick="onClick"
                 android:padding="5dp"
                 android:text="@string/common_dialog_ok"
                 android:textColor="@color/common_text_color"
@@ -50,9 +49,8 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="@dimen/dp15"
-                android:padding="5dp"
                 android:gravity="center"
-                android:onClick="onClick"
+                android:padding="5dp"
                 android:text="@string/cancel"
                 android:textColor="@color/common_text_color"
                 android:textSize="18sp" />

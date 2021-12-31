@@ -2,9 +2,6 @@ package com.isport.blelibrary.db.action.watch_w516;
 
 import android.text.TextUtils;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.google.gson.Gson;
 import com.isport.blelibrary.db.CommonInterFace.WatchData;
 import com.isport.blelibrary.db.action.BleAction;
@@ -19,12 +16,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 /**
  * @创建者 bear
  * @创建时间 2019/3/5 15:54
  * @描述
  */
 public class Watch_W516_24HDataModelAction {
+
+    private static final String TAG = "Watch_W516_24HDataModelAction";
 
 
     /**

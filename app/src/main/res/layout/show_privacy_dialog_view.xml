@@ -13,9 +13,10 @@
         android:layout_gravity="center"
         android:padding="5dp"
         android:textSize="23sp"
-        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="用户协议和隐私政策"/>
+        android:text="@string/string_user_privacy"/>
 
 
    <LinearLayout
@@ -48,7 +49,7 @@
                android:padding="5dp"
                android:textColor="@color/blue_00aaee"
                android:layout_height="wrap_content"
-               android:text="《奔啦啦用户协议》"/>
+               android:text="@string/user_agreement_tips"/>
 
            <TextView
                android:id="@+id/privacyTv"
@@ -57,7 +58,7 @@
                android:textSize="18sp"
                android:padding="5dp"
                android:textColor="@color/blue_00aaee"
-               android:text="《奔啦啦隐私政策》"/>
+               android:text="@string/privacy_agreement_tips"/>
 
 
        </LinearLayout>
@@ -80,7 +81,7 @@
             android:layout_margin="10dp"
             android:background="@drawable/item_comm_main_layout"
             android:layout_height="wrap_content"
-            android:text="不同意"/>
+            android:text="@string/privacy_agreement_refuse"/>
 
 
         <Button
@@ -91,7 +92,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/blue_00aaee"
             android:background="@drawable/item_comm_main_layout"
-            android:text="同意"/>
+            android:text="@string/privacy_agreement_ok"/>
 
 
     </LinearLayout>

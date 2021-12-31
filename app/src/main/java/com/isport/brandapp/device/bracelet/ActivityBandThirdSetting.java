@@ -40,7 +40,7 @@ import brandapp.isport.com.basicres.commonview.TitleBarView;
 import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
 
 /**
- *消息提醒页面
+ *魔样消息提醒页面
  */
 public class ActivityBandThirdSetting extends BaseMVPTitleActivity<ThridMeaageView, ThridMessagePresenter> implements ThridMeaageView, View.OnClickListener, ItemView.OnItemViewCheckedChangeListener {
     private ItemView iv_message_qq, iv_message_wechat, iv_message_whatsapp, iv_message_facebook, iv_message_twitter, iv_message_skype, iv_message_message, iv_message_linkedin, iv_message_instagram;

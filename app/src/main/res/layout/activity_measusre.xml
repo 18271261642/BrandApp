@@ -17,7 +17,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/common_white"
-        android:textSize="@dimen/sp18"></TextView>
+        android:textSize="@dimen/sp18"/>
 
     <View
         android:layout_width="match_parent"

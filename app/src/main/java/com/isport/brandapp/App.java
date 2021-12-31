@@ -2,10 +2,13 @@ package com.isport.brandapp;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
@@ -15,6 +18,7 @@ import com.isport.blelibrary.BleConstance;
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.SyncCacheUtils;
+import com.isport.brandapp.blue.AlertService;
 import com.isport.brandapp.blue.CallListener;
 import com.isport.brandapp.blue.NotificationService;
 import com.isport.brandapp.device.UpdateSuccessBean;
@@ -27,6 +31,7 @@ import com.isport.brandapp.sport.response.SportRepository;
 import com.isport.brandapp.util.AppSP;
 import com.isport.brandapp.util.BleUtil;
 import com.isport.brandapp.util.DeviceTypeUtil;
+import com.isport.brandapp.util.SMSBroadCastReceiver;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.commonsdk.UMConfigure;
@@ -64,6 +69,8 @@ public class App extends BaseApp {
 
     // UMENG 各个平台的配置，建议放在全局Application或者程序入口M
 
+
+    private SMSBroadCastReceiver smsBroadcastReceiver;
 
     @Override
     public void onCreate() {
@@ -104,16 +111,30 @@ public class App extends BaseApp {
         intentFilter.addAction(BleConstance.W560_PHONE_MUTE_ACTION);
         registerReceiver(broadcastReceiver,intentFilter);
 
+
+
+
         TelephonyManager telephony = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
         CallListener customPhoneListener = new CallListener(this);
         telephony.listen(customPhoneListener, PhoneStateListener.LISTEN_CALL_STATE);
+
+
+
+        if(smsBroadcastReceiver == null)
+            smsBroadcastReceiver = new SMSBroadCastReceiver();
+        registerReceiver(smsBroadcastReceiver,new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
+
 
         CrashReport.initCrashReport(getApplicationContext(), "93283676c4", false);
 
         BaseUtils.init(this);
 
         initUmenData();
+
+//        //绑定通知服务
+//        Intent intent = new Intent(this, AlertService.class);
+//        bindService(intent,serviceConnection,Context.BIND_AUTO_CREATE);
     }
 
 
@@ -523,6 +544,18 @@ public class App extends BaseApp {
                 }
             }
 
+        }
+    };
+
+
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
 
         }
     };

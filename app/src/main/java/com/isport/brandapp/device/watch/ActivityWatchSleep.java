@@ -134,6 +134,7 @@ public class ActivityWatchSleep extends BaseMVPActivity<WatchSleepView, WatchSle
     @Override
     protected void initData() {
         deviceBean = (DeviceBean) getIntent().getSerializableExtra(JkConfiguration.DEVICE);
+
         if (deviceBean != null) {
             currentDeviceType = deviceBean.deviceType;
             deviceId = deviceBean.deviceID;
@@ -147,8 +148,6 @@ public class ActivityWatchSleep extends BaseMVPActivity<WatchSleepView, WatchSle
         titleBarView.setLeftIcon(R.drawable.icon_back);
         titleBarView.setRightIcon(R.drawable.icon_device_share);
         titleBarView.setHistrotyIcon(R.drawable.icon_sleep_history);
-
-        getCurrentData();
 
         //测试数据
         //展示默认数据
@@ -166,6 +165,8 @@ public class ActivityWatchSleep extends BaseMVPActivity<WatchSleepView, WatchSle
         setEarlyLater(58, 54, 2, 47);
         setTotalTime(70, 113, 40, 124);
 
+
+        getCurrentData();
     }
 
     private void getCurrentData() {
@@ -308,7 +309,7 @@ public class ActivityWatchSleep extends BaseMVPActivity<WatchSleepView, WatchSle
 
     public void setContinousBarChartViewW311(int[] sleepArry) {
 
-        Logger.myLog(TAG,"-------睡眠字段="+Arrays.toString(sleepArry));
+        Logger.myLog(TAG,"-------睡眠字段="+sleepArry.length+Arrays.toString(sleepArry));
       /*  if (true) {
             return;
         }*/
@@ -360,7 +361,7 @@ public class ActivityWatchSleep extends BaseMVPActivity<WatchSleepView, WatchSle
                     endIndex = i + 1;
                 }
                 Calendar calendar = Calendar.getInstance();
-                calendar.set(Calendar.HOUR_OF_DAY, 20);
+                calendar.set(Calendar.HOUR_OF_DAY, sleepArry.length == 1440 ? 20 : 9);
                 calendar.set(Calendar.MINUTE, 0);
                 calendar.set(Calendar.SECOND, 0);
                 calendar.set(Calendar.MILLISECOND, 0);
@@ -614,7 +615,6 @@ public class ActivityWatchSleep extends BaseMVPActivity<WatchSleepView, WatchSle
 
 
     public void setPopupWindow(Context context, View view) {
-
         BaseDialog mMenuViewBirth = new BaseDialog.Builder(context)
                 .setContentView(R.layout.app_activity_watch_dem)
                 .fullWidth()
@@ -780,15 +780,26 @@ public class ActivityWatchSleep extends BaseMVPActivity<WatchSleepView, WatchSle
         }
     }
 
+    long lastClickTime;
+
+    public boolean isFastDoubleClick() {
+        long time = System.currentTimeMillis();
+        long timeD = time - lastClickTime;
+        lastClickTime = time;
+        return timeD <= 500;
+    }
+
     private boolean isFirst;
 
     @Override
     protected void initEvent() {
         isFirst = true;
+
         titleBarView.setOnHistoryClickListener(new TitleBarView.OnHistoryClickListener() {
             @Override
             public void onHistoryClicked(View view) {
-
+                if(isFastDoubleClick())
+                    return;
                 setPopupWindow(ActivityWatchSleep.this, view);
 
                 int time = (int) (System.currentTimeMillis() / 1000);
@@ -911,6 +922,9 @@ public class ActivityWatchSleep extends BaseMVPActivity<WatchSleepView, WatchSle
 
     @Override
     public void successDayDate(WatchSleepDayData watchSleepDayData) {
+
+        Logger.myLog(TAG,"------睡眠查找="+watchSleepDayData.toString());
+
         if (!TextUtils.isEmpty(watchSleepDayData.getDateStr())) {
             mCurrentStr = watchSleepDayData.getDateStr();
             //UI展示

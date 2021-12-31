@@ -1,13 +1,14 @@
 package com.isport.brandapp.banner.recycleView.holder;
 
 import android.content.Context;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import com.isport.brandapp.banner.recycleView.listener.OnToolsItemClickListener;
 
 import java.util.List;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Description：
@@ -18,11 +19,11 @@ import java.util.List;
 public class CustomHolder<T> extends RecyclerView.ViewHolder {
 
 
-    public    Context                     context;
-    public    View                        itemView;
-    protected List<T>                     datas;
-    protected int                         itemID;
-    public    OnToolsItemClickListener<T> listener;
+    public Context context;
+    public View itemView;
+    protected List<T> datas;
+    protected int itemID;
+    public OnToolsItemClickListener<T> listener;
 
     public void setOnTOnToolsItemClickListener(OnToolsItemClickListener<T> listener) {
         this.listener = listener;

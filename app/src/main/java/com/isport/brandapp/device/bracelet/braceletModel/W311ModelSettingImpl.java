@@ -29,6 +29,15 @@ import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonutil.TokenUtil;
 
 public class W311ModelSettingImpl implements IW311SettingModel {
+
+
+    //删除保存所有的通用闹钟
+    public void deleteAllSaveCommAlarm(String userId,String deviceId){
+        Bracelet_W311_AlarmModelAction.deletBracelet(deviceId,userId);
+    }
+
+
+
     @Override
     public Bracelet_W311_DisplayModel getDispalyItem(String userId, String deviceId) {
         Bracelet_W311_DisplayModel bracelet_w311_displayModel = Bracelet_W311_SettingModelAction.findWatch_W311_DisplayModelByDeviceId(deviceId);

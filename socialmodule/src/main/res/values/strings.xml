@@ -132,6 +132,9 @@
     <string name="launch_friend_rope_rank">Enable the skipping ranking function？</string>
     <string name="see_friend_rope_rank">1、You can view the rope skipping data and ranking of your friends. </string>
     <string name="friend_see_your_roperank">2、Your friends can see your rope skipping data in the ranking</string>
+
+    <string name="friend_see_yout_sportrank">2，Your friends can see your sport data in the ranking</string>
+
     <string name="rope_ranking">Rope skipping ranking</string>
     <string name="rope_number">Skip numbers</string>
     <string name="rope_ranking_time">Skip duration</string>

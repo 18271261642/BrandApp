@@ -292,7 +292,7 @@ public class ParseData {
         ThreadPoolUtils.getInstance().addTask(new Runnable() {
             @Override
             public void run() {
-                Logger.myLog("updateWatch_W516_24HDataModel" + mWatch_W516_24HDataModel.toString());
+              //  Logger.myLog("updateWatch_W516_24HDataModel" + mWatch_W516_24HDataModel.toString());
                 Watch_W516_24HDataModelDao watch_w516_24HDataModelDao = BleAction
                         .getWatch_W516_24HDataModelDao();
                 watch_w516_24HDataModelDao.insertOrReplace(mWatch_W516_24HDataModel);
@@ -475,6 +475,8 @@ public class ParseData {
                 Watch_W560_AlarmModel watch_w560_alarmModelByDeviceId = Watch_W560_AlarmModelAction
                         .findWatch_W560_AlarmModelByDeviceId(watch_w560_alarmModel
                                 .getDeviceId(), BaseManager.mUserId, watch_w560_alarmModel.getIndex());
+
+
                 if (watch_w560_alarmModelByDeviceId != null) {
                     watch_w560_alarmModelByDeviceId.setUserId(watch_w560_alarmModel.getUserId());
                     watch_w560_alarmModelByDeviceId.setTimeString(watch_w560_alarmModel.getTimeString());
@@ -608,9 +610,6 @@ public class ParseData {
         Logger.myLog(TAG,"--所有原始数据="+new Gson().toJson(m24HDATA));
 
         try {
-
-
-
             byte[] bytesFirst = new byte[40];//减去第一包剩下的数据集合
             byte[] tmp = m24HDATA.get(0);
             System.arraycopy(tmp, 0, bytesFirst, 0, 20);
@@ -670,6 +669,15 @@ public class ParseData {
             // 29-32 运动总卡路里
             int cal = (Utils.byte2Int(bytesFirst[32]) << 24) + (Utils.byte2Int(bytesFirst[31]) << 16)
                     + (Utils.byte2Int(bytesFirst[30]) << 8) + Utils.byte2Int(bytesFirst[29]);
+
+            //平均速度
+            int tmpAvgSpeed = getIntFromBytes(bytesFirst[24],bytesFirst[23],bytesFirst[22],bytesFirst[21]);
+            int tmpCountDistance = getIntFromBytes(bytesFirst[28],bytesFirst[27],bytesFirst[26],bytesFirst[25]);
+            int tmpCountCalor = getIntFromBytes(bytesFirst[32],bytesFirst[31],bytesFirst[30],bytesFirst[29]);
+
+            Logger.myLog(TAG,"----------锻炼总数据解析="+tmpAvgSpeed+"\n"+tmpCountDistance+"\n"+tmpCountCalor);
+
+
 
             //W81DeviceEexerciseAction w81DeviceEexerciseAction = new W81DeviceEexerciseAction();
             //w81DeviceEexerciseAction.saveExerciseHrData(String.valueOf(BaseManager.mUserId), baseDevice.getDeviceName(), info.getMeasureData(), info.getTimeInterval(), info.getStartMeasureTime());
@@ -732,7 +740,7 @@ public class ParseData {
                 w81De.setTotalSteps(String.valueOf(step));
                 w81De.setTotalCalories(String.valueOf(cal));
 
-                parseW560PracticeData(m24HDATA,bluetoothListener,baseDevice,context,w81De);
+                parseW560PracticeData(m24HDATA,bluetoothListener,baseDevice,context,w81De,index);
 
                 return;
             }
@@ -811,7 +819,8 @@ public class ParseData {
     static List<Integer> caloriesList = new ArrayList<>();
 
 
-    private static void parseW560PracticeData(List<byte[]> m24HDATA, BluetoothListener bluetoothListener, BaseDevice baseDevice, Context context,W81DeviceExerciseData w81DeviceExerciseData){
+    private static void parseW560PracticeData(List<byte[]> m24HDATA, BluetoothListener bluetoothListener,
+                                              BaseDevice baseDevice, Context context,W81DeviceExerciseData w81DeviceExerciseData,int index){
         sourceList.clear();
         allHeartList.clear();
         allStepAdDistance.clear();
@@ -914,7 +923,7 @@ public class ParseData {
         w81DeviceExerciseData.setAvgHr(avgHeart == 0 ? "--":avgHeart+"");
         action.saveDefExerciseData(w81DeviceExerciseData);
 
-        bluetoothListener.onSyncSuccessPractiseData(-1);
+        bluetoothListener.onSyncSuccessPractiseData(index);
     }
 
 
@@ -941,6 +950,9 @@ public class ParseData {
                 int year = (Utils.byte2Int(bytesFirst[5]) << 8) + Utils.byte2Int(bytesFirst[4]);
                 int non = Utils.byte2Int(bytesFirst[6]);
                 int day = Utils.byte2Int(bytesFirst[7]);
+
+
+
                 long step = (Utils.byte2Int(bytesFirst[10]) << 16) + (Utils.byte2Int(bytesFirst[9]) << 8) + Utils
                         .byte2Int
                                 (bytesFirst[8]);
@@ -950,8 +962,8 @@ public class ParseData {
                         .byte2Int(bytesFirst[14]);
                 long time = (Utils.byte2Int(bytesFirst[18]) << 8) + Utils.byte2Int(bytesFirst[17]);
 
-//                Logger.myLog("year = " + year + "non = " + non + "day = " + day + " step = " + step + " cal = " + cal +
-//                        " dis = " + dis + " time = " + time);
+                Logger.myLog("year = " + year + "non = " + non + "day = " + day + " step = " + step + " cal = " + cal +
+                        " dis = " + dis + " time = " + time);
                 byte[] data = new byte[(m24HDATA.size() - 1) * 19];//减去第一包剩下的数据集合
                 for (int i = 1; i < m24HDATA.size(); i++) {
                     byte[] tmp = m24HDATA.get(i);
@@ -992,6 +1004,9 @@ public class ParseData {
                     int minuteOfDay = instance.get(Calendar.MINUTE);//当前分钟
                     float floatF = (hourOfDay * 60 + minuteOfDay) / (float) 19;
                     int intI = (hourOfDay * 60 + minuteOfDay) / 19;
+                    Log.e(TAG,"-----睡眠日期="+year+"-"+non+"-"+day+" "+hourOfDay+":"+minuteOfDay+" "+floatF +" "+intI);
+
+
                     int pakNum;
                     if ((floatF - intI) > 0) {
                         pakNum = intI + 1;
@@ -1221,6 +1236,8 @@ public class ParseData {
                     int minuteOfDay = instance.get(Calendar.MINUTE);//当前分钟
                     float floatF = (hourOfDay * 60 + minuteOfDay) / (float) 19;
                     int intI = (hourOfDay * 60 + minuteOfDay) / 19;
+
+
                     int pakNum;
                     if ((floatF - intI) > 0) {
                         pakNum = intI + 1;
@@ -1404,6 +1421,8 @@ public class ParseData {
                     watch_w516_24HDataModelDao.insertOrReplace(watch_w516_24HDataModel);
                 }
 
+                Logger.myLog(TAG,"---------保存睡眠相关数据="+new Gson().toJson(watch_w516_24HDataModel));
+
                 if (bluetoothListener != null) {
                     bluetoothListener.onSyncSuccess();
                 }
@@ -1493,7 +1512,7 @@ public class ParseData {
                 try {
                     int index = Utils.byte2Int(values[3]);
                     byte[] booleanArrayG = Utils.getBooleanArray(values[4]);
-                    boolean isEnable = Utils.byte2Int(values[4]) == 0 ? false : true;
+                    boolean isEnable = Utils.byte2Int(values[4]) != 0;
                     int repaet = Utils.byte2Int(values[5]);
                     Bracelet_W311_AlarmModel alarmModel = new Bracelet_W311_AlarmModel();
                     alarmModel.setDeviceId(baseDevice.getDeviceName());
@@ -1512,7 +1531,7 @@ public class ParseData {
                     alarmModel.setMessageString("123");
                     Bracelet_W311_AlarmModelAction.saveW526AlarmBean(alarmModel);
                 } catch (Exception e) {
-
+                    e.printStackTrace();
                 }
 
             }
@@ -1559,7 +1578,7 @@ public class ParseData {
             });
 
         } catch (Exception e) {
-
+            e.printStackTrace();
         } finally {
 
         }
@@ -1904,5 +1923,7 @@ public class ParseData {
         return avgHr;
     }
 
-
+    public static   int getIntFromBytes(byte high_h, byte high_l, byte low_h, byte low_l) {
+        return (high_h & 0xff) << 24 | (high_l & 0xff) << 16 | (low_h & 0xff) << 8 | low_l & 0xff;
+    }
 }

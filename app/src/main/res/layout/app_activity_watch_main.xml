@@ -68,7 +68,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_toLeftOf="@+id/view_cetern"
-                    android:src="@drawable/icon_w516_pic" />
+                    android:src="@drawable/icon_device_w560" />
 
 
             </LinearLayout>
@@ -325,7 +325,7 @@
                 app:contentTextColor="@color/common_gray_color"
                 app:itemText="@string/watch_call_remind_str"
                 app:itemviewTitleSize="@dimen/sp15"
-                app:showArrow="false"
+                app:showArrow="true"
                 app:showBottomLine="true"
                 app:showCheckModel="true"
                 app:showRemind="false" />
@@ -342,7 +342,7 @@
                 app:contentTextColor="@color/common_gray_color"
                 app:itemText="@string/watch_msg_setting_str"
                 app:itemviewTitleSize="@dimen/sp15"
-                app:showArrow="false"
+                app:showArrow="true"
                 app:showBottomLine="true"
                 app:showCheckModel="true"
                 app:showRemind="false" />

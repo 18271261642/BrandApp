@@ -41,7 +41,7 @@
                 app:tabIndicatorColor="@color/common_view_color"
                 app:tabIndicatorFullWidth="true"
                 app:tabIndicatorHeight="@dimen/friend_dp2"
-                app:tabMode="fixed"
+                app:tabMode="scrollable"
                 app:tabPaddingBottom="@dimen/friend_dp2"
                 app:tabRippleColor="@android:color/transparent"
                 app:tabSelectedTextColor="@color/common_text_color"

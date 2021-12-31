@@ -3,6 +3,40 @@
     /**app**/
     <string name="app_name">Bonlala</string>//iSport健康管家
 
+
+    <string name="string_permiss_title">Bonlala permissions instructions</string>
+    <string name="string_permiss_desc">To ensure the normal use of the APP, please enable the following permissions</string>
+    <string name="string_permiss_ble">Use the Bluetooth function</string>
+    <string name="string_permiss_ble_desc">Need to use the phone\'s Bluetooth function to connect to the Bluetooth watch</string>
+    <string name="string_permiss_gps">Use Location</string>
+    <string name="string_permiss_gps_desc">Map running track record and search Bluetooth watch need to turn on the phone GPS switch</string>
+    <string name="string_permiss_local">Location permission usage</string>
+    <string name="string_permiss_local_desc">Get high-precision position information for running</string>
+    <string name="string_permiss_camera">Camera permission use</string>
+    <string name="string_permiss_camera_desc">Use the camera to take a picture as an avatar</string>
+    <string name="string_permiss_file">File read and write permission usage</string>
+    <string name="string_permiss_file_desc">The camera takes a picture and saves, select a picture from the album as the avatar</string>
+    <string name="string_permiss_phone">Use of phone permissions</string>
+    <string name="string_permiss_phone_desc">Message reminder function, incoming call reminds the watch to check the current incoming call status</string>
+    <string name="string_permiss_contact">Use of permissions for contacts and address book</string>
+    <string name="string_permiss_contact_desc">When a call comes in, the watch can display the name and phone number</string>
+
+
+
+    <string name="string_w560_practise_out_walk">Outdoor Walk</string>
+    <string name="string_w560_practise_out_run">Outdoor Run</string>
+    <string name="String_w560_practise_cycle">Outdoor Cycle</string>
+    <string name="string_w560_practise_indoor_walk">Indoor Walk</string>
+    <string name="string_w560_practise_indoor_run">Indoor Run</string>
+    <string name="string_w560_practise_yoga">Yoga</string>
+    <string name="string_w560_practise_eliptical">Elliptical</string>
+    <string name="string_w560_pracitse_spinning">Spinning</string>
+    <string name="string_w560_practise_run">Hiking</string>
+    <string name="string_w560_practise_rowing">Rowing</string>
+    <string name="string_w560_practise_other">Others</string>
+
+
+
     <string name="string_share_rank_txt">The %1$s th person on the entire network completed the challenge \"%2$s\"</string>
     <string name="string_share_share">Share</string>
     <string name="string_challenge_numbers">challenge numbers</string>

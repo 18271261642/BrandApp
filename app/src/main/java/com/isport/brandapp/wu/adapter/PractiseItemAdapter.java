@@ -17,6 +17,8 @@ import com.isport.brandapp.R;
 import com.isport.brandapp.wu.Constant;
 import com.isport.brandapp.wu.bean.ExerciseInfo;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,10 +94,11 @@ public class PractiseItemAdapter extends RecyclerView.Adapter<PractiseItemAdapte
         }
         holder.tv_sport_time.setText(TimeUtils.getFormatTimeHHMMSS(Long.valueOf(info.getVaildTimeLength())));
         String aveRate = "0";
-        if (!TextUtils.isEmpty(info.getAveRate())) {
-            aveRate = info.getAveRate();
+        if (!TextUtils.isEmpty(info.getAveRate().trim())) {
+            aveRate = info.getAveRate().trim();
         }
-        if (Integer.valueOf(aveRate) != 0) {
+
+        if (StringUtils.isNumeric(aveRate) && Integer.valueOf(aveRate) != 0) {
             holder.tv_average_heart.setText(mContext.getString(R.string.average_heart_value, aveRate));
         } else {
             holder.tv_average_heart.setText("--BPM");
@@ -131,75 +134,145 @@ public class PractiseItemAdapter extends RecyclerView.Adapter<PractiseItemAdapte
             }
         });
 
+        if (isDetail) {
+            holder.iv_right.setVisibility(View.GONE);
+            holder.iv_type.setVisibility(View.GONE);
+            holder.tv_run.setText(mContext.getString(R.string.practise_sum_time));
+        } else {
+            holder.iv_right.setVisibility(View.VISIBLE);
+            holder.iv_type.setVisibility(View.VISIBLE);
+        }
+
         int type = Integer.parseInt(info.getExerciseType());
 
+        boolean isW560 = AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_W560) ;
+        Logger.myLog("ADAPTER","------isW560="+isW560);
 
-        if(AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_W560)){
+        if(isW560){
+
+            //运动类型[1-12] outdoor walk, outdoor run, outdoor cycle,
+            // indoor walk, indoor run, hiit, yoga, elliptical, spinning,
+            // hiking, rowing, other
             switch (type){
                 case 0x01:  //户外走
-                    holder.tv_run.setText(mContext.getString(R.string.walk));
-                    holder.iv_type.setImageResource(R.drawable.icon_practice_walk);
+                    holder.tv_run.setText(mContext.getString(R.string.string_w560_practise_out_walk));
+                    holder.iv_type.setImageResource(R.drawable.icon_w560_outdoor_walk);
                     showSet(holder, 0);
                     break;
                 case 0x02:  //户外跑
-                    holder.tv_run.setText(mContext.getString(R.string.outdoor_running));
-                    holder.iv_type.setImageResource(R.drawable.icon_practice_indoor_run);
+                    holder.tv_run.setText(mContext.getString(R.string.string_w560_practise_out_run));
+                    holder.iv_type.setImageResource(R.drawable.icon_w560_outdoor_run);
                     showSet(holder, 0);
                     break;
-                case 0x03:  //单车
-                    holder.tv_run.setText(mContext.getString(R.string.ride));
-                    holder.iv_type.setImageResource(R.drawable.icon_practice_cycle);
-                    showSet(holder, 0);
+                case 0x03:  //骑行
+                    holder.tv_run.setText(mContext.getString(R.string.String_w560_practise_cycle));
+                    holder.iv_type.setImageResource(R.drawable.icon_w560_outdoor_cycle);
+                    showSet(holder, 2);
                     break;
                 case 0x04:  //室内走
                     holder.tv_run.setText(mContext.getString(R.string.string_practise_indoor_walk));
-                    holder.iv_type.setImageResource(R.drawable.icon_practice_indoor_walk);
+                    holder.iv_type.setImageResource(R.drawable.icon_w560_indoor_walk);
                     showSet(holder, 0);
                     break;
                 case 0x05:  //室内跑
-                    holder.tv_run.setText(mContext.getString(R.string.treadmill));
-                    holder.iv_type.setImageResource(R.drawable.icon_practice_indoor_run);
+                    holder.tv_run.setText(mContext.getString(R.string.string_w560_practise_indoor_run));
+                    holder.iv_type.setImageResource(R.drawable.icon_w560_indoor_run);
                     showSet(holder, 0);
                     break;
-                case 0x06:
-                    holder.tv_run.setText(mContext.getString(R.string.treadmill));
-                    holder.iv_type.setImageResource(R.drawable.icon_practice_hiit);
-                    showSet(holder, 0);
+                case 0x06: //HIIT
+                    holder.tv_run.setText("HIIT");
+                    holder.iv_type.setImageResource(R.drawable.icon_w560_hiit);
+                    showSet(holder, 2);
                     break;
                 case 0x07:  //瑜伽
                     holder.tv_run.setText(mContext.getString(R.string.string_practise_yoga));
-                    holder.iv_type.setImageResource(R.drawable.icon_practice_yoga);
-                    showSet(holder, 0);
+                    holder.iv_type.setImageResource(R.drawable.icon_w560_yoga);
+                    showSet(holder, 2);
                     break;
                 case 0x08:  //椭圆机
-                    holder.tv_run.setText(mContext.getString(R.string.string_practise_elliptical));
-                    holder.iv_type.setImageResource(R.drawable.icon_practice_elliptical);
-                    showSet(holder, 0);
+                    holder.tv_run.setText(mContext.getString(R.string.string_w560_practise_eliptical));
+                    holder.iv_type.setImageResource(R.drawable.icon_w560_elliption);
+                    showSet(holder, 2);
                     break;
                 case 0x09:  //动感单车
                     holder.tv_run.setText(mContext.getString(R.string.string_practise_spinning));
-                    holder.iv_type.setImageResource(R.drawable.icon_practice_spining);
-                    showSet(holder, 0);
+                    holder.iv_type.setImageResource(R.drawable.icon_w560_spinning);
+                    showSet(holder, 2);
                     break;
                 case 10:    //远足
-                    holder.tv_run.setText(mContext.getString(R.string.string_practise_spinning));
-                    holder.iv_type.setImageResource(R.drawable.icon_practice_hiking);
-                    showSet(holder, 0);
+                    holder.tv_run.setText(mContext.getString(R.string.string_w560_practise_run));
+                    holder.iv_type.setImageResource(R.drawable.icon_w560_outdoor_walk);
+                    showSet(holder, 2);
                     break;
                 case 11:    //划船
-                    holder.tv_run.setText(mContext.getString(R.string.string_practise_rowing));
+                    holder.tv_run.setText(mContext.getString(R.string.string_w560_practise_rowing));
                     holder.iv_type.setImageResource(R.drawable.icon_practice_rowing);
-                    showSet(holder, 0);
+                    showSet(holder, 2);
                     break;
                 case 12:    //其它
-                default:
                     holder.tv_run.setText(mContext.getString(R.string.string_practise_other));
-                    holder.iv_type.setImageResource(R.drawable.icon_practice_other);
-                    showSet(holder, 0);
+                    holder.iv_type.setImageResource(R.drawable.icon_w560_other);
+                    showSet(holder, 2);
                     break;
 
             }
-        }else{
+
+            return;
+        }
+
+        boolean isW5xx = AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_W560B);
+
+        Logger.myLog("ADAPTER","------isW5xx="+isW5xx);
+        if(isW5xx){
+            //运动类型[1-8] 健走 跑步 骑行 登山 足球 篮球 乒乓球 羽毛球
+            switch (type){
+                case 0x01:  //走路
+                    holder.tv_run.setText(mContext.getString(R.string.walk));
+                    holder.iv_type.setImageResource(R.drawable.icon_sport_recode_walk);
+                    showSet(holder, 0);
+                    break;
+                case 0x02:  //跑步
+                    holder.tv_run.setText(mContext.getString(R.string.run));
+                    holder.iv_type.setImageResource(R.drawable.icon_sport_running);
+                    showSet(holder, 0);
+                    break;
+                case 0x03:  //骑行
+                    holder.tv_run.setText(mContext.getString(R.string.ride));
+                    holder.iv_type.setImageResource(R.drawable.icon_bike);
+                    showSet(holder, 2);
+                    break;
+                case 0x08:  //登山
+                    holder.tv_run.setText(mContext.getString(R.string.climbing));
+                    holder.iv_type.setImageResource(R.drawable.icon_practice_hiit);
+                    showSet(holder, 2);
+                    break;
+                case 0x07:  //足球
+                    holder.tv_run.setText(mContext.getString(R.string.football));
+                    holder.iv_type.setImageResource(R.drawable.icon_football);
+                    showSet(holder, 2);
+                    break;
+                case 0x06: //篮球
+                    holder.tv_run.setText(mContext.getString(R.string.basketball));
+                    holder.iv_type.setImageResource(R.drawable.icon_basketball);
+                    showSet(holder, 2);
+                    break;
+                case 0x09://乒乓球
+                    holder.tv_run.setText(mContext.getString(R.string.pingpang));
+                    holder.iv_type.setImageResource(R.drawable.icon_pingpang);
+                    showSet(holder, 2);
+                    break;
+                case 0x05:  //羽毛球
+                    holder.tv_run.setText(mContext.getString(R.string.badminton));
+                    holder.iv_type.setImageResource(R.drawable.icon_badminton);
+                    showSet(holder, 2);
+                    break;
+
+            }
+
+            return;
+        }
+
+
             switch (type) {
                 case Constant.PRACTISE_TYPE_ALL:
                 case Constant.PRACTISE_TYPE_WALK:
@@ -215,12 +288,12 @@ public class PractiseItemAdapter extends RecyclerView.Adapter<PractiseItemAdapte
                 case Constant.PRACTISE_TYPE_ROPE_SKIP:
                     holder.tv_run.setText(mContext.getString(R.string.rope_skip));
                     holder.iv_type.setImageResource(R.drawable.icon_skip);
-                    showSet(holder, 1);
+                    showSet(holder, 2);
                     break;
                 case Constant.PRACTISE_TYPE_RIDE:
                     holder.tv_run.setText(mContext.getString(R.string.ride));
                     holder.iv_type.setImageResource(R.drawable.icon_bike);
-                    showSet(holder, 1);
+                    showSet(holder, 2);
                     break;
                 case Constant.PRACTISE_TYPE_CLIMBING:
                     holder.tv_run.setText(mContext.getString(R.string.climbing));
@@ -230,17 +303,17 @@ public class PractiseItemAdapter extends RecyclerView.Adapter<PractiseItemAdapte
                 case Constant.PRACTISE_TYPE_BADMINTON:
                     holder.tv_run.setText(mContext.getString(R.string.badminton));
                     holder.iv_type.setImageResource(R.drawable.icon_badminton);
-                    showSet(holder, 2);
+                    showSet(holder, 1);
                     break;
                 case Constant.PRACTISE_TYPE_FOOTBALL:
                     holder.tv_run.setText(mContext.getString(R.string.football));
                     holder.iv_type.setImageResource(R.drawable.icon_football);
-                    showSet(holder, 2);
+                    showSet(holder, 1);
                     break;
                 case Constant.PRACTISE_TYPE_BASKETBALL:
                     holder.tv_run.setText(mContext.getString(R.string.basketball));
                     holder.iv_type.setImageResource(R.drawable.icon_basketball);
-                    showSet(holder, 2);
+                    showSet(holder, 1);
                     break;
                 case Constant.PRACTISE_TYPE_PINGPANG:
                     holder.tv_run.setText(mContext.getString(R.string.pingpang));
@@ -249,18 +322,7 @@ public class PractiseItemAdapter extends RecyclerView.Adapter<PractiseItemAdapte
                     break;
 
             }
-        }
 
-
-
-        if (isDetail) {
-            holder.iv_right.setVisibility(View.GONE);
-            holder.iv_type.setVisibility(View.GONE);
-            holder.tv_run.setText(mContext.getString(R.string.practise_sum_time));
-        } else {
-            holder.iv_right.setVisibility(View.VISIBLE);
-            holder.iv_type.setVisibility(View.VISIBLE);
-        }
 
     }
 
@@ -268,19 +330,22 @@ public class PractiseItemAdapter extends RecyclerView.Adapter<PractiseItemAdapte
 
 
     private void showSet(MyViewHolder holder, int type) {
-
         switch (type) {
             case 0:
                 holder.cardview_step.setVisibility(View.VISIBLE);
                 holder.ll_bottom.setVisibility(View.VISIBLE);
                 break;
             case 1:
-                holder.cardview_step.setVisibility(View.INVISIBLE);
+                holder.cardview_step.setVisibility(View.VISIBLE);
                 holder.ll_bottom.setVisibility(View.GONE);
                 break;
             case 2:
-                holder.cardview_step.setVisibility(View.VISIBLE);
+                holder.cardview_step.setVisibility(View.INVISIBLE);
                 holder.ll_bottom.setVisibility(View.GONE);
+                break;
+                case 3:  //保利心率、卡路里、步数
+
+
                 break;
         }
     }

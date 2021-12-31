@@ -13,8 +13,12 @@ import android.util.Log;
 import com.crrepa.ble.conn.type.CRPBleMessageType;
 import com.crrepa.ble.conn.type.CRPDeviceLanguageType;
 import com.isport.blelibrary.ISportAgent;
+import com.isport.blelibrary.db.action.bracelet_w311.Bracelet_W311_SettingModelAction;
 import com.isport.blelibrary.db.action.watch_w516.Watch_W516_NotifyModelAction;
+import com.isport.blelibrary.db.action.watch_w516.Watch_W516_SleepAndNoDisturbModelAction;
+import com.isport.blelibrary.db.table.bracelet_w311.Bracelet_W311_ThridMessageModel;
 import com.isport.blelibrary.db.table.watch_w516.Watch_W516_NotifyModel;
+import com.isport.blelibrary.db.table.watch_w516.Watch_W516_SleepAndNoDisturbModel;
 import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
 import com.isport.blelibrary.deviceEntry.interfaces.IDeviceType;
 import com.isport.blelibrary.entry.NotificationMsg;
@@ -24,6 +28,7 @@ import com.isport.blelibrary.utils.BleRequest;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.Utils;
 import com.isport.brandapp.AppConfiguration;
+import com.isport.brandapp.util.DateTimeUtils;
 import com.isport.brandapp.util.DeviceTypeUtil;
 
 import java.io.UnsupportedEncodingException;
@@ -90,6 +95,15 @@ public class NotiManager {
         w81MapstrPkNames.put(Constants.MESSGE_OHTERS, CRPBleMessageType.MESSAGE_OTHER);
         */
 
+
+        //短信
+        w81MapstrPkNames.put(Constants.MSG_PACKAGENAME,CRPBleMessageType.MESSAGE_SMS);
+        w81MapstrPkNames.put(Constants.XIAOMI_SMS_PACK_NAME,CRPBleMessageType.MESSAGE_SMS);
+        w81MapstrPkNames.put(Constants.SAMSUNG_MSG_PACKNAME,CRPBleMessageType.MESSAGE_SMS);
+        w81MapstrPkNames.put(Constants.SAMSUNG_MSG_SRVERPCKNAME,CRPBleMessageType.MESSAGE_SMS);
+        w81MapstrPkNames.put(Constants.SYS_SMS,CRPBleMessageType.MESSAGE_SMS);
+        w81MapstrPkNames.put(Constants.SMS_PACKAGE_NAME,CRPBleMessageType.MESSAGE_SMS);
+
         w81MapstrPkNames.put(Constants.KEY_13_PACKAGE, CRPBleMessageType.MESSAGE_QQ);
         w81MapstrPkNames.put(Constants.KEY_14_PACKAGE, CRPBleMessageType.MESSAGE_WECHAT);
         w81MapstrPkNames.put(Constants.KEY_14B_PACKAGE, CRPBleMessageType.MESSAGE_WECHAT_IN);
@@ -139,20 +153,66 @@ public class NotiManager {
      * @param packagename  whose notifications you want to push to ble device
      * @param notification the notification will be pushed to ble device
      */
-    public void handleNotification(String packagename, Notification notification) {
+    public void handleNotification(String packagename, Notification notification,String smsAction) {
         try {
+
+            Bundle extras = notification.extras;
+            if(extras == null)
+                return;
+            CharSequence tickerText = notification.tickerText;
+            SpannableString spannableString;
+            String content = "";
+            String title = "";
+
+            Object objectStr = extras.get(Notification.EXTRA_TITLE);
+            if(objectStr != null){
+                if(objectStr instanceof  String){
+                    title = extras.getString(Notification.EXTRA_TITLE, "")+"";
+                    // 获取通知内容
+                    content = extras.getString(Notification.EXTRA_TEXT, "")+"";
+                }else{
+                    content = objectStr.toString();
+                }
+            }else{
+                if (tickerText != null) {
+                    content = tickerText.toString();
+                }
+            }
+            Logger.myLog(TAG,"----title="+title+" content="+content+"\n"+NotificationService.SmsAction);
+
+            if(title != null && (title.contains("Messaging is running") || title.contains("正在运行") || title.contains("信息未发送")) )
+                return;
+
+            //对短信的处理，
+            if(Constants.smsMap.containsKey(packagename) && NotificationService.SmsAction != null && NotificationService.SmsAction.equals("android.provider.Telephony.SMS_RECEIVED")){
+                NotificationService.SmsAction = null;
+                return;
+            }
+            String buildName = Build.MANUFACTURER;
+            if(buildName!=null){
+                if( buildName.equalsIgnoreCase("huawei") || buildName.equalsIgnoreCase("honor"))
+                    return;
+            }
             BaseDevice baseDevice = ISportAgent.getInstance().getCurrnetDevice();
             if (!AppConfiguration.isConnected || baseDevice == null) {
                 return;
             }
 
-            Logger.myLog(TAG,"-----baseDevice="+baseDevice.toString());
+            Logger.myLog(TAG,"-----baseDevice="+baseDevice.toString()+"\n"+packagename);
             //判断是否是W560
-            if(baseDevice.deviceType == IDeviceType.TYPE_WATCH_W560 || baseDevice.deviceType == IDeviceType.TYPE_WATCH_W560B){
-                sendW560MsgTypeMsg(packagename,notification);
+            if(DeviceTypeUtil.isContainW55X(baseDevice.deviceType)){
+                sendW560MsgTypeMsg(packagename,notification,baseDevice.deviceType,baseDevice.deviceName,smsAction);
                 return;
             }
 
+            //MOY 系列
+            if(DeviceTypeUtil.isContainW81(baseDevice.deviceType)){
+                sendMoYMsgTypeMsg(packagename,title,content,baseDevice.getDeviceName());
+                return;
+            }
+
+//            ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, title, content, 2);
+//
 
             int currentType = 0;
             String currentDeviceName = "";
@@ -241,8 +301,84 @@ public class NotiManager {
 
     }
 
+    //魔样系列
+    private void sendMoYMsgTypeMsg(String packagename, String tile,String contentStr,String deviceId) {
 
-    private void sendW560MsgTypeMsg(String packName,Notification notification){
+        try {
+            //短信
+            if(w81MapstrPkNames.containsKey(packagename)){
+                ISportAgent.getInstance().requestBle(BleRequest.w81_send_message,tile+":"+contentStr, CRPBleMessageType.MESSAGE_SMS);
+                return;
+            }
+            Bracelet_W311_ThridMessageModel moySms = Bracelet_W311_SettingModelAction.findBracelet_W311_ThridMessage(deviceId, TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()));
+            if(moySms == null)
+                return;
+
+
+            //微信
+            if(packagename.equals(Constants.WECHAT_APP_NAME) && moySms.getIsWechat()){
+                ISportAgent.getInstance().requestBle(BleRequest.w81_send_message,tile+contentStr, CRPBleMessageType.MESSAGE_WECHAT);
+                return;
+            }
+
+
+            //QQ
+            if(packagename.equals(Constants.QQ_APP_NAME) && moySms.getIsQQ()){
+                ISportAgent.getInstance().requestBle(BleRequest.w81_send_message,tile+contentStr, CRPBleMessageType.MESSAGE_QQ);
+                return;
+            }
+
+            //WhatsAPP
+            if(packagename.equals(Constants.WHATS_APP_PACKAGE_NAME)){
+                ISportAgent.getInstance().requestBle(BleRequest.w81_send_message,tile+contentStr, CRPBleMessageType.MESSAGE_WHATSAPP);
+                return;
+            }
+
+            //facebook
+            if(packagename.equals(Constants.FACEBOOK_APP_PACK_NAME) && moySms.getIsFaceBook()){
+                ISportAgent.getInstance().requestBle(BleRequest.w81_send_message,tile+contentStr, CRPBleMessageType.MESSAGE_FACEBOOK);
+                return;
+            }
+
+            //twitter
+            if(packagename.equals(Constants.TWITTER_APP_PACK_NAME) && moySms.getIsTwitter()){
+                ISportAgent.getInstance().requestBle(BleRequest.w81_send_message,tile+contentStr, CRPBleMessageType.MESSAGE_TWITTER);
+                return;
+            }
+
+
+            //Skype
+            if(packagename.equals(Constants.KEY_15_PACKAGE_1) && moySms.getIsSkype()){
+                ISportAgent.getInstance().requestBle(BleRequest.w81_send_message,tile+contentStr, CRPBleMessageType.MESSAGE_SKYPE);
+                return;
+            }
+
+            //line
+            if(packagename.equals(Constants.MESSGE_LINE) && moySms.getIsLine()){
+                ISportAgent.getInstance().requestBle(BleRequest.w81_send_message,tile+contentStr, CRPBleMessageType.MESSAGE_LINE);
+                return;
+            }
+
+
+            //Instagram
+            if(packagename.equals(Constants.INSORTS_APP_PACK_NAME) && moySms.getIsInstagram()){
+                ISportAgent.getInstance().requestBle(BleRequest.w81_send_message,tile+contentStr, CRPBleMessageType.MESSAGE_INSTAGREM);
+                return;
+            }
+            //其它
+            if(moySms.getIsOthers()){
+                ISportAgent.getInstance().requestBle(BleRequest.w81_send_message,tile+contentStr, CRPBleMessageType.MESSAGE_OTHER);
+            }
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private void sendW560MsgTypeMsg(String packName,Notification notification,int deviceType,String deviceName,String smsAction){
         try {
             Bundle extras = notification.extras;
             if(extras == null)
@@ -266,7 +402,7 @@ public class NotiManager {
                     content = tickerText.toString();
                 }
             }
-            Logger.myLog(TAG,"----title="+title+" content="+content+" msgContent=");
+            Logger.myLog(TAG,"----title="+title+" content="+content);
 
             if(title != null && (title.contains("Messaging is running") || title.contains("正在运行")) )
                 return;
@@ -280,12 +416,38 @@ public class NotiManager {
             if(Constants.msgTypeMap.containsKey(packName)){
                 String buildName = Build.MANUFACTURER;
 
-                Logger.myLog(TAG,"--bname="+buildName);
-                if(packName.equals(Constants.MSG_PACKAGENAME) && (buildName.toLowerCase().equals("huawei") || buildName.toLowerCase().equals("honor"))){
-                    return;
+                Logger.myLog(TAG,"--bname="+buildName+"\n"+(buildName.equalsIgnoreCase("huawei")));
+//                if(packName.equals(Constants.MSG_PACKAGENAME)){
+//                    return;
+//
+//                }
 
+                //处理560B的勿扰模式
+                if(deviceType == IDeviceType.TYPE_WATCH_W560B || deviceType == IDeviceType.TYPE_WATCH_W560){
+                    Watch_W516_SleepAndNoDisturbModel watchDNDBean = Watch_W516_SleepAndNoDisturbModelAction.findWatch_W516_SleepAndNoDisturbModelyDeviceId(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), deviceName);
+                    //没有设置勿扰模式
+                    if(watchDNDBean ==null){
+                        ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, title, content, deviceType == IDeviceType.TYPE_WATCH_W560 ? Constants.msgTypeMap.get(packName) : Constants.w560BTypeMap.get(packName));
+                        return;
+                    }
+                    //勿扰模式未打开
+                    if(!watchDNDBean.getOpenNoDisturb()){
+                        ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, title, content,  deviceType == IDeviceType.TYPE_WATCH_W560 ? Constants.msgTypeMap.get(packName) : Constants.w560BTypeMap.get(packName));
+                        return;
+                    }
+                    //开始时间和结束时间
+                    String startTime = watchDNDBean.getNoDisturbStartTime();
+                    String endTime = watchDNDBean.getNoDisturbEndTime();
+
+                    //判断是否在区间内
+                    if(DateTimeUtils.isComparisonWith(startTime,endTime))
+                        return;
+
+                    ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, title, content,  deviceType == IDeviceType.TYPE_WATCH_W560 ? Constants.msgTypeMap.get(packName) : Constants.w560BTypeMap.get(packName));
+                    return;
                 }
-                ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, title, content, Constants.msgTypeMap.get(packName));
+
+                ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, title, content,  Constants.w560BTypeMap.get(packName));
             }
 
 

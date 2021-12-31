@@ -59,43 +59,49 @@ internal class RopeDeviceSettingActivity() : BaseTitleActivity(), DeviceUpgradeV
     var mSelectPopupWindow: SelectPopupWindow? = null
     var sportDetail = SportSettingBean()
     var ropeHrvalue: Int by Preference(Preference.ROPE_Hr_Count, 0)
+
+
     override fun initData() {
-        devcieUpgradePresent = DevcieUpgradePresent(this)
-        if (AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.ROPE_SKIPPING)) {
-            var bean = AppConfiguration.deviceMainBeanList.get(JkConfiguration.DeviceType.ROPE_SKIPPING)
-            deviceInfoByDeviceId = DeviceInformationTableAction.findDeviceInfoByDeviceId(bean!!.deviceName)
-            if (deviceInfoByDeviceId != null) {
-                iv_watch_stable_version.setContentText("V" + deviceInfoByDeviceId.version)
-                devcieUpgradePresent!!.getDeviceUpgradeInfo(JkConfiguration.DeviceType.ROPE_SKIPPING)
+        try {
+            devcieUpgradePresent = DevcieUpgradePresent(this)
+            if (AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.ROPE_SKIPPING)) {
+                val bean: DeviceBean = AppConfiguration.deviceMainBeanList.get(JkConfiguration.DeviceType.ROPE_SKIPPING)
+                        ?: return
+                if(bean.deviceName == null)
+                    return
+                deviceInfoByDeviceId = DeviceInformationTableAction.findDeviceInfoByDeviceId(bean!!.deviceName)
+                if (deviceInfoByDeviceId != null) {
+                    iv_watch_stable_version.setContentText("V" + deviceInfoByDeviceId.version)
+                    devcieUpgradePresent!!.getDeviceUpgradeInfo(JkConfiguration.DeviceType.ROPE_SKIPPING)
+                }
             }
-        }
 
-        var deviceBean = AppConfiguration.deviceMainBeanList.get(JkConfiguration.DeviceType.ROPE_SKIPPING)
-        if (deviceBean != null) {
-            var battery = getVersionOrBattery(deviceBean!!.deviceType, deviceBean.deviceName)
-            iv_battery.setProgress(battery)
-            tv_battery.text = "" + battery + "%"
-        }
-        setConnectState()
-        var userInfoBean = CommonUserAcacheUtil.getUserInfo(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()))
-        if (userInfoBean == null) {
-            return
-        }
-
-        if (userInfoBean != null) {
-            age = UserUtils.getAge(userInfoBean.birthday)
-            sex = userInfoBean.gender
-            var maxHr = HeartRateConvertUtils.getMaxHeartRate(age, sex)
-
-            if (ropeHrvalue == 0) {
-                ropeHrvalue = (0.75 * maxHr).toInt()
+            val deviceBean = AppConfiguration.deviceMainBeanList.get(JkConfiguration.DeviceType.ROPE_SKIPPING)
+            if (deviceBean != null) {
+                var battery = getVersionOrBattery(deviceBean!!.deviceType, deviceBean.deviceName)
+                iv_battery.setProgress(battery)
+                tv_battery.text = "" + battery + "%"
             }
-            sportDetail.currentHrValue = ropeHrvalue
-            sportDetail.hrMaxValue = 250
-            sportDetail.hrMinValue = (maxHr * 0.70f).toInt()
-            item_hr.setTitleText("" + sportDetail.currentHrValue + UIUtils.getString(R.string.bmp_unit))
-        }
+            setConnectState()
+            val userInfoBean = CommonUserAcacheUtil.getUserInfo(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()))
+                    ?: return
 
+            if (userInfoBean != null) {
+                age = UserUtils.getAge(userInfoBean.birthday)
+                sex = userInfoBean.gender
+                var maxHr = HeartRateConvertUtils.getMaxHeartRate(age, sex)
+
+                if (ropeHrvalue == 0) {
+                    ropeHrvalue = (0.75 * maxHr).toInt()
+                }
+                sportDetail.currentHrValue = ropeHrvalue
+                sportDetail.hrMaxValue = 250
+                sportDetail.hrMinValue = (maxHr * 0.70f).toInt()
+                item_hr.setTitleText("" + sportDetail.currentHrValue + UIUtils.getString(R.string.bmp_unit))
+            }
+        }catch (e : Exception){
+            e.printStackTrace()
+        }
     }
 
     private val mBleReciveListener: BleReciveListener = object : BleReciveListener {
@@ -315,7 +321,7 @@ internal class RopeDeviceSettingActivity() : BaseTitleActivity(), DeviceUpgradeV
     }
 
 
-     var mDeviceBean: DeviceBean? = null
+    var mDeviceBean: DeviceBean? = null
     fun showUnbindDialog() {
         //w516 w311 w520只会存在一个
 

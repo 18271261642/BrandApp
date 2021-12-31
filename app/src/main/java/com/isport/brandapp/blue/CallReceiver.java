@@ -31,6 +31,7 @@ public class CallReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if(action == null)
             return;
+        Log.e(TAG,"----电话action="+action);
         if (action.equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
             if (Build.VERSION.SDK_INT >= 24) {
                 if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) !=

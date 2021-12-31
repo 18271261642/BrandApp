@@ -129,6 +129,9 @@
     <string name="launch_friend_rope_rank">启用好友运动排行榜功能吗？</string>
     <string name="see_friend_rope_rank">1、查看好友的跳绳数据和排名情况 </string>
     <string name="friend_see_your_roperank">2、好友可以在排行榜中看到您的跳绳数据</string>
+
+    <string name="friend_see_yout_sportrank">2、好友可以在排行榜中看到你的运动数据</string>
+
     <string name="rope_ranking">跳绳排行</string>
     <string name="rope_number">跳绳个数</string>
     <string name="rope_ranking_time">跳绳时长</string>

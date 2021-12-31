@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">viewlibray</string>
     <!--pickView-->
-
+    <string name="string_share_notinstall_desc">The software is not installed!</string>
     <string name="pickerview_year">Y</string>//年
     <string name="pickerview_month">M</string>//月
     <string name="pickerview_day">D</string>//日

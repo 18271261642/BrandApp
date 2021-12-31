@@ -119,7 +119,7 @@ class TrainFinishActivity : BaseTitleActivity(), TrainFinishView {
 
     override fun initData() {
         mPresenter = TrainFishPre(this)
-        mCourseId = intent.getStringExtra(BaseConstant.EXTRA_COURSE_ID)
+        mCourseId = intent.getStringExtra(BaseConstant.EXTRA_COURSE_ID).toString()
         Log.e("testt", "mCourseId=" + mCourseId)
         mPresenter.getTrainCourseInfo(mCourseId, "2")
 //        tv_time.text = "2020-08-08 12:12:12"

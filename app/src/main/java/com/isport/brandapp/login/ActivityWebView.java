@@ -485,12 +485,18 @@ public class ActivityWebView extends BaseTitleActivity implements UMShareListene
 
                 break;
             case R.id.iv_weibo:
-                if (PackageUtil.isWxInstall(ActivityWebView.this, PackageUtil.weiboPakage)) {
-                    share("weibo", shareUrl);
-                } else {
+                if(!UMShareAPI.get(this).isInstall(this,SHARE_MEDIA.SINA)){
                     ToastUtil.showTextToast(ActivityWebView.this, UIUtils.getString(R.string.please_install_software));
                     return;
                 }
+                share("weibo", shareUrl);
+//
+//                if (PackageUtil.isWxInstall(ActivityWebView.this, PackageUtil.weiboPakage)) {
+//                    share("weibo", shareUrl);
+//                } else {
+//                    ToastUtil.showTextToast(ActivityWebView.this, UIUtils.getString(R.string.please_install_software));
+//                    return;
+//                }
 
                 break;
             case R.id.iv_facebook:

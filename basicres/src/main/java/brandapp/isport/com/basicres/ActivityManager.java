@@ -1,10 +1,8 @@
 package brandapp.isport.com.basicres;
 
-import android.content.ComponentName;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.LruCache;
-
 
 import java.util.Iterator;
 import java.util.Map;
@@ -98,6 +96,7 @@ public class ActivityManager {
 
             activityLru.trimToSize(activityLru.maxSize());
         } catch (Exception e) {
+            e.printStackTrace();
             Logger.d("ActivityManager finishAllActivity error. " + e.getMessage());
         }
     }

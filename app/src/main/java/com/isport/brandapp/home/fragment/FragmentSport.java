@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioButton;
+
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdate;
 import com.amap.api.maps.CameraUpdateFactory;
@@ -37,11 +38,14 @@ import com.isport.brandapp.sport.SportReportActivity;
 import com.isport.brandapp.sport.SportSettingActivity;
 import com.isport.brandapp.sport.location.LocationServiceHelper;
 import com.tbruyelle.rxpermissions2.RxPermissions;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -346,6 +350,9 @@ public class FragmentSport extends BaseMVPFragment<FragmentSportView, FragmentSp
     private void requestPermission() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACTIVITY_RECOGNITION},0x03);
+            }
             ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.BODY_SENSORS},0x00);
         }
 

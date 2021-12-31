@@ -1,7 +1,6 @@
 package com.isport.brandapp.home.view;
 
 import android.content.Context;
-import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -9,11 +8,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.isport.blelibrary.utils.Logger;
+import com.isport.brandapp.R;
+import com.isport.brandapp.banner.recycleView.holder.CustomHolder;
 import com.isport.brandapp.home.bean.db.WatchSportMainData;
 import com.isport.brandapp.home.customview.MainHeadDataItemView;
 import com.isport.brandapp.home.view.circlebar.CirclebarAnimatorLayout;
-import com.isport.brandapp.R;
-import com.isport.brandapp.banner.recycleView.holder.CustomHolder;
 import com.isport.brandapp.util.AppSP;
 
 import java.util.List;
@@ -22,12 +21,15 @@ import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonutil.UIUtils;
 import brandapp.isport.com.basicres.commonutil.ViewMultiClickUtil;
 import phone.gym.jkcq.com.commonres.common.JkConfiguration;
-import test.Test2Activity;
 
 /**
  * 步数汇总图表
  */
 public class DataHeaderHolder extends CustomHolder<String> {
+
+    private static final String TAG = "DataHeaderHolder";
+
+
     TextView tvTime;
     CirclebarAnimatorLayout heardLayout;
     RelativeLayout rlLayout;
@@ -35,6 +37,8 @@ public class DataHeaderHolder extends CustomHolder<String> {
     MainHeadDataItemView itemCal;
     ImageView iv_change;
     // private ImageView ivChange;
+
+
 
     public DataHeaderHolder(View itemView) {
         super(itemView);
@@ -81,14 +85,14 @@ public class DataHeaderHolder extends CustomHolder<String> {
         });
 
 
-        //添加长按
-        itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                context.startActivity(new Intent(context, Test2Activity.class));
-                return true;
-            }
-        });
+//        //添加长按
+//        itemView.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View view) {
+//                context.startActivity(new Intent(context, Test2Activity.class));
+//                return true;
+//            }
+//        });
 
     }
 
@@ -102,6 +106,8 @@ public class DataHeaderHolder extends CustomHolder<String> {
         heardLayout.setSportTarget(target);
     }
 
+
+
     /**
      *
      * @param cal 当前卡路里
@@ -111,9 +117,10 @@ public class DataHeaderHolder extends CustomHolder<String> {
      */
     public void updateUI(String cal, String dis, int step, String time) {
         try {
-
             int goalType = AppSP.getInt(BaseApp.getApp(),AppSP.DEVICE_GOAL_KEY,0);
             if(goalType == 0){  //步数目标
+                setTarget(JkConfiguration.WATCH_GOAL);
+
                 heardLayout.setSportStep(step);
                 //距离 title
                 itemDis.setTitleText(context.getResources().getString(R.string.watch_step_type_distance));
@@ -130,6 +137,8 @@ public class DataHeaderHolder extends CustomHolder<String> {
                 itemCal.setUnitText(context.getResources().getString(R.string.watch_step_unite_calory));
 
             }else if(goalType == 1){    //距离目标
+                setTarget(JkConfiguration.WATCH_GOAL_DISTANCE);
+
                 heardLayout.setSportStep(dis == null ? -1 : Float.valueOf(dis));
                 //距离 title
                 itemDis.setTitleText(context.getResources().getString(R.string.steps));
@@ -146,6 +155,8 @@ public class DataHeaderHolder extends CustomHolder<String> {
                 itemCal.setUnitText(context.getResources().getString(R.string.watch_step_unite_calory));
 
             }else if(goalType == 2){    //卡路里目标
+                setTarget(JkConfiguration.WATCH_GOAL_CALORIE);
+
                 heardLayout.setSportStep(cal == null ? -1 : Float.valueOf(cal));
                 //距离 title
                 itemDis.setTitleText(context.getResources().getString(R.string.steps));
@@ -164,7 +175,6 @@ public class DataHeaderHolder extends CustomHolder<String> {
 
 
 
-            setTarget(JkConfiguration.WATCH_GOAL);
             if (TextUtils.isEmpty(time)) {
                 tvTime.setVisibility(View.GONE);
             } else {
@@ -172,12 +182,14 @@ public class DataHeaderHolder extends CustomHolder<String> {
                 tvTime.setText(time);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             Logger.myLog(e.toString());
         }
     }
 
 
     public void updateUI(WatchSportMainData watchSportMainData) {
+        Logger.myLog(TAG,"----updateUI="+watchSportMainData.toString());
         if (watchSportMainData == null) {
             defUpdateUI();
             return;

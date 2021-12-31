@@ -1,5 +1,6 @@
 package com.isport.brandapp.device.bracelet.braceletPresenter;
 
+import com.isport.blelibrary.db.action.bracelet_w311.Bracelet_W311_AlarmModelAction;
 import com.isport.blelibrary.db.table.bracelet_w311.Bracelet_W311_AlarmModel;
 import com.isport.blelibrary.db.table.watch_w516.Watch_W560_AlarmModel;
 import com.isport.brandapp.device.bracelet.braceletModel.IW311SettingModel;
@@ -79,9 +80,9 @@ public class AlarmPresenter extends BasePresenter<AlarmView> {
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).as(view.bindAutoDispose()).subscribe(new BaseObserver<Boolean>(BaseApp.getApp(), true) {
             @Override
             public void onNext(Boolean isSave) {
-                if (view != null) {
-                    view.successSaveAlarmItem();
-                }
+//                if (view != null) {
+//                    view.successSaveAlarmItem();
+//                }
             }
 
             @Override
@@ -412,6 +413,75 @@ public class AlarmPresenter extends BasePresenter<AlarmView> {
                 if (view != null) {
                     view.successSaveAlarmItem();
                 }
+            }
+
+            @Override
+            protected void hideDialog() {
+
+            }
+
+            @Override
+            protected void showDialog() {
+
+            }
+
+            @Override
+            public void onError(ExceptionHandle.ResponeThrowable e) {
+            }
+
+        });
+    }
+
+    //更新所有闹钟
+    public void saveAllAlarm(ArrayList<Bracelet_W311_AlarmModel> lists, String deviceId, String userId){
+        Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
+                boolean dispalyItem = model.updateAllAlarmModel(lists,deviceId,userId);
+                emitter.onNext(dispalyItem);
+                emitter.onComplete();
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).as(view.bindAutoDispose()).subscribe(new BaseObserver<Boolean>(BaseApp.getApp(), false) {
+            @Override
+            public void onNext(Boolean isSave) {
+//                if (view != null) {
+//                    view.successSaveAlarmItem();
+//                }
+            }
+
+            @Override
+            protected void hideDialog() {
+
+            }
+
+            @Override
+            protected void showDialog() {
+
+            }
+
+            @Override
+            public void onError(ExceptionHandle.ResponeThrowable e) {
+            }
+
+        });
+    }
+
+
+    //删除所有保存的通用闹钟
+    public void deleteAllCommAlarm(String userId,String deviceId){
+        Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
+                Bracelet_W311_AlarmModelAction.deletBracelet(deviceId,userId);
+                emitter.onNext(true);
+                emitter.onComplete();
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).as(view.bindAutoDispose()).subscribe(new BaseObserver<Boolean>(BaseApp.getApp(), false) {
+            @Override
+            public void onNext(Boolean isSave) {
+//                if (view != null) {
+//                    view.successSaveAlarmItem();
+//                }
             }
 
             @Override

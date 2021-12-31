@@ -391,7 +391,7 @@ public class NewShareActivity extends BaseActivity implements View.OnClickListen
                     fl_share_content.setBackgroundResource(R.drawable.share_heartrate_bg1);
                     setBgColor(true);
                 } else {
-                    fl_share_content.setBackgroundResource(R.drawable.bg_share_rope_1);
+                    fl_share_content.setBackgroundResource(R.drawable.bg_share_rope_1_radius);
                     setBgColor(true);
                 }
 
@@ -411,7 +411,7 @@ public class NewShareActivity extends BaseActivity implements View.OnClickListen
                 } else if (currentShareDeviceType == JkConfiguration.DeviceType.HEART_RATE) {
                     fl_share_content.setBackgroundResource(R.drawable.share_heartrate_bg2);
                 } else {
-                    fl_share_content.setBackgroundResource(R.drawable.bg_share_rope_2);
+                    fl_share_content.setBackgroundResource(R.drawable.bg_share_rope_2_radius);
                 }
                 setBgColor(true);
                 // fl_share_content.getBackground().mutate().setAlpha(255);
@@ -429,7 +429,7 @@ public class NewShareActivity extends BaseActivity implements View.OnClickListen
                 } else if (currentShareDeviceType == JkConfiguration.DeviceType.HEART_RATE) {
                     fl_share_content.setBackgroundResource(R.drawable.share_heartrate_bg3);
                 } else {
-                    fl_share_content.setBackgroundResource(R.drawable.bg_share_rope_3);
+                    fl_share_content.setBackgroundResource(R.drawable.bg_share_rope_3_radius);
                 }
                 setBgColor(true);
                 //fl_share_content.getBackground().mutate().setAlpha(255);
@@ -445,9 +445,9 @@ public class NewShareActivity extends BaseActivity implements View.OnClickListen
                 } else if (currentShareDeviceType == JkConfiguration.DeviceType.SLEEP) {
                     fl_share_content.setBackgroundResource(R.drawable.share_sleep_bg4);
                 } else if (currentShareDeviceType == JkConfiguration.DeviceType.HEART_RATE) {
-                    fl_share_content.setBackgroundResource(R.drawable.bg_share_rope_4);
+                    fl_share_content.setBackgroundResource(R.drawable.bg_share_rope_4_radius);
                 } else {
-                    fl_share_content.setBackgroundResource(R.drawable.bg_share_rope_4);
+                    fl_share_content.setBackgroundResource(R.drawable.bg_share_rope_4_radius);
                 }
                 setBgColor(true);
                 // fl_share_content.getBackground().mutate().setAlpha(255);

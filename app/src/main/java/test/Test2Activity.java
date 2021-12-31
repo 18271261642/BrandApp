@@ -1,11 +1,13 @@
 package test;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.isport.blelibrary.ISportAgent;
+import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
 import com.isport.blelibrary.utils.BleRequest;
 import com.isport.brandapp.R;
 
@@ -27,6 +29,8 @@ public class Test2Activity extends BaseActivity {
 
     private Button getVersionBtn;
 
+    private EditText exEdit;
+
     public void test2SendData1(View view){
         ISportAgent.getInstance().requestBle(BleRequest.READ_DEVICE_GOAL);
     }
@@ -38,6 +42,7 @@ public class Test2Activity extends BaseActivity {
 
     @Override
     protected void initView(View view) {
+        exEdit = findViewById(R.id.exEdit);
         testWatchStepChartView = findViewById(R.id.testWatchStepChartView);
         testInputEdit = findViewById(R.id.testInputEdit);
 
@@ -88,7 +93,16 @@ public class Test2Activity extends BaseActivity {
             return;
         int numberV = Integer.parseInt(inputStr);
 
-
+        BaseDevice device = ISportAgent.getInstance().getCurrnetDevice();
+        Log.e(TAG,"----device="+device.toString());
         ISportAgent.getInstance().requestBle(0x01, numberV,"这是title", "这是content");
+    }
+
+
+    public void getExceData(View view){
+        String indexInput = exEdit.getText().toString();
+        if(TextUtils.isEmpty(indexInput))
+            return;
+        ISportAgent.getInstance().requestBle(-1,Integer.parseInt(indexInput));
     }
 }

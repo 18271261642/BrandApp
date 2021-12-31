@@ -302,7 +302,10 @@ public class S002DeviceDataRepository {
                     InitCommonParms<List<RopeDetail>, BaseUrl, BaseDbPar> parInitCommonParms = new InitCommonParms<>();
                     BaseUrl baseUrl = new BaseUrl();
                     baseUrl.userid = userId;
-                    baseUrl.extend1 = day;
+                    if(!summaryType.equals("ALL")){
+                        baseUrl.extend1 = day;
+                    }
+
                     baseUrl.extend2 = summaryType;
                     return (Observable<Summary>) RetrofitClient.getInstance().postS002(parInitCommonParms
                             .setPostBody(!(App.appType() == App.httpType)).setBaseUrl(baseUrl).setType(JkConfiguration.RequstType.ROPE_SUMMARY).getPostBody());

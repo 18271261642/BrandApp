@@ -112,7 +112,7 @@ public class W560BDevice extends BaseDevice implements IDeviceType, IWatch516, I
 
     @Override
     public void syncTodayData() {
-        WatchW557BleManager.getInstance().get_daily_record(0, true);
+        WatchW557BleManager.getInstance().get_daily_record(1, true);
     }
 
     @Override
@@ -424,6 +424,11 @@ public class W560BDevice extends BaseDevice implements IDeviceType, IWatch516, I
     @Override
     public void meassureOneHr(boolean isStart) {
         WatchW557BleManager.getInstance().startMessureOnceHr(isStart);
+    }
+
+
+    public void getExerciseData(int num){
+        WatchW557BleManager.getInstance().getExceData(num);
     }
 
 }

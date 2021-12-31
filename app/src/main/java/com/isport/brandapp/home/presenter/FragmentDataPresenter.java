@@ -969,6 +969,9 @@ public class FragmentDataPresenter extends BasePresenter<FragmentDataView> imple
 
 
     public void getDeviceSleepDataFromDB(boolean show, int currentType) {
+
+        Logger.myLog(TAG,"-------获取睡眠----getDeviceSleepDataFromDB----=currentType="+currentType);
+
         Observable.create(new ObservableOnSubscribe<SleepMainData>() {
             @Override
             public void subscribe(ObservableEmitter<SleepMainData> emitter) throws Exception {
@@ -1004,7 +1007,7 @@ public class FragmentDataPresenter extends BasePresenter<FragmentDataView> imple
             @Override
             public void onNext(SleepMainData sleepMainData) {
                 if (view != null) {
-                    // Logger.myLog("getMainW311SleepDataFromDB" + sleepMainData.toString());
+                     Logger.myLog("TAG","--------getMainW311SleepDataFromDB" + sleepMainData.toString());
                     view.successGetMainBraceletSleepFromDB(
                             sleepMainData, show);
                 }

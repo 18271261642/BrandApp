@@ -43,8 +43,8 @@ import java.util.List;
 import java.util.Vector;
 
 import brandapp.isport.com.basicres.BaseApp;
-import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 import brandapp.isport.com.basicres.commonutil.TokenUtil;
+import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 
 
 /**
@@ -62,11 +62,15 @@ public class NotificationService extends NotificationListenerService {
 
     private AudioManager audioManager;
 
+    public static String SmsAction = null;
+
     @Override
     public void onCreate() {
         super.onCreate();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BleConstance.W560_MUSIC_CONTROL_STATUS);
+
+        intentFilter.addAction("android.provider.Telephony.SMS_RECEIVED");
         registerReceiver(broadcastReceiver,intentFilter);
 
         if(audioManager == null)
@@ -79,8 +83,7 @@ public class NotificationService extends NotificationListenerService {
     public void onDestroy() {
         super.onDestroy();
         try {
-            if(broadcastReceiver != null)
-                unregisterReceiver(broadcastReceiver);
+            unregisterReceiver(broadcastReceiver);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -166,7 +169,7 @@ public class NotificationService extends NotificationListenerService {
         }
 
 
-        NotiManager.getInstance(this).handleNotification(sbn.getPackageName(), sbn.getNotification());
+        NotiManager.getInstance(this).handleNotification(sbn.getPackageName(), sbn.getNotification(),SmsAction);
     }
 
     public List<String> getText(Notification notification) {
@@ -261,54 +264,12 @@ public class NotificationService extends NotificationListenerService {
 
     }
 
-    //手机接收到通知后，发送蓝牙指令到双指针手表
-    private void sendMsgEventBus(String pname) {
-//        NotificationEntry entry = NotificationEntry.getInstance(NotificationService.this);
-//        if (pname.equals("com.tencent.mobileqq") || pname.equals("com.tencent.mm") || pname.equals("com.facebook" +
-//                                                                                                           ".katana")
-//                || pname.equals("com.twitter.android") || pname.equals("com.facebook.orca") || pname.equals("com.whatsapp")
-//                || pname.equals("com.linkedin.android") || pname.equals("com.skype.polaris") || pname.equals("com.skype.raider")
-//                || pname.equals("com.skype.rover") || pname.equals("com.instagram.android") || pname.equals("com.twitter.android")) {
-//            if ((entry.isAllowCall() || entry.isOpenNoti()) && entry.isAllowApp()) {
-//                EventBus.getDefault().post(EventCode.MSG);
-//            }
-//
-//        } else if (pname.equals("com.android.email")) {
-//            if ((entry.isAllowCall() || entry.isOpenNoti()) && entry.isAllowEmail()) {
-//                EventBus.getDefault().post(EventCode.MSG);
-//            }
-//        } else if (pname.equals("com.android.mms")) {
-//            EventBus.getDefault().post(EventCode.MSG);
-//        }
-    }
-
     //当系统通知被删掉后出发回调
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
 
     }
 
-//    private void handCtNotification(String pname, CmdCTController controller) {
-//        NotificationEntry entry = NotificationEntry.getInstance(NotificationService.this);
-//        if (pname.equals("com.tencent.mobileqq") || pname.equals("com.tencent.mm") || pname.equals("com.facebook" + "" +
-//                                                                                                           ".katana")
-//                || pname.equals("com.twitter.android") || pname.equals("com.facebook.orca") || pname.equals("com.whatsapp")
-//                || pname.equals("com.linkedin.android") || pname.equals("com.skype.polaris") || pname.equals("com.skype.raider")
-//                || pname.equals("com.skype.rover") || pname.equals("com.instagram.android") || pname.equals("com.twitter.android")) {
-//            if ((entry.isAllowCall() || entry.isOpenNoti()) && entry.isAllowApp()) {
-//                controller.handleNotification(NotificationService.this, pname, null);
-//                EventBus.getDefault().post(EventCode.MSG);
-//            }
-//
-//        } else if (pname.equals("com.android.email")) {
-//            if ((entry.isAllowCall() || entry.isOpenNoti()) && entry.isAllowEmail()) {
-//                controller.sendEmailCmd();
-//                EventBus.getDefault().post(EventCode.MSG);
-//            }
-//        } else if (pname.equals("com.android.mms")) {
-//            EventBus.getDefault().post(EventCode.MSG);
-//        }
-//    }
 
     public static void toggleNotificationListenerService(Context context) {
         Log.e(TAG, "***去重启***");
@@ -366,6 +327,11 @@ public class NotificationService extends NotificationListenerService {
             String action = intent.getAction();
             if(action == null)
                 return;
+            if(action.equals("android.provider.Telephony.SMS_RECEIVED")){       //短信的广播
+                SmsAction = action;
+            }
+
+
             if(action.equals(BleConstance.W560_MUSIC_CONTROL_STATUS)){
                 int statusCode = intent.getIntExtra(BleConstance.W560_MUSIC_STATUS,0);
                 Logger.myLog(TAG,"-code="+statusCode);

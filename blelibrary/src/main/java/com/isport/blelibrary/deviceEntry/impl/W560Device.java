@@ -15,9 +15,11 @@ import com.isport.blelibrary.entry.WristbandData;
 import com.isport.blelibrary.entry.WristbandForecast;
 import com.isport.blelibrary.managers.BaseManager;
 import com.isport.blelibrary.managers.WatchW557BleManager;
+import com.isport.blelibrary.utils.Constants;
 import com.isport.blelibrary.utils.Logger;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -396,7 +398,31 @@ public class W560Device extends BaseDevice implements IDeviceType, IWatch516, IW
 
     @Override
     public void setWeather(WristbandData wristbandData, List<WristbandForecast> list) {
-        WatchW557BleManager.getInstance().setCmdW526Weather(wristbandData, list);
+        List<WristbandForecast> w560BWeather = new ArrayList<>();
+        for(WristbandForecast wristbandForecast : list){
+
+            String weatherId = wristbandForecast.getWeatherId();
+            int weatherTag =  Constants.W81WeatherConfig.get(weatherId);
+            //560的云
+            if(weatherTag == 0 || weatherTag == 1 || weatherTag == 2 || weatherTag == 7){
+                wristbandForecast.setWeatherId("FOGGY"); //1
+            }
+
+            if(weatherTag == 5){  //晴 0
+                wristbandForecast.setWeatherId("CLOUDY");
+            }
+
+            if(weatherTag == 3 || weatherTag == 4){  //雨 3
+                wristbandForecast.setWeatherId("RAINY");
+            }
+
+            if(weatherTag == 2){ //风 2
+                wristbandForecast.setWeatherId("OVERCAST");
+            }
+
+            w560BWeather.add(wristbandForecast);
+        }
+        WatchW557BleManager.getInstance().setCmdW526Weather(wristbandData, w560BWeather);
 
     }
 
@@ -458,4 +484,8 @@ public class W560Device extends BaseDevice implements IDeviceType, IWatch516, IW
         WatchW557BleManager.getInstance().sendMusicStatus(musicName,allTime,currTime);
     }
 
+
+    public void getExerciseData(int num){
+        WatchW557BleManager.getInstance().getExceData(num);
+    }
 }

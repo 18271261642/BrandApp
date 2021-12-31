@@ -6,9 +6,9 @@ ext {
             applicationId    : "com.isport.brandapp",
 
             sdkMinVersion    : 19,
-            sdkTargetVersion : 29,
+            sdkTargetVersion : 30,
 
-            sdkCompileVersion: 29,
+            sdkCompileVersion: 30,
           //  toolsBuildVersion: "26.0.1",
 
             appVersionCode   : 2,

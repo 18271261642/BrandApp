@@ -16,7 +16,7 @@ class ExitTrainActivity : BaseActivity(), TrainFinishView {
     lateinit var mCourseId: String
 
     override fun initData() {
-        mCourseId = intent.getStringExtra(BaseConstant.EXTRA_COURSE_ID)
+        mCourseId = intent.getStringExtra(BaseConstant.EXTRA_COURSE_ID).toString()
         mPresenter.getTrainCourseInfo(mCourseId, "1")
     }
 

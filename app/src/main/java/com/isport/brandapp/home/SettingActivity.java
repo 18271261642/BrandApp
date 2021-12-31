@@ -3,6 +3,7 @@ package com.isport.brandapp.home;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.view.View;
 import android.widget.TextView;
@@ -48,6 +49,7 @@ public class SettingActivity extends BaseTitleActivity implements View.OnClickLi
     ItemView itemViewAbout;
     ItemView log;
     TextView btnLoginOut;
+    ItemView logoutItemView;
 
     @Override
     protected int getLayoutId() {
@@ -63,6 +65,8 @@ public class SettingActivity extends BaseTitleActivity implements View.OnClickLi
         btnLoginOut = view.findViewById(R.id.btn_login_out);
         log = view.findViewById(R.id.log);
         log.setVisibility(View.GONE);
+        logoutItemView = view.findViewById(R.id.logoutItemView);
+        logoutItemView.setOnClickListener(this);
     }
 
     @Override
@@ -109,7 +113,7 @@ public class SettingActivity extends BaseTitleActivity implements View.OnClickLi
     }
 
 
-    Handler handler = new Handler() {
+    private  final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
@@ -184,6 +188,28 @@ public class SettingActivity extends BaseTitleActivity implements View.OnClickLi
             case R.id.btn_login_out:
                 PublicAlertDialog.getInstance().cancelshowDialogWithContentAndTitledialog();
                 PublicAlertDialog.getInstance().showDialog("", context.getResources().getString(R.string.log_out_notice), context, getResources().getString(R.string.common_dialog_cancel), getResources().getString(R.string.common_dialog_ok), new AlertDialogStateCallBack() {
+                    @Override
+                    public void determine() {
+                        ISportAgent.getInstance().disConDevice(false);
+                        TokenUtil.getInstance().clear(context);
+                        DeviceTypeUtil.clearDevcieInfo(context);
+                        UserAcacheUtil.clearAll();
+                        App.initAppState();
+                        AppSP.putBoolean(context, AppSP.CAN_RECONNECT, false);
+                        Intent intent = new Intent(context, ActivityLogin.class);
+                        startActivity(intent);
+                        ActivityManager.getInstance().finishAllActivity(ActivityLogin.class.getSimpleName());
+                    }
+
+                    @Override
+                    public void cancel() {
+
+                    }
+                }, false);
+                break;
+            case R.id.logoutItemView:       //注销账号，实际上为退出登录
+                PublicAlertDialog.getInstance().cancelshowDialogWithContentAndTitledialog();
+                PublicAlertDialog.getInstance().showDialog("提醒", "是否注销账号?", context, getResources().getString(R.string.common_dialog_cancel), getResources().getString(R.string.common_dialog_ok), new AlertDialogStateCallBack() {
                     @Override
                     public void determine() {
                         ISportAgent.getInstance().disConDevice(false);

@@ -107,15 +107,12 @@
                             android:layout_below="@+id/tv_age"
                             android:layout_centerHorizontal="true"
                             android:layout_marginLeft="@dimen/dp30"
-                            android:layout_marginRight="@dimen/dp15"
                             android:layout_marginTop="@dimen/dp5"
-                            android:textStyle="bold"
-                            android:text="dfsafds"
+                            android:layout_marginRight="@dimen/dp15"
                             android:singleLine="true"
                             android:textColor="@color/common_white"
-                            android:textSize="28sp" />
-
-
+                            android:textSize="28sp"
+                            android:textStyle="bold" />
 
 
                         <TextView
@@ -126,7 +123,6 @@
                             android:layout_marginLeft="@dimen/dp30"
                             android:layout_marginTop="@dimen/dp10"
                             android:layout_marginRight="@dimen/dp30"
-                            android:text="fjdlsfjdslfjlafjdlsfjdslfjlasdkjfklasdjflkasdjfklasjdlfkajskldfjskdlfjasldkfjlaskdjflkasdjfklasdjfklasdjkfljsdlkfjsdlkfjaslkdfjsdkjfklasdjflkasdjfklasjdlfkajskldfjskdlfjasldkfjlaskdjflkasdjfklasdjfklasdjkfljsdlkfjsdlkfjaslkdfj"
                             android:textColor="@color/common_tips_color"
                             android:textSize="13sp"
                             android:visibility="visible" />

@@ -53,4 +53,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="获取固件版本"/>
+
+
+    <EditText
+        android:id="@+id/exEdit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入序号"/>
+
+    <Button
+        android:id="@+id/getExitBtn"
+        android:onClick="getExceData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="获取锻炼数据"/>
+
+
 </LinearLayout>

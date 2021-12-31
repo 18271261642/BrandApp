@@ -285,6 +285,10 @@ internal class RealRopeSkippingActivity() : BaseMVPTitleActivity<RealRopeSkippin
 
         //设置目标
         tv_top_taget_view.setOnClickListener {
+
+            if(!isClickStart)
+                return@setOnClickListener
+
             when (sportBean!!.currentRopeType) {
                 JkConfiguration.RopeSportType.Count -> {   //计数训练
                     mSelectPopupWindow?.popWindowSelect(
@@ -370,14 +374,21 @@ internal class RealRopeSkippingActivity() : BaseMVPTitleActivity<RealRopeSkippin
     fun isCanBack(isCanBack: Boolean) {
         if (isCanBack) {
             tv_rope_start.setTag(end)
+
         } else {
             tv_rope_start.setTag(start)
         }
+
+        tv_top_taget_view.setShowShadow (isCanBack)
+        tv_top_taget_tips.text = if(isCanBack) sportBean?.topTargetTips else sportBean?.topTitle
+
         isClickStart = isCanBack;
         if (sportBean != null) {
             titleBarView.setInvisibalLeftIcon(!sportBean!!.isStart)
             titleBarView.setRightIconVisible(!sportBean!!.isStart)
         }
+
+
 
     }
 
@@ -416,8 +427,11 @@ internal class RealRopeSkippingActivity() : BaseMVPTitleActivity<RealRopeSkippin
                     isCallEnd = false;
                     if (sportBean!!.currentRopeType != msg.ropeType) {
                         isSettingSuccess = false
-                        initDatas(msg.ropeType, isviewClick)
+                       // initDatas(msg.ropeType, isviewClick)
                     }
+
+                    Logger.myLog(tgs,"----挑战--bean==null="+Gson().toJson(bean));
+
                     if (bean != null) {//说明是挑战
                         if (bean!!.achieveSecond == 0) {   //是记数挑战，只记录个数，不记录时间
                             sportBean!!.ducation = msg.time.toInt()
@@ -427,11 +441,11 @@ internal class RealRopeSkippingActivity() : BaseMVPTitleActivity<RealRopeSkippin
                         } else {    //计时和记数
                            // sportBean!!.topValue = "" + msg.countdown
 
-                            sportBean!!.topValue =  DateUtil.getRopeFormatTimehhmmss(sportBean!!.countdownDucation.toLong())
 
                             sportBean!!.countdownDucation = msg.countdownMin * 60 + msg.countdownSec
                           //  sportBean!!.bottomValue = DateUtil.getRopeFormatTimehhmmss(sportBean!!.countdownDucation.toLong())
 
+                            sportBean!!.topValue =  DateUtil.getRopeFormatTimehhmmss(sportBean!!.countdownDucation.toLong())
                             sportBean!!.bottomValue =""+ msg.countdown
 
                             sportBean!!.ducation = msg.time.toInt()
@@ -533,7 +547,7 @@ internal class RealRopeSkippingActivity() : BaseMVPTitleActivity<RealRopeSkippin
                     setValue()
                 }
             }
-        } else if (o is RopeStartOrEndSuccessObservable) {
+        } else if (o is RopeStartOrEndSuccessObservable) {   //开始和结束
 
             Logger.myLog(tgs,"---------开始和结束状态返回="+Gson().toJson(arg))
             if (arg is RopeRealDataBean) {
@@ -800,10 +814,10 @@ internal class RealRopeSkippingActivity() : BaseMVPTitleActivity<RealRopeSkippin
         if (AppConfiguration.isConnected) {
             if (AppConfiguration.currentConnectDevice !== null && AppConfiguration.currentConnectDevice.deviceType == JkConfiguration.DeviceType.ROPE_SKIPPING) {
                 iv_device_state.setTag(conn)
-                iv_device_state.setAlpha(0.3f)
+                iv_device_state.setAlpha(1.0f)
             } else {
                 iv_device_state.setTag(disCon)
-                iv_device_state.setAlpha(1.0f)
+                iv_device_state.setAlpha(0.3f)
             }
         } else {
             iv_device_state.setAlpha(0.3f)
@@ -851,7 +865,7 @@ internal class RealRopeSkippingActivity() : BaseMVPTitleActivity<RealRopeSkippin
     //显示数字进度条
     fun setTopeValue(count: String) {
 
-        Logger.myLog(tgs,"------sportBeansportBean-----="+Gson().toJson(sportBean)+"--bena="+Gson().toJson(bean)+"\n"+Gson().toJson(targetBean))
+        Logger.myLog(tgs,"------sportBeansportBean-----="+Gson().toJson(sportBean)+"--bena="+Gson().toJson(bean)+"\n"+Gson().toJson(targetBean)+"\n"+count)
 
         tv_top_value.text = (count)
         tv_top_value_precent.text = (count)
@@ -948,7 +962,47 @@ internal class RealRopeSkippingActivity() : BaseMVPTitleActivity<RealRopeSkippin
             tv_hr_value.text = UIUtils.getString(R.string.no_data)
             ropeChallengeHeartTv?.text =  UIUtils.getString(R.string.no_data)
         }
+
+        setHeartTvColor(hr)
+
     }
+
+
+    //设置心率的颜色
+    private fun setHeartTvColor(heartValue : Int){
+        val point = HeartRateConvertUtils.hearRate2Point(heartValue, HeartRateConvertUtils.getMaxHeartRate(age, sex))
+        //Logger.myLog("hrList.get(i)" + hrValue + "HeartRateConvertUtils.getMaxHeartRate(age):" + HeartRateConvertUtils.getMaxHeartRate(age, sex) + "age:" + age + "point:" + point)
+        //Logger.myLog("age=" + age + "hrValue=" + hrValue + "point=" + point + "sex=" + sex)
+
+        var color = UIUtils.getColor(R.color.common_white)
+        when (point) {
+            0 -> {
+                color = UIUtils.getColor(R.color.color_leisure)
+            }
+            1 -> {
+                color = UIUtils.getColor(R.color.color_warm_up)
+            }
+            2 -> {
+                color = UIUtils.getColor(R.color.color_fat_burning_exercise)
+            }
+            3 -> {
+                color = UIUtils.getColor(R.color.color_aerobic_exercise)
+            }
+            4 -> {
+                color = UIUtils.getColor(R.color.color_anaerobic_exercise)
+            }
+            5 -> {
+                color = UIUtils.getColor(R.color.color_limit)
+            }
+        }
+
+        ropeChallengeHeartTv?.setTextColor(color)
+    }
+
+
+
+
+
 
     fun setValue() {
 
@@ -963,11 +1017,9 @@ internal class RealRopeSkippingActivity() : BaseMVPTitleActivity<RealRopeSkippin
         tv_bottom_unitl.text = (sportBean!!.bottomUnit)
         tv_bottom_title.text = (sportBean!!.bottomTitle)
         if (sportBean!!.isClick) {
-            tv_top_taget_view.visibility = View.VISIBLE
             tv_top_tips.visibility = View.GONE
         } else {
             tv_top_tips.visibility = View.VISIBLE
-            tv_top_taget_view.visibility = View.GONE
         }
         if (sportBean!!.isStart) {
             titleBarView.setRightIconVisible(false)
@@ -1287,7 +1339,7 @@ internal class RealRopeSkippingActivity() : BaseMVPTitleActivity<RealRopeSkippin
         if (bean?.achieveSecond != 0) {
             RopePkCompletyDialog(this@RealRopeSkippingActivity, currentRopeName, currentTime + "/" + DateUtil.getRopeFormatTimehhmmss((bean?.achieveSecond)!!.toLong()), currentRopeCount + "/" + bean?.achieveNum, currentToalCal, false, avgHeart, object :RopePkCompletyDialog.OnTypeClickListenter {
                 override fun changeDevcieonClick(type: Int) {
-                    handler.removeCallbacks(null)
+                    //handler.removeCallbacks(null)
                     stopPlayMusic()
                     finish()
                 }
@@ -1301,7 +1353,7 @@ internal class RealRopeSkippingActivity() : BaseMVPTitleActivity<RealRopeSkippin
         } else {
             RopePkCompletyDialog(this@RealRopeSkippingActivity, currentRopeName, currentTime, currentRopeCount + "/" + bean?.achieveNum, currentToalCal, false, avgHeart, object : RopePkCompletyDialog.OnTypeClickListenter {
                 override fun changeDevcieonClick(type: Int) {
-                    handler.removeCallbacks(null)
+                  //  handler.removeCallbacks(null)
                     stopPlayMusic()
                     finish()
                 }

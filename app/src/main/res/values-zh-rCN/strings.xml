@@ -4,6 +4,38 @@
     <string name="app_name">奔啦啦</string>//iSport健康管家
 
 
+    <string name="string_permiss_title">奔啦啦权限使用说明</string>
+    <string name="string_permiss_desc">为保证APP的正常使用,请开启以下权限</string>
+    <string name="string_permiss_ble">使用蓝牙功能</string>
+    <string name="string_permiss_ble_desc">需要使用手机蓝牙功能连接蓝牙手表</string>
+    <string name="string_permiss_gps">使用GPS功能</string>
+    <string name="string_permiss_gps_desc">地图跑步轨迹记录和搜索蓝牙手表需要打开手机GPS开关</string>
+    <string name="string_permiss_local">位置权限使用</string>
+    <string name="string_permiss_local_desc">跑步运动获取高精度位置信息</string>
+    <string name="string_permiss_camera">相机权限使用</string>
+    <string name="string_permiss_camera_desc">使用相机拍摄图片作为头像</string>
+    <string name="string_permiss_file">文件读写权限使用</string>
+    <string name="string_permiss_file_desc">相机拍照保存从相册选择图片作为头像</string>
+    <string name="string_permiss_phone">电话权限的使用</string>
+    <string name="string_permiss_phone_desc">消息提醒功能来电提醒手表查看当前来电状态</string>
+    <string name="string_permiss_contact">联系人、通讯录权限的使用</string>
+    <string name="string_permiss_contact_desc">来电时，手表可以显示姓名和手机号</string>
+
+
+
+    <string name="string_w560_practise_out_walk">户外走</string>
+    <string name="string_w560_practise_out_run">户外跑</string>
+    <string name="String_w560_practise_cycle">骑行</string>
+    <string name="string_w560_practise_indoor_walk">室内走</string>
+    <string name="string_w560_practise_indoor_run">室内跑</string>
+    <string name="string_w560_practise_yoga">瑜伽</string>
+    <string name="string_w560_practise_eliptical">椭圆机</string>
+    <string name="string_w560_pracitse_spinning">动感单车</string>
+    <string name="string_w560_practise_run">徒步</string>
+    <string name="string_w560_practise_rowing">划船</string>
+    <string name="string_w560_practise_other">其它</string>
+
+    <string name="string_user_privacy">用户协议和隐私政策</string>
 
     <string name="string_share_share">分享</string>
     <string name="string_share_rank_txt">全网第 %1$s 人完成挑战  %2$s</string>
@@ -122,8 +154,8 @@
     <string name="showContent">全文</string>
     <string name="hiden">收起</string>
 
-    <string name="facebook_app_id">849525262075423</string>
-
+    <string name="facebook_app_id">693785877755643</string>
+    <string name="fb_login_protocol_scheme">fb693785877755643</string>
     <!--已整理-->
     <string name="app_def_setting"> - - ：- -</string>//
     <string name="no_data">- -</string>//
@@ -503,8 +535,8 @@
     <string name="watch_litter_sleep_title_1">1.零星小睡时长标准</string>
     <string name="watch_litter_sleep_title_2">2.什么时段适合日间小睡？</string>
     <string name="watch_litter_sleep_title_3">参考文献</string>
-    <string name="watch_litter_sleep_content_1">夜间睡眠时间不足或睡眠质量不高，可以在曰间 通过适当的小睡来补充精力。一般来说，在中午 1点之前小睡15-30分钟，可以让您重新精力充沛， 提升下午的清醒程度和工作效率。 但是，日间小睡时间不宜超过45分钟，否则可能 让您进入深睡阶段，体温降，醒来后感觉非常困 倦、或出现头晕、恶心等不良症状。同时，如果 白天进入了深睡，会降低夜晚的睡意，导致夜间 难以入睡。</string>
-    <string name="watch_litter_sleep_content_2">生物钟里最重要的部分就是体温节律，当体温升 高时，人会感觉更清醒；当体温下降时，人会感 觉到身体疲乏，睡意来袭。体温在一天之中呈现 周期性的波动，在早晨开始上升，午间有时会进 行下调，然后继续上升，直到夜晚来临。因此， 在中午体温回落时（一般在中午1点之前）小睡， 效果是最好的。曰间小睡时间过晚，会对体温节 律产生干扰，影响夜间睡眠质量。*未超过3小时 的单次睡眠均统计在零星小睡中。</string>
+    <string name="watch_litter_sleep_content_1">夜间睡眠时间不足或睡眠质量不高，可以在日间通过适当的小睡来补充精力。一般来说，在中午 1点之前小睡15-30分钟，可以让您重新精力充沛， 提升下午的清醒程度和工作效率。 但是，日间小睡时间不宜超过45分钟，否则可能 让您进入深睡阶段，体温降，醒来后感觉非常困 倦、或出现头晕、恶心等不良症状。同时，如果 白天进入了深睡，会降低夜晚的睡意，导致夜间 难以入睡。</string>
+    <string name="watch_litter_sleep_content_2">生物钟里最重要的部分就是体温节律，当体温升 高时，人会感觉更清醒；当体温下降时，人会感 觉到身体疲乏，睡意来袭。体温在一天之中呈现 周期性的波动，在早晨开始上升，午间有时会进 行下调，然后继续上升，直到夜晚来临。因此， 在中午体温回落时（一般在中午1点之前）小睡， 效果是最好的。日间小睡时间过晚，会对体温节 律产生干扰，影响夜间睡眠质量。*未超过3小时 的单次睡眠均统计在零星小睡中。</string>
     <string name="watch_litter_sleep_content_3">[1] The circadian rhythm of body temperature.Frontiers in Bioscience, 2010(15): 564-594.\n[2] 《睡眠障碍诊疗手册》，人民卫生出版社， 2012年9月第1版。</string>
 
     <string name="watch_stable_remind_str">久坐提醒</string>
@@ -852,7 +884,7 @@
     <string name="heart_data_title">心率颜色区间强度对应表</string>
     //睡眠详情页面名词解释
     <string name="activity_sleep_history_exp">睡眠是生物维持生命的重要行为之一，通过硬件设备记录您的睡眠状况，对睡眠质量进行分析，帮助您了解和调整睡眠习惯。</string>
-    <string name="activity_hr_history_exp">心率检测是通过手环等硬件进行心率检测，您可以根据心率等变化情况来调节运动强度，达到科学运动等目的。心率折线图中每个点代表当前5分钟的心率。</string>
+    <string name="activity_hr_history_exp">心率检测是通过手环等硬件进行心率检测，您可以根据心率等变化情况来调节运动强度，达到科学运动等目的。心率折线图中每个点代表当前%1$s分钟的心率。</string>
 
     //设备解绑引导页面
     <string name="device_unbind_tips">请解除手机与设备的配对</string>

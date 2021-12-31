@@ -1,40 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="92dp"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:layout_height="92dp">
+
 
     <TextView
         android:id="@+id/tv_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:textStyle="bold"
         android:layout_marginLeft="@dimen/dp15"
         android:text="08:00"
         android:textColor="#2F2F33"
-        android:textSize="@dimen/sp32" />
+        android:textSize="@dimen/sp32"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <View
+        android:id="@+id/alarmTmpView"
         android:layout_width="0.5dp"
-        android:layout_height="wrap_content"
-        android:background="@color/ali_feedback_black"
-        android:layout_marginTop="@dimen/dp10"
-        android:layout_marginBottom="@dimen/dp10"
-        android:layout_marginLeft="@dimen/dp15"/>
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/dp10"
+        android:layout_marginTop="@dimen/dp15"
+        android:layout_marginBottom="@dimen/dp15"
+        android:background="@color/ali_feedback_black" />
+
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/alarmTmpView"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/tv_repeat"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dp50"
-            android:layout_marginLeft="@dimen/dp15"
+            android:maxLines="15"
+            android:lines="1"
+            android:ellipsize="end"
+            android:layout_marginLeft="@dimen/dp10"
             android:gravity="center_vertical|left"
-            android:text="周一"
+            android:text="周一,周二，周三，周四，周五，周六，周日"
             android:textColor="#2F2F33"
             android:textSize="@dimen/sp16" />
 
@@ -42,28 +58,29 @@
             android:id="@+id/tv_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp10"
             android:text="名字"
-            android:layout_marginLeft="@dimen/dp15"
             android:textColor="#2f2f33"
-            android:textSize="@dimen/sp16"/>
+            android:textSize="@dimen/sp16" />
 
     </LinearLayout>
 
-    <View
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_weight="1" />
 
     <ImageView
         android:id="@+id/view_car_remind_radio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="@dimen/dp10"
         android:layout_gravity="center_vertical"
+        android:layout_marginRight="@dimen/dp10"
         android:clickable="true"
         android:padding="5dp"
         android:src="@drawable/icon_open"
         android:text=""
-        android:visibility="visible" />
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
 </LinearLayout>
+

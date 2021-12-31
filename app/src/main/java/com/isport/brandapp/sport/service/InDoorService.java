@@ -13,6 +13,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 
 import com.isport.blelibrary.utils.ThreadSinglePoolUtils;
 import com.isport.brandapp.device.sleep.TimeUtil;
@@ -43,6 +44,8 @@ import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 
 public class InDoorService extends BaseService<IndoorRunningServiceView, IndoorRunningServicePersenter> {
 
+    private static final String TAG = "InDoorService";
+    
     // 用静态变量记录下当前时刻跑步的数据。
     public static final IndoorRunDatas theMomentRunData = new IndoorRunDatas();
 
@@ -177,13 +180,15 @@ public class InDoorService extends BaseService<IndoorRunningServiceView, IndoorR
     Intent intent;
 
 
-    private ServiceConnection serviceConnection = new ServiceConnection() {
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             //Activity和Service通过aidl进行通信
             iSportStepInterface = ISportStepInterface.Stub.asInterface(service);
             try {
                 // mFirstStepSum = iSportStepInterface.getCurrentTimeSportStep();
+                int phoneStep = iSportStepInterface.getCurrentTimeSportStep();
+                Log.e(TAG,"-------手机步数="+phoneStep);
                 argsForInRunService.phonePauseStep = iSportStepInterface.getCurrentTimeSportStep();
                 sumStepSum = 0;
                 //updateStepCount();
@@ -287,9 +292,10 @@ public class InDoorService extends BaseService<IndoorRunningServiceView, IndoorR
                     public void run() {
                         if (null != iSportStepInterface) {
                             int step = 0;
-                            Logger.e("step--------------" + step);
+
                             try {
                                 step = iSportStepInterface.getCurrentTimeSportStep();
+                                Logger.e("step--------------" + step);
                             } catch (RemoteException e) {
                                 e.printStackTrace();
                             } finally {

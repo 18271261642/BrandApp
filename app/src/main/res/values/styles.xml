@@ -195,4 +195,10 @@
         <item name="android:windowBackground">@color/common_view_color</item>
     </style>
 
+
+
+    <style name="FaceBookLoginStyle">
+        <item name="android:drawable">@drawable/facebook</item>
+    </style>
+
 </resources>

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -81,6 +82,7 @@ import com.isport.brandapp.device.watch.view.WatchView;
 import com.isport.brandapp.dialog.UnBindDeviceDialog;
 import com.isport.brandapp.dialog.UnbindStateCallBack;
 import com.isport.brandapp.home.bean.http.WatchSleepDayData;
+import com.isport.brandapp.login.ShowPermissionActivity;
 import com.isport.brandapp.upgrade.bean.DeviceUpgradeBean;
 import com.isport.brandapp.upgrade.present.DevcieUpgradePresent;
 import com.isport.brandapp.upgrade.view.DeviceUpgradeView;
@@ -482,6 +484,26 @@ public class ActivityBraceletMain extends BaseMVPTitleActivity<WatchView, WatchP
         ivWatchMsgSetting.setOnCheckedChangeListener(this);
         iv_bracelet_dropping_reminder.setOnCheckedChangeListener(this);
 
+        ivWatchMsgSetting.setShowArrow(true);
+        ivWatchCallRemind.setShowArrow(true);
+        ivWatchMsgSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
+                    startActivityForResult(intent, 0x01);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        ivWatchCallRemind.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(ActivityBraceletMain.this, ShowPermissionActivity.class));
+            }
+        });
 
         ivWatchStepTarget.setOnContentClickListener(new ItemDeviceSettingView.OnContentClickListener() {
             @Override
@@ -1694,6 +1716,18 @@ public class ActivityBraceletMain extends BaseMVPTitleActivity<WatchView, WatchP
         ivWatchMsgSetting.setChecked(false);
         //先请求SMS权限 RECEIVE_SMS  不论时拒绝还是同意都不做操作，应该设置为关闭状态
         PermissionManageUtil permissionManage1 = new PermissionManageUtil(context);
+        permissionManage1.requestPermissions(mRxPermission, Manifest.permission.READ_SMS, UIUtils.getString(R.string.permission_location3), new PermissionManageUtil.OnGetPermissionListener() {
+            @Override
+            public void onGetPermissionYes() {
+
+            }
+
+            @Override
+            public void onGetPermissionNo() {
+
+            }
+        });
+
         if (!mRxPermission.isGranted(Manifest.permission.RECEIVE_SMS)) {
             permissionManage1.requestPermissions(mRxPermission, Manifest.permission.RECEIVE_SMS,
                     UIUtils.getString(R.string.permission_location3), new

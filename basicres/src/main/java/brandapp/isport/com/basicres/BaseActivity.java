@@ -532,7 +532,7 @@ public abstract class BaseActivity extends BasicActivity implements Observer {
 
     }
 
-    private void showProgress(final String desc, final boolean isCancelable) {
+    public void showProgress(final String desc, final boolean isCancelable) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -597,7 +597,7 @@ public abstract class BaseActivity extends BasicActivity implements Observer {
         });
     }
 
-    private void dismissProgressBar() {
+    public void dismissProgressBar() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

@@ -4,6 +4,7 @@ package phone.gym.jkcq.com.socialmodule.activity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -42,9 +43,11 @@ public class SportRankActivity extends BaseTitleActivity {
     private LinearLayout ll_launch;
     private LinearLayout ll_tab_rank;
     private Button btn_launch;
-    private String mTitles[] = {UIUtils.getString(R.string.friend_outdoor_step), UIUtils.getString(R.string.friend_outdoor_calorie), UIUtils.getString(R.string.friend_outdoor_running), UIUtils.getString(R.string.friend_treadmill), UIUtils.getString(R.string.friend_tdoor_cycling), UIUtils.getString(R.string.friend_walking)};
+    private String mTitles[] = {UIUtils.getString(R.string.friend_outdoor_step), UIUtils.getString(R.string.friend_outdoor_calorie), UIUtils.getString(R.string.friend_outdoor_running), UIUtils.getString(R.string.friend_treadmill),UIUtils.getString(R.string.friend_tdoor_cycling),UIUtils.getString(R.string.friend_walking)};
 
     private UserInfoBean mUserInfo;
+    private TextView tv_content1;
+    private TextView tv_content2;
 
     @Override
     protected int getLayoutId() {
@@ -56,6 +59,11 @@ public class SportRankActivity extends BaseTitleActivity {
 
     @Override
     protected void initView(View view) {
+        tv_content1 = findViewById(R.id.tv_content1);
+        tv_content2 = findViewById(R.id.tv_content2);
+
+        tv_content1.setText(getResources().getString(R.string.see_friend_sport_rank));
+        tv_content2.setText(getResources().getString(R.string.friend_see_yout_sportrank));
         if (view != null) {
             ll_tab_rank = view.findViewById(R.id.ll_tab_rank);
             ll_launch = view.findViewById(R.id.ll_launch);

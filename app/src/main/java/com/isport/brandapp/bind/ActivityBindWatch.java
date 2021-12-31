@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.AdapterView;
 
+import com.google.gson.Gson;
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
 import com.isport.blelibrary.interfaces.BleReciveListener;
@@ -61,6 +62,9 @@ import phone.gym.jkcq.com.commonres.common.JkConfiguration;
  */
 
 public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPresenter> implements BindBaseView {
+
+    private static final String TAG = "ActivityBindWatch";
+
     private RefreshRecyclerView refreshRecyclerView;
     private AdapterBindPageDeviceList adapterBindPageDeviceList;
     private boolean hasWatch;
@@ -231,7 +235,7 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
         list.add(new DeviceBean(JkConfiguration.DeviceType.WATCH_W516, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_FILTER), R.drawable.icon_w516));
         list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W556, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_556_FILTER), R.drawable.icon_scan_w526));
         list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W557, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_557_FILTER), R.drawable.icon_scan_w557));
-        list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W560, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_560_FILTER), R.drawable.icon_scan_w560));
+        list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W560, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_560_FILTER), R.drawable.icon_search_type_w560));
         list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W560B, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_560B_FILTER), R.drawable.icon_scan_w560));
         list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W812, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_812_FILTER), R.drawable.icon_scan_w812));
         list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W812B, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_812B_FILTER), R.drawable.icon_scan_w812b));
@@ -239,9 +243,14 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
         list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W817, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_817_FILTER), R.drawable.icon_scan_w817));
         list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W819, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_819_FILTER), R.drawable.icon_scan_w819));
         hasWatch = false;
-        if (AppConfiguration.deviceBeanList != null) {
-            for (int deviceType : AppConfiguration.deviceBeanList.keySet()) {
-                DeviceBean deviceBean = AppConfiguration.deviceBeanList.get(deviceType);
+
+        //此处AppConfiguration.deviceBeanList 更换为AppConfiguration.deviceMainBeanList
+
+
+
+        if (AppConfiguration.deviceMainBeanList != null) {
+            for (int deviceType : AppConfiguration.deviceMainBeanList.keySet()) {
+                DeviceBean deviceBean = AppConfiguration.deviceMainBeanList.get(deviceType);
                 switch (deviceBean.currentType) {
                     case JkConfiguration.DeviceType.Watch_W910:
                         updateList(0, deviceBean);
@@ -297,10 +306,9 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
 
     private void onItemClickAction(int position) {
 
-
         mDeviceBean = list.get(position);
-        Logger.myLog("mDeviceBean" + mDeviceBean + "position=" + position);
-        if (AppConfiguration.deviceBeanList != null && AppConfiguration.deviceBeanList.size() > 0) {
+        Logger.myLog(TAG,"mDeviceBean=" + mDeviceBean.toString() + "position=" + position+"\n"+"map保存="+new Gson().toJson(AppConfiguration.deviceBeanList));
+        if (AppConfiguration.deviceMainBeanList != null && AppConfiguration.deviceMainBeanList.size() > 0) {
             //已经有绑定的设备列表
             if (Utils.isEmpty(mDeviceBean.deviceName)) {
                 if (DeviceTypeUtil.isContainBrand() || DeviceTypeUtil.isContainW81() || DeviceTypeUtil.isContainWatch()) {
@@ -332,7 +340,7 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
     private void unBindDevice(DeviceBean deviceBean, boolean isDe) {
         isDerictUnBind = true;
         currentType = deviceBean.deviceType;
-        Logger.myLog("点击去解绑 == " + currentType);
+        Logger.myLog("点击去解绑 == " + currentType+"\n"+deviceBean.toString());
         mActPresenter.unBind(deviceBean, isDe);
     }
 
@@ -463,7 +471,7 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
         isDerictUnBind = false;
         mDeviceBean = DeviceTypeUtil.getBindDevcie();
 
-        Logger.myLog("DeviceTypeUtil.getBindDevcie()=" + mDeviceBean + "");
+        Logger.myLog(TAG,"------DeviceTypeUtil.getBindDevcie()=" + mDeviceBean.toString() + "");
         if (mDeviceBean == null) {
             return;
         }
@@ -477,10 +485,12 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
                 if (AppConfiguration.isConnected) {
                     BaseDevice device = ISportAgent.getInstance().getCurrnetDevice();
 
+                    Logger.myLog(TAG,"---------jiebang-vaseDevice="+device.toString());
 
                     int deviceType = 0;
                     if (device != null) {
-                        deviceType = device.deviceType;
+                        deviceType = device.deviceType ;
+
                     }
                     if (deviceType == JkConfiguration.DeviceType.ROPE_SKIPPING) {
                         ToastUtils.showToast(context, UIUtils.getString(R.string.app_disconnect_device));

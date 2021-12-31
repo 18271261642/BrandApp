@@ -1,5 +1,6 @@
 package com.isport.brandapp.util;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -21,10 +22,16 @@ public class BleUtil {
      */
     static public ITelephony getITelephony(TelephonyManager telMgr)
             throws Exception {
-        Method getITelephonyMethod = telMgr.getClass().getDeclaredMethod(
-                "getITelephony");
-        getITelephonyMethod.setAccessible(true);// 私有化函数也能使用
-        return (ITelephony) getITelephonyMethod.invoke(telMgr);
+        try {
+            @SuppressLint("SoonBlockedPrivateApi") Method getITelephonyMethod = telMgr.getClass().getDeclaredMethod(
+                    "getITelephony");
+            getITelephonyMethod.setAccessible(true);// 私有化函数也能使用
+            return (ITelephony) getITelephonyMethod.invoke(telMgr);
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
 
@@ -104,10 +111,13 @@ public class BleUtil {
             mthEndCall.setAccessible(true);
             ITelephony iTel = (ITelephony) mthEndCall.invoke(telMag,
                     (Object[]) null);
+            assert iTel != null;
             iTel.endCall();
 //            Log.e("", ""+iTel.toString());
         } catch (Exception e) {
             e.printStackTrace();
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
         }
 //        Log.e("", "endCall test");
     }
@@ -119,15 +129,11 @@ public class BleUtil {
                     .getMethod("getService", String.class);
             IBinder binder = (IBinder) method.invoke(null, new Object[]{TELEPHONY_SERVICE});
             ITelephony telephony = ITelephony.Stub.asInterface(binder);
+            assert telephony != null;
             telephony.endCall();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-            //Log.d(TAG, "", e);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-           // Log.d(TAG, "", e);
-        } catch (Exception e) {
-            e.printStackTrace();
+        }
+        catch (Throwable noSuchMethodError){
+            noSuchMethodError.printStackTrace();
         }
 
     }

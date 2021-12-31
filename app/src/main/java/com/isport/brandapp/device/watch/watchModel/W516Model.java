@@ -2,7 +2,6 @@ package com.isport.brandapp.device.watch.watchModel;
 
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-
 import com.google.gson.Gson;
 import com.isport.blelibrary.db.action.watch_w516.Watch_W516_24HDataModelAction;
 import com.isport.blelibrary.db.parse.ParseData;
@@ -24,8 +23,8 @@ import com.isport.brandapp.home.bean.http.WristbandHrHeart;
 import com.isport.brandapp.home.bean.http.Wristbandstep;
 import com.isport.brandapp.R;
 import com.isport.brandapp.device.bracelet.bean.StepBean;
+import com.isport.brandapp.util.DateTimeUtils;
 import com.isport.brandapp.util.DeviceTypeUtil;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +32,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
+import java.util.Locale;
 import bike.gymproject.viewlibray.SleepFormatUtils;
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.action.BaseAction;
@@ -233,7 +232,7 @@ public class W516Model implements IW516Model {
     /**
      * 获取两周的数据
      *
-     * @param strDate
+     * @param
      * @return
      */
     @Override
@@ -343,17 +342,18 @@ public class W516Model implements IW516Model {
      */
     @Override
     public WatchSleepDayData getWatchSleepDayLastData(String deviceId) {
-
         WatchSleepDayData watchSleepDayData = new WatchSleepDayData();
         Watch_W516_24HDataModel currentModel = Watch_W516_24HDataModelAction.findLastTwoDayData(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), deviceId);
         if (currentModel != null) {
+
             int type = parSleepDayType(currentModel);
             switch (type) {
                 case day20beforhasData:
-                    if (currentModel != null) {
-                        Watch_W516_24HDataModel lastmModel = Watch_W516_24HDataModelAction.findWatch_W516_Watch_W516_24HDataModelByDeviceId(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), TimeUtils.getLastDayStr(currentModel.getDateStr()), deviceId);
-                        watchSleepDayData = parWatchSleepDayLastData(lastmModel, currentModel);
+                    Watch_W516_24HDataModel lastmModel = Watch_W516_24HDataModelAction.findWatch_W516_Watch_W516_24HDataModelByDeviceId(TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()), TimeUtils.getLastDayStr(currentModel.getDateStr()), deviceId);
+                    if(lastmModel == null){
+                        return  analysisSleep(currentModel,deviceId);
                     }
+                    watchSleepDayData = parWatchSleepDayLastData(lastmModel, currentModel);
                     break;
                 case day20afterhasData:
                 case alldayData:
@@ -373,9 +373,112 @@ public class W516Model implements IW516Model {
     }
 
 
+
+    private WatchSleepDayData analysisSleep(Watch_W516_24HDataModel w24HData,String deviceId){
+        String sleepArrayStr = w24HData.getSleepArray();
+        int[] sleepArray = new Gson().fromJson(sleepArrayStr,int[].class);
+
+        WatchSleepDayData watchSleepDayData = new WatchSleepDayData();
+        watchSleepDayData.setDateStr(DateTimeUtils.getCurrentDate());
+
+        watchSleepDayData.setDateStr(w24HData.getDateStr());
+
+        Logger.myLog(TAG,"---111----睡眠数组="+sleepArray.length+"\n"+Arrays.toString(sleepArray));
+
+        //处理睡眠数组，当天睡眠从0点到9点，最多 9 * 60个点
+        int[] tmpSleepArray = new int[9 * 60];
+
+        System.arraycopy(sleepArray,0,tmpSleepArray,0,tmpSleepArray.length);
+
+        int yesSleepCount = 4 * 60;
+        int[] resultSleepByte = new int[yesSleepCount + tmpSleepArray.length];
+
+        System.arraycopy(tmpSleepArray,0,resultSleepByte,yesSleepCount,tmpSleepArray.length);
+
+        Logger.myLog(TAG,"-----处理的睡眠="+resultSleepByte.length+"\n"+new Gson().toJson(resultSleepByte));
+        watchSleepDayData.setSleepArry(resultSleepByte);
+        //找出第一个不为0的元素下标
+        int startIndex = 0;
+        for(int i = 0;i<tmpSleepArray.length;i++){
+            if(tmpSleepArray[i] != 0){
+                startIndex = i;
+                break;
+            }
+        }
+
+        //开始的睡眠时间
+        int startTime = startIndex +1;
+
+        //结束时间 倒序
+        int endIndex = 0;
+        for(int k= tmpSleepArray.length-1;k>=0;k--){
+            if(tmpSleepArray[k] !=0){
+                endIndex = k;
+             break;
+            }
+        }
+
+        //结束时间
+        int endTime = endIndex +1;
+
+        int deepSleepTime = 0;
+        int totalSleepTime = 0;
+        int lightLV2SleepTime = 0;
+        int lightLV1SleepTime = 0;
+        int awakeSleepTime = 0;
+
+        for(int n = 0;n<tmpSleepArray.length;n++){
+            int sleepValue = tmpSleepArray[n];
+            if (sleepValue == 250) {
+                //深睡
+                Logger.myLog("深睡");
+                deepSleepTime++;
+                totalSleepTime++;
+            }
+
+             if (sleepValue == 251) {
+                //浅睡 level 2
+                // Logger.myLog("浅睡 level 2");
+                lightLV2SleepTime++;
+                totalSleepTime++;
+
+            }
+
+
+              if (sleepValue == 252) {
+                //浅睡 level 1
+                //Logger.myLog("浅睡 level 1");
+                lightLV1SleepTime++;
+                totalSleepTime++;
+
+            }
+              if (sleepValue == 253) {
+                //清醒
+                //Logger.myLog("清醒");
+                awakeSleepTime++;
+                totalSleepTime++;
+            }
+        }
+
+        watchSleepDayData.setDeepSleepTime(deepSleepTime);
+        watchSleepDayData.setAwakeSleepTime(awakeSleepTime);
+        watchSleepDayData.setTotalSleepTime(totalSleepTime);
+        watchSleepDayData.setLightLV1SleepTime(lightLV1SleepTime);
+        watchSleepDayData.setLightLV2SleepTime(lightLV2SleepTime);
+
+        Logger.myLog(TAG,"-------处理当天睡眠="+watchSleepDayData.toString());
+
+        return watchSleepDayData;
+
+    }
+
+
+
+
+
     /**
-     * @param userId
-     * @param deviceId
+     * @param
+     * @param
      * @return
      */
 
@@ -652,7 +755,7 @@ public class W516Model implements IW516Model {
         }*/
             wristbandstep.setStepArry(stepList);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
 
@@ -667,7 +770,7 @@ public class W516Model implements IW516Model {
 
         //有可能当天为null
         watchSleepDayData.setDateStr(strDate);
-        Logger.myLog("parWatchSleepDayData");
+       // Logger.myLog(TAG,"---今天昨天的睡眠数据parWatchSleepDayData="+strDate+"\n"+"今天="+currentModel.toString()+"\n"+" 昨天="+lastModel.toString());
         int[] m1440Result;//所有数据
 
         int[] m240Data = new int[240];//默认的240为0长度的填充数据
@@ -695,7 +798,7 @@ public class W516Model implements IW516Model {
 
         if (watch_w516_24HDataModel != null) {
             String currentDate = watch_w516_24HDataModel.getDateStr();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA);
             Calendar calendar = Calendar.getInstance();
             String dateString = formatter.format(calendar.getTime());
             calendar.add(Calendar.DAY_OF_MONTH, -1);

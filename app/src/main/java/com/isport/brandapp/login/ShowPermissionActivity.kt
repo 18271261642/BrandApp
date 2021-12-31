@@ -12,8 +12,11 @@ import android.provider.Settings
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import brandapp.isport.com.basicres.commonpermissionmanage.PermissionManageUtil
 import com.isport.brandapp.R
 import kotlinx.android.synthetic.main.activity_show_permission_layout.*
+import no.nordicsemi.android.dfu.internal.manifest.Manifest
+import test.Test2Activity
 
 /**
  * 权限展示页面
@@ -28,7 +31,7 @@ class ShowPermissionActivity : AppCompatActivity(),View.OnClickListener {
     private val OPEN_GPS_CODE = 0x00
     private val REQUEST_PERMISSION_CODE = 0x01
 
-
+    val instance by lazy {this}
 
     private val handle : Handler = object: Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
@@ -62,6 +65,11 @@ class ShowPermissionActivity : AppCompatActivity(),View.OnClickListener {
         permissionPhoneStatusLayout.setOnClickListener(this)
         permissionContactLayout.setOnClickListener(this)
         showPermissionBtn.setOnClickListener(this)
+
+        permissionPhoneStatusLayout.setOnLongClickListener {
+            startActivity(Intent(this,Test2Activity::class.java))
+            return@setOnLongClickListener true
+        }
     }
 
 
@@ -126,11 +134,16 @@ class ShowPermissionActivity : AppCompatActivity(),View.OnClickListener {
             }
 
             if(p0.id == R.id.permissionPhoneStatusLayout){     //电话权限
-                requestPermission(arrayOf(android.Manifest.permission.READ_PHONE_STATE))
+                requestPermission(arrayOf(android.Manifest.permission.READ_PHONE_STATE,android.Manifest.permission.CALL_PHONE))
+
             }
 
             if(p0.id == R.id.permissionContactLayout){     //通讯录
-                requestPermission(arrayOf(android.Manifest.permission.READ_CONTACTS, android.Manifest.permission.READ_CALL_LOG))
+                if(ActivityCompat.checkSelfPermission(this,android.Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED){
+                    goToDeviceSetting()
+                    return
+                }
+                requestPermission(arrayOf(android.Manifest.permission.READ_CONTACTS, android.Manifest.permission.READ_CALL_LOG,android.Manifest.permission.CALL_PHONE))
             }
 
 
@@ -143,11 +156,19 @@ class ShowPermissionActivity : AppCompatActivity(),View.OnClickListener {
         }
     }
 
+    //去设置页面
+    private fun goToDeviceSetting(){
+        val permiss  =  PermissionManageUtil(this)
+        permiss.goSetting()
+
+    }
+
 
     //请求权限
     private fun requestPermission(permissStr: Array<String>){
         ActivityCompat.requestPermissions(this, permissStr, REQUEST_PERMISSION_CODE)
 
+        ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.READ_SMS),REQUEST_PERMISSION_CODE)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ANSWER_PHONE_CALLS), REQUEST_PERMISSION_CODE)
         }
@@ -170,7 +191,6 @@ class ShowPermissionActivity : AppCompatActivity(),View.OnClickListener {
         val bleManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bleManager.adapter
         return bluetoothAdapter?.isEnabled
-
     }
 
     //打开GPS

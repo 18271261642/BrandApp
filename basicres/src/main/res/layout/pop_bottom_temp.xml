@@ -38,7 +38,8 @@
                 android:layout_marginRight="@dimen/dp15"
                 android:gravity="center"
                 android:onClick="onClick"
-                android:text="@string/cancel"
+                android:text="@string/common_dialog_ok"
+
                 android:textColor="@color/common_text_color"
                 android:textSize="@dimen/sp16" />
 
@@ -51,7 +52,7 @@
                 android:layout_marginLeft="@dimen/dp15"
                 android:gravity="center"
                 android:onClick="onClick"
-                android:text="@string/common_dialog_ok"
+                android:text="@string/cancel"
                 android:textColor="@color/common_text_color"
                 android:textSize="@dimen/sp16" />
 
@@ -86,7 +87,6 @@
                 android:id="@+id/datePicker2"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
-                android:layout_below="@id/tv_determine"
                 android:layout_weight="0.5"
                 android:gravity="center" />
 
@@ -94,7 +94,6 @@
                 android:id="@+id/datePicker_point"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
-                android:layout_below="@id/tv_determine"
                 android:layout_weight="0.2"
                 android:gravity="center" />
 
@@ -102,7 +101,6 @@
                 android:id="@+id/datePicker3"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
-                android:layout_below="@id/tv_determine"
                 android:layout_weight="0.5"
                 android:gravity="center" />
 

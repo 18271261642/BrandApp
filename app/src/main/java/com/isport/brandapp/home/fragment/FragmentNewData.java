@@ -315,9 +315,14 @@ public class FragmentNewData extends BaseMVPFragment<FragmentDataView, FragmentD
                     break;
 
                 case 0x05:
-                    if (dataRealHeartRateHolder != null) {
-                        dataRealHeartRateHolder.close();
+                    try {
+                        if (dataRealHeartRateHolder != null) {
+                            dataRealHeartRateHolder.close();
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
                     }
+
                     break;
 
             }
@@ -739,6 +744,11 @@ public class FragmentNewData extends BaseMVPFragment<FragmentDataView, FragmentD
                                 hasHrDataCount = 0;
                                 dataRealHeartRateHolder.hidelayout_hr();
                                 dataRealHeartRateHolder.setCheckbox_hr_state();
+
+                                String birthday = loginBean.getBirthday();
+                                age = UserUtils.getAge(birthday);
+                                sex = loginBean.getGender();
+
                                 if (isShow) {
                                     dataRealHeartRateHolder.setLineDataAndShow(currentHr, age, sex, false);
                                 } else {
@@ -879,6 +889,8 @@ public class FragmentNewData extends BaseMVPFragment<FragmentDataView, FragmentD
                         BraceletW311RealTimeResult w311mResult2 = (BraceletW311RealTimeResult) mResult;
                         int cal = w311mResult2.getCal();
                         float dis = w311mResult2.getStepKm();
+
+                        Logger.myLog(TAG,"-------步数汇总="+w311mResult2.toString());
 
                         if (DeviceTypeUtil.isContainWrishBrand(w81) && w311RealTimeDataPresenter != null) {
                             w311RealTimeDataPresenter.saveRealTimeData(loginBean.getUserId(), mCurrentDevice.getDeviceName(), w311mResult2.getStepNum(), dis, cal, DateUtils.getYMD(System.currentTimeMillis()), w311mResult2.getMac());
@@ -1968,9 +1980,13 @@ public class FragmentNewData extends BaseMVPFragment<FragmentDataView, FragmentD
             if (!lists.contains(JkConfiguration.BODY_ONCE_HR)) {
                 lists.add(lists.size(), JkConfiguration.BODY_ONCE_HR);
             }
-            if (!lists.contains(JkConfiguration.BODY_BLOODPRESSURE)) {  //血压
-                lists.add(lists.size(), JkConfiguration.BODY_BLOODPRESSURE);
+
+            if(!AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_W560)){
+                if (!lists.contains(JkConfiguration.BODY_BLOODPRESSURE)) {  //血压
+                    lists.add(lists.size(), JkConfiguration.BODY_BLOODPRESSURE);
+                }
             }
+
             if (!lists.contains(JkConfiguration.BODY_OXYGEN)) { //血氧
                 lists.add(lists.size(), JkConfiguration.BODY_OXYGEN);
             }
@@ -2368,6 +2384,8 @@ public class FragmentNewData extends BaseMVPFragment<FragmentDataView, FragmentD
      */
     @Override
     public void successGetMainSleepaceDataFromDB(Sleep_Sleepace_DataModel sleep_Sleepace_DataModel, SleepMainData sleepMainData, boolean show) {
+       Logger.myLog(TAG,"--------从DB获取睡眠="+new Gson().toJson(sleep_Sleepace_DataModel)+"\n"+new Gson().toJson(sleepMainData));
+
         mSleepMainData = sleepMainData;
         mSleep_Sleepace_DataModel = sleep_Sleepace_DataModel;
         if (mSleepMainData != null) {
@@ -2383,9 +2401,10 @@ public class FragmentNewData extends BaseMVPFragment<FragmentDataView, FragmentD
 
     @Override
     public void successGetMainBraceletSleepFromDB(SleepMainData sleepMainData, boolean show) {
+       // Logger.myLog(TAG,"----------mSleepMainData == successGetMainBraceletSleepFromDB:" + mSleepMainData.toString());
         mSleepMainData = sleepMainData;
         if (mSleepMainData != null) {
-            Logger.myLog("mSleepMainData == successGetMainBraceletSleepFromDB:" + mSleepMainData.toString());
+            Logger.myLog(TAG,"mSleepMainData == successGetMainBraceletSleepFromDB:" + mSleepMainData.toString());
             braceletMainData = new SleepMainData();
             braceletMainData.setCompareSleepTime(mSleepMainData.getCompareSleepTime());
             braceletMainData.setLastSyncTime(mSleepMainData.getLastSyncTime());
@@ -2409,6 +2428,8 @@ public class FragmentNewData extends BaseMVPFragment<FragmentDataView, FragmentD
     @Override
     public void successSleepHistoryDataFormHttp(SleepMainData sleepMainData, Sleep_Sleepace_DataModel
             sleep_Sleepace_DataModel) {
+        Logger.myLog(TAG,"------== successSleepHistoryDataFormHttp:" + mSleepMainData.toString());
+
         mSleepMainData = sleepMainData;
         mSleep_Sleepace_DataModel = sleep_Sleepace_DataModel;
 
@@ -2426,7 +2447,7 @@ public class FragmentNewData extends BaseMVPFragment<FragmentDataView, FragmentD
             @Override
             public void run() {
                 if (dataSleepHolder != null) {
-                    // Logger.myLog("mSleepMainData == refleshSleepace:" + mSleepMainData + "braceletMainData:" + braceletMainData);
+                     Logger.myLog("mSleepMainData == refleshSleepace:" + mSleepMainData + "braceletMainData:" + braceletMainData);
                     if (braceletMainData != null && DeviceTypeUtil.isContainWatchOrBracelet()) {
                         dataSleepHolder.updateUI(braceletMainData.getLastSyncDate(), braceletMainData.getMinute());
                     } else {
@@ -2651,7 +2672,7 @@ public class FragmentNewData extends BaseMVPFragment<FragmentDataView, FragmentD
                 mainHeadLayout.showOptionButton(false, UIUtils.getString(R.string.disConnect));
             } else {
                 setHeadDevcieType(deviceType, false);
-                mainHeadLayout.showOptionButton(false, UIUtils.getString(R.string.connect));
+                mainHeadLayout.showOptionButton(false, UIUtils.getString(R.string.connected));
             }
 
         }
@@ -2842,6 +2863,9 @@ public class FragmentNewData extends BaseMVPFragment<FragmentDataView, FragmentD
                 if (DeviceTypeUtil.isContainW81(currentType) || DeviceTypeUtil.isContainWatch(currentType) || DeviceTypeUtil.isContainWrishBrand(currentType)) {
                     if (DeviceTypeUtil.isContainWatch(currentType)) {
                         String string = BleSPUtils.getString(BaseApp.getApp(), BleSPUtils.WATCH_LAST_SYNCTIME, TimeUtils.getTodayYYYYMMDD());
+
+                        Log.e(TAG,"------刷新天数="+string);
+
                         ISportAgent.getInstance().requestBle(BleRequest.Watch_W516_GET_DAILY_RECORD, string);
                     } else {
                         ISportAgent.getInstance().requestBle(BleRequest.bracelet_sync_data);
@@ -3633,11 +3657,12 @@ public class FragmentNewData extends BaseMVPFragment<FragmentDataView, FragmentD
             case JkConfiguration.DeviceType.Watch_W812B:
                 mainHeadLayout.setIconDeviceIcon(R.drawable.icon_main_w812b);
                 break;
+                case JkConfiguration.DeviceType.Watch_W560:
+                    mainHeadLayout.setIconDeviceIcon(R.drawable.icon_main_device_w560);
+                    break;
             case JkConfiguration.DeviceType.Watch_W560B:
-            case JkConfiguration.DeviceType.Watch_W560:
                 mainHeadLayout.setIconDeviceIcon(R.drawable.icon_main_w560);
                 break;
-
             default:
                 break;
         }

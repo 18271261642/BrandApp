@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import bike.gymproject.viewlibray.pickerview.ArrayPickerView;
 import bike.gymproject.viewlibray.pickerview.ArrayPickerView.ItemSelectedValue;
 import bike.gymproject.viewlibray.pickerview.DatePickerView;
-import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 import brandapp.isport.com.basicres.commonutil.Logger;
 import brandapp.isport.com.basicres.mvp.BasePresenter;
+import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 
 /**
  * Created by huashao on 2017/10/30.
@@ -186,116 +186,122 @@ public class UserDialogSetting extends BasePresenter<UserDialogView> implements
     // 时间选择器
 
     public void setPopupWindowTemp(Context context, View view, int value) {
-        LayoutInflater inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mTmeapView = inflater.inflate(R.layout.app_pop_bottom_temp, null);
-        TextView tv_determine = (TextView) mTmeapView.findViewById(R.id.tv_determine);
-        TextView tv_cancel = (TextView) mTmeapView.findViewById(R.id.tv_cancel);
-        final ArrayPickerView datePicker1 = (ArrayPickerView) mTmeapView.findViewById(R.id.datePicker1);
-        final ArrayPickerView datePicker2 = (ArrayPickerView) mTmeapView.findViewById(R.id.datePicker2);
-        final ArrayPickerView datePicker3 = (ArrayPickerView) mTmeapView.findViewById(R.id.datePicker3);
-        final ArrayPickerView datePicker_point = (ArrayPickerView) mTmeapView.findViewById(R.id.datePicker_point);
-        popupWindowTemp = new PopupWindow(context);
-        popupWindowTemp.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
-        popupWindowTemp.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        //popupWindowBirth.setHeight(DisplayUtils.dip2px(context, 150));
-        popupWindowTemp.setContentView(mTmeapView);
-        popupWindowTemp.setBackgroundDrawable(new ColorDrawable(0x00000000));
-        popupWindowTemp.setOutsideTouchable(false);
-        popupWindowTemp.setFocusable(true);
-        popupWindowTemp.setAnimationStyle(R.style.popwin_anim_style);
-        popupWindowTemp.showAtLocation(view, Gravity.BOTTOM
-                | Gravity.CENTER_HORIZONTAL, 0, 0);
+        try {
+            LayoutInflater inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            if(inflater == null)
+                return;
+            mTmeapView = inflater.inflate(R.layout.pop_bottom_temp, null);
+            TextView tv_determine = (TextView) mTmeapView.findViewById(R.id.tv_determine);
+            TextView tv_cancel = (TextView) mTmeapView.findViewById(R.id.tv_cancel);
+            final ArrayPickerView datePicker1 = (ArrayPickerView) mTmeapView.findViewById(R.id.datePicker1);
+            final ArrayPickerView datePicker2 = (ArrayPickerView) mTmeapView.findViewById(R.id.datePicker2);
+            final ArrayPickerView datePicker3 = (ArrayPickerView) mTmeapView.findViewById(R.id.datePicker3);
+            final ArrayPickerView datePicker_point = (ArrayPickerView) mTmeapView.findViewById(R.id.datePicker_point);
+            popupWindowTemp = new PopupWindow(context);
+            popupWindowTemp.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
+            popupWindowTemp.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+            //popupWindowBirth.setHeight(DisplayUtils.dip2px(context, 150));
+            popupWindowTemp.setContentView(mTmeapView);
+            popupWindowTemp.setBackgroundDrawable(new ColorDrawable(0x00000000));
+            popupWindowTemp.setOutsideTouchable(false);
+            popupWindowTemp.setFocusable(true);
+            popupWindowTemp.setAnimationStyle(R.style.popwin_anim_style);
+            popupWindowTemp.showAtLocation(view, Gravity.BOTTOM
+                    | Gravity.CENTER_HORIZONTAL, 0, 0);
 
-        ArrayList<String> localData1 = new ArrayList<>();
-        localData1.add("+");
-        localData1.add("-");
-        int showIndex1 = 0, showIndex2 = 0, showIndex3 = 0;
+            ArrayList<String> localData1 = new ArrayList<>();
+            localData1.add("+");
+            localData1.add("-");
+            int showIndex1 = 0, showIndex2 = 0, showIndex3 = 0;
 
-        if (value >= 0) {
-            showIndex1 = 0;
-        } else {
-            showIndex1 = 1;
-        }
-
-        int currentValue = Math.abs(value);
-        int yu = currentValue % 10;
-        int ge = currentValue / 10;
-        ArrayList<String> localData2 = new ArrayList<>();
-        ArrayList<String> localData3 = new ArrayList<>();
-        ArrayList<String> localDataPoint = new ArrayList<>();
-        localDataPoint.add(".");
-        for (int i = 0; i <= 9; i++) {
-
-            if (i < 5) {
-                if (ge == i) {
-                    showIndex2 = i;
-                }
-                localData2.add(i + "");
+            if (value >= 0) {
+                showIndex1 = 0;
+            } else {
+                showIndex1 = 1;
             }
-            if (yu == i) {
-                showIndex3 = i;
-            }
-            localData3.add(i + "");
-        }
 
+            int currentValue = Math.abs(value);
+            int yu = currentValue % 10;
+            int ge = currentValue / 10;
+            ArrayList<String> localData2 = new ArrayList<>();
+            ArrayList<String> localData3 = new ArrayList<>();
+            ArrayList<String> localDataPoint = new ArrayList<>();
+            localDataPoint.add(".");
+            for (int i = 0; i <= 9; i++) {
 
-        datePicker1.setData(localData1);
-        datePicker1.setCyclic(false);
-        datePicker1.setItemOnclick(this);
-        datePicker1.setSelectItem(showIndex1);
-
-        datePicker_point.setData(localDataPoint);
-        datePicker_point.setCyclic(false);
-        datePicker_point.setSelectItem(0);
-
-        datePicker2.setData(localData2);
-        datePicker2.setCyclic(false);
-        datePicker2.setItemOnclick(this);
-        datePicker2.setSelectItem(showIndex2);
-
-        datePicker3.setData(localData3);
-        datePicker3.setCyclic(false);
-        datePicker3.setItemOnclick(this);
-        datePicker3.setSelectItem(showIndex3);
-
-        if(mTmeapView == null)
-            return;
-        mTmeapView.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                View linView = mTmeapView.findViewById(R.id.pop_layout);
-                if(linView == null)
-                    return false;
-                int height =linView.getTop();
-                int y = (int) event.getY();
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (y < height) {
-                        popupWindowTemp.dismiss();
+                if (i < 5) {
+                    if (ge == i) {
+                        showIndex2 = i;
                     }
+                    localData2.add(i + "");
                 }
-                return true;
+                if (yu == i) {
+                    showIndex3 = i;
+                }
+                localData3.add(i + "");
             }
-        });
 
-        tv_determine.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            datePicker1.setData(localData1);
+            datePicker1.setCyclic(false);
+            datePicker1.setItemOnclick(this);
+            datePicker1.setSelectItem(showIndex1);
+
+            datePicker_point.setData(localDataPoint);
+            datePicker_point.setCyclic(false);
+            datePicker_point.setSelectItem(0);
+
+            datePicker2.setData(localData2);
+            datePicker2.setCyclic(false);
+            datePicker2.setItemOnclick(this);
+            datePicker2.setSelectItem(showIndex2);
+
+            datePicker3.setData(localData3);
+            datePicker3.setCyclic(false);
+            datePicker3.setItemOnclick(this);
+            datePicker3.setSelectItem(showIndex3);
+
+            if(mTmeapView == null)
+                return;
+            mTmeapView.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+                    View linView = mTmeapView.findViewById(R.id.pop_layout);
+                    if(linView == null)
+                        return false;
+                    int height =linView.getTop();
+                    int y = (int) event.getY();
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        if (y < height) {
+                            popupWindowTemp.dismiss();
+                        }
+                    }
+                    return true;
+                }
+            });
+
+            tv_determine.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 //                calculationAgeAndConstellation(datePicker.getTime());
 //                localUserChooseBirthday = datePicker.getTime();
-                if (dialogview != null) {
-                    String value = datePicker1.getItem() + datePicker2.getItem() + datePicker3.getItem();
-                    dialogview.dataSetSuccess("0", value);
+                    if (dialogview != null) {
+                        String value = datePicker1.getItem() + datePicker2.getItem() + datePicker3.getItem();
+                        dialogview.dataSetSuccess("0", value);
+                    }
+                    popupWindowTemp.dismiss();
                 }
-                popupWindowTemp.dismiss();
-            }
-        });
-        tv_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(popupWindowTemp != null)
-                popupWindowTemp.dismiss();
-            }
-        });
+            });
+            tv_cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(popupWindowTemp != null)
+                        popupWindowTemp.dismiss();
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     private View mMenuViewBirth;

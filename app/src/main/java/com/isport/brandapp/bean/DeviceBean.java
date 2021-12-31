@@ -72,6 +72,151 @@ public class DeviceBean implements Serializable {
         this.index=index;
     }
 
+
+    public int getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(int deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public int getDeviceType() {
+        return deviceType;
+    }
+
+    public void setDeviceType(int deviceType) {
+        this.deviceType = deviceType;
+    }
+
+    public String getMac() {
+        return mac;
+    }
+
+    public void setMac(String mac) {
+        this.mac = mac;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+    }
+
+    public String getDeviceID() {
+        return deviceID;
+    }
+
+    public void setDeviceID(String deviceID) {
+        this.deviceID = deviceID;
+    }
+
+    public String getDeviceImgurl() {
+        return deviceImgurl;
+    }
+
+    public void setDeviceImgurl(String deviceImgurl) {
+        this.deviceImgurl = deviceImgurl;
+    }
+
+    public long getTimeTamp() {
+        return timeTamp;
+    }
+
+    public void setTimeTamp(long timeTamp) {
+        this.timeTamp = timeTamp;
+    }
+
+    public int getBattery() {
+        return battery;
+    }
+
+    public void setBattery(int battery) {
+        this.battery = battery;
+    }
+
+    public int getCurrentType() {
+        return currentType;
+    }
+
+    public void setCurrentType(int currentType) {
+        this.currentType = currentType;
+    }
+
+    public boolean isConnectState() {
+        return connectState;
+    }
+
+    public void setConnectState(boolean connectState) {
+        this.connectState = connectState;
+    }
+
+    public SportBean getSportBean() {
+        return sportBean;
+    }
+
+    public void setSportBean(SportBean sportBean) {
+        this.sportBean = sportBean;
+    }
+
+    public SleepBean getSleepBean() {
+        return sleepBean;
+    }
+
+    public void setSleepBean(SleepBean sleepBean) {
+        this.sleepBean = sleepBean;
+    }
+
+    public WeightBean getWeightBean() {
+        return weightBean;
+    }
+
+    public void setWeightBean(WeightBean weightBean) {
+        this.weightBean = weightBean;
+    }
+
+    public BrandBean getBrandBean() {
+        return brandBean;
+    }
+
+    public void setBrandBean(BrandBean brandBean) {
+        this.brandBean = brandBean;
+    }
+
+    public String getScanName() {
+        return scanName;
+    }
+
+    public void setScanName(String scanName) {
+        this.scanName = scanName;
+    }
+
+    public int getResId() {
+        return resId;
+    }
+
+    public void setResId(int resId) {
+        this.resId = resId;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public int getResBg() {
+        return resBg;
+    }
+
+    public void setResBg(int resBg) {
+        this.resBg = resBg;
+    }
+
     @Override
     public String toString() {
         return "DeviceBean{" +

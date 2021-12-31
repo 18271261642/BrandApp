@@ -332,8 +332,8 @@ public class WatchPresenter extends BasePresenter<WatchView> implements ArrayPic
                  * W560选择卡路里
                  * 默认10千卡，选择范围：10到1000千卡，每个选项增加10
                  */
-                calorieDataNoUnit = new String[100];
-                calorieData = new String[100];
+                calorieDataNoUnit = new String[500];
+                calorieData = new String[500];
                 for (int n = 0; n < calorieDataNoUnit.length; n++) {
                     int calorieTemp = 10 * (n + 1);
                     calorieDataNoUnit[n] = String.valueOf(calorieTemp);
@@ -901,7 +901,7 @@ public class WatchPresenter extends BasePresenter<WatchView> implements ArrayPic
                 NetProgressObservable.getInstance().hide();
                 com.isport.blelibrary.utils.Logger.myLog("解绑成功");
                 AppSP.putString(context, AppSP.FORM_DFU, "false");
-                ISportAgent.getInstance().deleteDeviceType(deviceBean.deviceType, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
+                ISportAgent.getInstance().deleteDeviceType(deviceBean.currentType, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
                 BleAction.deletAll();
                 BaseAction.dropDatas();
                 if (deviceBean.deviceType == JkConfiguration.DeviceType.WATCH_W516 || deviceBean.deviceType == JkConfiguration.DeviceType.BRAND_W311) {
