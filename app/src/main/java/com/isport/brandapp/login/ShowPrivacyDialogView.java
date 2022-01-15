@@ -67,7 +67,8 @@ public class ShowPrivacyDialogView extends AppCompatDialog implements View.OnCli
     public void startPrivacyActivity() {
         Intent intentprivacy = new Intent(getContext(), ActivityprivacyAgreement.class);
         intentprivacy.putExtra("title", UIUtils.getString(R.string.privacy_agreement));
-        intentprivacy.putExtra("url", AllocationApi.BaseUrl + "/isport/concumer-basic/agreement/privacyagreement.html");
+        intentprivacy.putExtra("url",AllocationApi.BaseUrl + "/agreement_static/privacyagreement.html");
+        //intentprivacy.putExtra("url", AllocationApi.BaseUrl + "/isport/concumer-basic/agreement/privacyagreement.html");
         getContext().startActivity(intentprivacy);
     }
 

@@ -14,6 +14,7 @@ import com.isport.blelibrary.deviceEntry.impl.W526Device;
 import com.isport.blelibrary.deviceEntry.impl.W557Device;
 import com.isport.blelibrary.deviceEntry.impl.W560BDevice;
 import com.isport.blelibrary.deviceEntry.impl.W560Device;
+import com.isport.blelibrary.deviceEntry.impl.W7018Device;
 import com.isport.blelibrary.deviceEntry.impl.W812BDevice;
 import com.isport.blelibrary.deviceEntry.impl.W812Device;
 import com.isport.blelibrary.deviceEntry.impl.W813Device;
@@ -89,6 +90,8 @@ import phone.gym.jkcq.com.commonres.common.JkConfiguration;
  */
 
 public class DeviceListPresenter extends BasePresenter<DeviceListView> {
+
+    private static final String TAG = "DeviceListPresenter";
 
     DeviceListView view;
     DeviceOptionImple deviceOptionImple;
@@ -172,7 +175,7 @@ public class DeviceListPresenter extends BasePresenter<DeviceListView> {
 
                     }*/
                     for (int i = 0; i < bean.list.size(); i++) {
-                        Logger.myLog("deviceBeanHashMap" + bean.list.get(i).toString());
+                        Logger.myLog(TAG,"deviceBeanHashMap=" + bean.list.get(i).toString());
                         // 0:手环，1：体脂称，2：睡眠带
                         deviceBean = new DeviceBean();
                         bindDevice = bean.list.get(i);
@@ -270,6 +273,10 @@ public class DeviceListPresenter extends BasePresenter<DeviceListView> {
                                 break;
                             case JkConfiguration.DeviceType.ROPE_SKIPPING:
                                 mainDeviceBean.setDeviceRes(R.drawable.icon_main_device_list_s002);
+                                break;
+
+                            case JkConfiguration.DeviceType.Watch_F18:
+                                mainDeviceBean.setDeviceRes(R.drawable.icon_main_device_list_f18);
                                 break;
                         }
 
@@ -543,6 +550,9 @@ public class DeviceListPresenter extends BasePresenter<DeviceListView> {
     public void connectDevice(String currentName, String watchMac, int deviceType, boolean show, boolean isConnectByUser) {
         BaseDevice device = null;
         switch (deviceType) {
+            case JkConfiguration.DeviceType.Watch_F18:
+                device = new W7018Device(currentName,watchMac);
+                break;
             case JkConfiguration.DeviceType.BRAND_W311: {
                 device = new W311Device(currentName, watchMac);
             }

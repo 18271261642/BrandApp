@@ -33,6 +33,8 @@ public interface IDeviceType {
     int TYPE_DFU = 1001;
     int TYPE_ALL = 1002;
 
+    int TYPE_WATCH_7018 = 7018;
+
 
     void syncTodayData();
 

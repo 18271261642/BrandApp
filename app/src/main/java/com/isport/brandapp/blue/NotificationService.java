@@ -126,6 +126,9 @@ public class NotificationService extends NotificationListenerService {
                     if (msgVector.size() >= 1)
                         sendMsg(msgVector.get(msgVector.size() - 1));
                     break;
+                case 2:
+                    SmsAction = null;
+                    break;
                 default:
                     break;
             }
@@ -329,6 +332,7 @@ public class NotificationService extends NotificationListenerService {
                 return;
             if(action.equals("android.provider.Telephony.SMS_RECEIVED")){       //短信的广播
                 SmsAction = action;
+                mHandler.sendEmptyMessageDelayed(0x02,2 * 1000);
             }
 
 

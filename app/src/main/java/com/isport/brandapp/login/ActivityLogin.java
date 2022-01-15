@@ -1,6 +1,5 @@
 package com.isport.brandapp.login;
 
-import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
 import android.text.Editable;
@@ -17,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -50,21 +50,22 @@ import com.isport.brandapp.login.view.LoginBaseView;
 import com.isport.brandapp.util.AppSP;
 import com.isport.brandapp.util.DeviceTypeUtil;
 import com.isport.brandapp.view.TimerView;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.umeng.socialize.UMAuthListener;
 import com.umeng.socialize.UMShareAPI;
 import com.umeng.socialize.bean.SHARE_MEDIA;
+
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.Arrays;
 import java.util.Map;
+
 import brandapp.isport.com.basicres.ActivityManager;
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonbean.BaseBean;
 import brandapp.isport.com.basicres.commonbean.UserInfoBean;
-import brandapp.isport.com.basicres.commonpermissionmanage.PermissionManageUtil;
 import brandapp.isport.com.basicres.commonutil.AppUtil;
 import brandapp.isport.com.basicres.commonutil.MessageEvent;
 import brandapp.isport.com.basicres.commonutil.ToastUtils;
@@ -225,29 +226,6 @@ public class ActivityLogin extends BaseMVPActivity<LoginBaseView, LoginPresenter
 
     }
 
-    private void requestPermission() {
-
-        PermissionManageUtil permissionManage = new PermissionManageUtil(context);
-        RxPermissions mRxPermission = new RxPermissions(this);
-        if (!mRxPermission.isGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            permissionManage.requestPermissions(new RxPermissions(this), Manifest.permission.ACCESS_FINE_LOCATION,
-                    UIUtils.getString(R.string.permission_location0), new
-                            PermissionManageUtil.OnGetPermissionListener() {
-
-
-                                @Override
-                                public void onGetPermissionYes() {
-                                }
-
-                                @Override
-                                public void onGetPermissionNo() {
-                                    ToastUtils.showToastLong(context, UIUtils.getString(R.string.location_permissions));
-                                }
-                            });
-        } else {
-        }
-    }
-
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(MessageEvent messageEvent) {
@@ -291,17 +269,17 @@ public class ActivityLogin extends BaseMVPActivity<LoginBaseView, LoginPresenter
                             break;
                         case 1:
                             TokenUtil.getInstance().updateAPPfirst(BaseApp.getApp(), "true");
-                            requestPermission();
+                            //requestPermission();
 
                             break;
                         case 2:
                             TokenUtil.getInstance().updateAPPfirst(BaseApp.getApp(), "true");
-                            requestPermission();
+                            //requestPermission();
                             startPrivacyActivity();
                             break;
                         case 3:
                             TokenUtil.getInstance().updateAPPfirst(BaseApp.getApp(), "true");
-                            requestPermission();
+                            //requestPermission();
 
                             startAgreementActivity();
                             break;
@@ -310,7 +288,7 @@ public class ActivityLogin extends BaseMVPActivity<LoginBaseView, LoginPresenter
             });
         } else {
 
-            requestPermission();
+            //requestPermission();
         }
 
         SyncCacheUtils.clearSetting(this);
@@ -537,16 +515,32 @@ public class ActivityLogin extends BaseMVPActivity<LoginBaseView, LoginPresenter
                 showEmailView();
                 break;
             case R.id.login_qq:
+                if(!checkBox.isChecked()){
+                    ToastUtils.showToast(this,"请同意隐私权限和政策!");
+                    return;
+                }
                 loginByQQ();
                 break;
             case R.id.login_weixin:
+                if(!checkBox.isChecked()){
+                    ToastUtils.showToast(this,"请同意隐私权限和政策!");
+                    return;
+                }
                 loginByWeChat();
                 break;
             case R.id.faceBookLayout:
             case R.id.login_facebook:
+                if(!checkBox.isChecked()){
+                    ToastUtils.showToast(this,"请同意隐私权限和政策!");
+                    return;
+                }
                 loginByFacebook();
                 break;
             case R.id.login_twitter:
+                if(!checkBox.isChecked()){
+                    ToastUtils.showToast(this,"请同意隐私权限和政策!");
+                    return;
+                }
                 loginByGoogle();
                 break;
             case R.id.timer_email:
@@ -572,7 +566,9 @@ public class ActivityLogin extends BaseMVPActivity<LoginBaseView, LoginPresenter
     public void startPrivacyActivity() {
         Intent intentprivacy = new Intent(context, ActivityprivacyAgreement.class);
         intentprivacy.putExtra("title", UIUtils.getString(R.string.privacy_agreement));
-        intentprivacy.putExtra("url", AllocationApi.BaseUrl + "/isport/concumer-basic/agreement/privacyagreement.html");
+        //https://api.mini-banana.com/agreement_static/privacyagreement.html
+        intentprivacy.putExtra("url",AllocationApi.BaseUrl + "/agreement_static/privacyagreement.html");
+        //intentprivacy.putExtra("url", AllocationApi.BaseUrl + "/isport/concumer-basic/agreement/privacyagreement.html");
         startActivity(intentprivacy);
     }
 

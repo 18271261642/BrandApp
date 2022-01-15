@@ -90,6 +90,7 @@ public class ScanPresenter extends BasePresenter<ScanBaseView> {
     }
 
     public void bindDevice(BaseDevice baseDevice) {
+        Logger.myLog(TAG,"-------点击按钮绑定="+baseDevice.toString());
         MainResposition<Integer, BindInsertOrUpdateBean, BaseUrl, DeviceDbParms> mainResposition = new
                 MainResposition<>();
         mainResposition.requst(HistoryParmUtil.setDevice(baseDevice))

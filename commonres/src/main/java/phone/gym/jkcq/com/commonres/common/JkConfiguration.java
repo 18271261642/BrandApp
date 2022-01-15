@@ -120,6 +120,9 @@ public class JkConfiguration {
         int Watch_W819 = 819;
         int Watch_W910 = 910;
 
+        //F18手表
+        int Watch_F18 = 7018;
+
         int SPORT = 10;
         int HEART_RATE = 11;
         int DFU = 1001;

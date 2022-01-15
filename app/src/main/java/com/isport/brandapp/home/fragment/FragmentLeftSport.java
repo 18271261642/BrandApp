@@ -1,11 +1,15 @@
 package com.isport.brandapp.home.fragment;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -23,6 +27,8 @@ import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
 import com.gyf.immersionbar.ImmersionBar;
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.XXPermissions;
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
 import com.isport.blelibrary.interfaces.BleReciveListener;
@@ -53,6 +59,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
@@ -104,6 +111,7 @@ public class FragmentLeftSport extends BaseFragment implements Device24HrView {
 
     Device24HrPresenter device24HrPresenter;
 
+    private AlertDialog.Builder gSensorDialog;
 
     @Override
     protected int getLayoutId() {
@@ -322,7 +330,23 @@ public class FragmentLeftSport extends BaseFragment implements Device24HrView {
 
     private void showCountDownPopWindow() {
         // 一个自定义的布局，作为显示的内容
+        if(sportType == JkConfiguration.SportType.sportIndoor){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+                if(XXPermissions.isPermanentDenied(getActivity(),Manifest.permission.BODY_SENSORS)){
+                    showPermissDialog(Manifest.permission.BODY_SENSORS,"室内跑需要使用手机计步传感器获取步数信息，是否确认打开改权限?",0);
+                    return;
+                }
+            }
+        }
 
+        if(sportType == JkConfiguration.SportType.sportOutRuning){
+
+            if(XXPermissions.isPermanentDenied(getActivity(),Manifest.permission.ACCESS_FINE_LOCATION)){
+                showPermissDialog(Manifest.permission.ACCESS_FINE_LOCATION,"室外跑需要获取位置信息使定位更加精确，是否确认打开改权限?",1);
+                return;
+            }
+
+        }
 
         contentView = new BaseDialog.Builder(getActivity())
                 .setContentView(R.layout.popwin_count_down)
@@ -336,28 +360,7 @@ public class FragmentLeftSport extends BaseFragment implements Device24HrView {
 
         final TextView mTimer = (TextView) contentView.findViewById(R.id.timer);
 
-   /*     popupWindow = new PopupWindow(contentView, LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT, true);
 
-        popupWindow.setTouchable(true);
-
-        popupWindow.setTouchInterceptor(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // Logger.i("mengdd", "onTouch : ");
-                // 这里如果返回true的话，touch事件将被拦截
-                // 拦截后 PopupWindow的onTouchEvent不被调用，这样点击外部区域无法dismiss
-                return true;
-            }
-        });
-
-        // 设置好参数之后再show
-        // 设置layout在PopupWindow中显示的位置
-        popupWindow.showAtLocation(btnStart, Gravity.FILL, 0, 0);*/
-
-
-        //  final Disposable[] disposable = new Disposable[1];
         Observable.interval(0, 1, TimeUnit.SECONDS)
                 .take(4).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Long>() {
             @Override
@@ -400,6 +403,66 @@ public class FragmentLeftSport extends BaseFragment implements Device24HrView {
             }
         });
     }
+
+
+    //申请传感器弹窗
+    private void showPermissDialog(String permiss,String context,int code){
+        gSensorDialog = new AlertDialog.Builder(getActivity())
+                .setCancelable(false)
+                .setTitle(getResources().getString(R.string.tips))
+                .setMessage(context)
+                .setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        getGSensorPermission(permiss,code);
+                    }
+                })
+                .setNegativeButton(getResources().getString(R.string.no), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        AlertDialog atD = gSensorDialog.create();
+        atD.show();
+        Button sureBtn = atD.getButton(DialogInterface.BUTTON_POSITIVE);
+        Button cancelBtn = atD.getButton(DialogInterface.BUTTON_NEGATIVE);
+
+        sureBtn.setTextColor(Color.BLACK);
+        cancelBtn.setTextColor(Color.BLACK);
+    }
+
+
+
+    private void getGSensorPermission(String psermiss,int code){
+        XXPermissions.with(this)
+                .permission(psermiss)
+                .request(new OnPermissionCallback() {
+                    @Override
+                    public void onGranted(List<String> list, boolean b) {
+
+                    }
+                });
+        if(code == 0){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+                XXPermissions.with(this)
+                        .permission(Manifest.permission.BODY_SENSORS)
+                        .request(new OnPermissionCallback() {
+                            @Override
+                            public void onGranted(List<String> list, boolean b) {
+
+                            }
+                        });
+            }
+        }
+
+
+    }
+
+
+
 
     public void isOpenGps() {
 

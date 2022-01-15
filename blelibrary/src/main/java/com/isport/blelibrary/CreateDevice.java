@@ -12,6 +12,7 @@ import com.isport.blelibrary.deviceEntry.impl.W526Device;
 import com.isport.blelibrary.deviceEntry.impl.W557Device;
 import com.isport.blelibrary.deviceEntry.impl.W560BDevice;
 import com.isport.blelibrary.deviceEntry.impl.W560Device;
+import com.isport.blelibrary.deviceEntry.impl.W7018Device;
 import com.isport.blelibrary.deviceEntry.impl.W812BDevice;
 import com.isport.blelibrary.deviceEntry.impl.W812Device;
 import com.isport.blelibrary.deviceEntry.impl.W813Device;
@@ -37,6 +38,13 @@ public class CreateDevice {
     public BaseDevice createDevcie(String name, String address, String filterStr, boolean isDFU) {
         Logger.myLog(TAG,"---createDevcie="+name+"\n"+address+"\n"+filterStr+"\n"+isDFU);
         BaseDevice baseDevice = null;
+
+        if(name.startsWith(Constants.WATCH_7018_FILTER)){
+
+            return create7018Device(name,address);
+        }
+
+
         if (name.startsWith(Constants.SCALE_FILTER) || name.startsWith
                 ("Chipsea")) {
             baseDevice = createScaleDevice(name, address);
@@ -258,5 +266,9 @@ public class CreateDevice {
 
     public BaseDevice createW910Device(String name, String mac) {
         return new W910Device(name, mac);
+    }
+
+    public BaseDevice create7018Device(String name,String mac){
+        return new W7018Device(name,mac);
     }
 }

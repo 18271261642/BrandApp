@@ -2,7 +2,10 @@ package com.isport.brandapp.device.bracelet;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
@@ -10,11 +13,14 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.crrepa.ble.conn.type.CRPTimeSystemType;
 import com.google.gson.Gson;
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.XXPermissions;
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.db.parse.ParseData;
 import com.isport.blelibrary.db.table.DeviceInformationTable;
@@ -97,6 +103,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import bike.gymproject.viewlibray.ItemDeviceSettingView;
@@ -174,6 +181,8 @@ public class ActivityBraceletMain extends BaseMVPTitleActivity<WatchView, WatchP
     HashMap<Integer, ItemDeviceSettingView> itemList = new HashMap<>();
 
     private LiftWristPresenter liftWristPresenter;
+
+    private AlertDialog.Builder watchAlert;
 
     @Override
     protected void onPause() {
@@ -956,10 +965,32 @@ public class ActivityBraceletMain extends BaseMVPTitleActivity<WatchView, WatchP
                 break;
 
             case R.id.iv_watch_call_remind:     //电话提醒
-                checkPhonePerssion(isChecked);
+                //checkPhonePerssion(isChecked);
+                if(!isChecked){
+                    ivWatchCallRemind.setChecked(false);
+                    updateNotifySettingCall(false);
+                    return;
+                }
+
+                showAlertMsg(new String[]{Manifest.permission.READ_PHONE_STATE,Manifest.permission.READ_CALL_LOG,
+                        Manifest.permission.READ_CONTACTS},"电话提醒需要以下权限:\n获取手机状态权限\n获取手机电话号码\n读取联系人和通讯录权限\n是否同意授权?",0,isChecked);
+                ivWatchCallRemind.setChecked(isChecked);
+                updateNotifySettingCall(isChecked);
                 break;
             case R.id.iv_watch_msg_setting:     //信息提醒
-                cheakMessagePerssion(isChecked);
+               // cheakMessagePerssion(isChecked);
+                if(!isChecked){
+                    ivWatchMsgSetting.setChecked(false);
+                    updateNotifySettingMsg(false);
+                    return;
+                }
+
+                showAlertMsg(new String[]{Manifest.permission.READ_SMS,Manifest.permission.RECEIVE_SMS,
+                        Manifest.permission.READ_CONTACTS},"短信提醒需要以下权限:\n获取手机短信\n接收短信\n是否同意授权?",1,isChecked);
+//                setMessageSwitchState(isChecked);
+
+                ivWatchMsgSetting.setChecked(isChecked);
+                updateNotifySettingMsg(isChecked);
 
                 break;
         }
@@ -1547,17 +1578,19 @@ public class ActivityBraceletMain extends BaseMVPTitleActivity<WatchView, WatchP
     public void successGetCallAndMessageNoti(Watch_W516_NotifyModel model) {
         Logger.myLog("getMsgSwitch== " + model.getMsgSwitch() + " getCallSwitch== " + model.getCallSwitch());
 
-
-        if (isHaveMessagePremission()) {
-            ivWatchMsgSetting.setChecked(model.getMsgSwitch());
-        } else {
-            ivWatchMsgSetting.setChecked(false);
-        }
-        if (isHaveCallPremission()) {
-            ivWatchCallRemind.setChecked(model.getCallSwitch());
-        } else {
-            ivWatchCallRemind.setChecked(false);
-        }
+        ivWatchMsgSetting.setChecked(model.getMsgSwitch());
+        ivWatchCallRemind.setChecked(model.getCallSwitch());
+//
+//        if (isHaveMessagePremission()) {
+//            ivWatchMsgSetting.setChecked(model.getMsgSwitch());
+//        } else {
+//            ivWatchMsgSetting.setChecked(false);
+//        }
+//        if (isHaveCallPremission()) {
+//            ivWatchCallRemind.setChecked(model.getCallSwitch());
+//        } else {
+//            ivWatchCallRemind.setChecked(false);
+//        }
 
 
     }
@@ -1821,5 +1854,56 @@ public class ActivityBraceletMain extends BaseMVPTitleActivity<WatchView, WatchP
 
     }
 
+
+    private void showAlertMsg(String[] perss,String msg,int code,boolean isChecked){
+        watchAlert = new AlertDialog.Builder(this)
+                .setTitle(getResources().getString(R.string.tips))
+                .setCancelable(false)
+                .setMessage(msg)
+                .setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        getPermiss(perss,code,isChecked);
+                    }
+                }).setNegativeButton(getResources().getString(R.string.no), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog pAt = watchAlert.create();
+        pAt.show();
+        Button sureBtn = pAt.getButton(DialogInterface.BUTTON_POSITIVE);
+        Button cancleBtn = pAt.getButton(DialogInterface.BUTTON_NEGATIVE);
+        sureBtn.setTextColor(Color.BLACK);
+        cancleBtn.setTextColor(Color.BLACK);
+    }
+
+
+    private void getPermiss(String[] permiss,int code,boolean isCheck){
+        XXPermissions.with(this)
+                .permission(permiss)
+                .request(new OnPermissionCallback() {
+                    @Override
+                    public void onGranted(List<String> list, boolean b) {
+
+                    }
+                });
+
+        if(code == 0){  //电话
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                XXPermissions.with(ActivityBraceletMain.this)
+                        .permission(Manifest.permission.ANSWER_PHONE_CALLS)
+                        .request(new OnPermissionCallback() {
+                            @Override
+                            public void onGranted(List<String> list, boolean b) {
+
+                            }
+                        });
+            }
+        }
+
+    }
 
 }

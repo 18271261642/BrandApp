@@ -179,18 +179,18 @@ public class NotiManager {
                 }
             }
             Logger.myLog(TAG,"----title="+title+" content="+content+"\n"+NotificationService.SmsAction);
-
+            String buildName = Build.MANUFACTURER;
             if(title != null && (title.contains("Messaging is running") || title.contains("正在运行") || title.contains("信息未发送")) )
                 return;
-
+            boolean isHw =   buildName.equalsIgnoreCase("huawei") || buildName.equalsIgnoreCase("honor");
             //对短信的处理，
-            if(Constants.smsMap.containsKey(packagename) && NotificationService.SmsAction != null && NotificationService.SmsAction.equals("android.provider.Telephony.SMS_RECEIVED")){
+            if( NotificationService.SmsAction != null && NotificationService.SmsAction.equals("android.provider.Telephony.SMS_RECEIVED")){
                 NotificationService.SmsAction = null;
                 return;
             }
-            String buildName = Build.MANUFACTURER;
+
             if(buildName!=null){
-                if( buildName.equalsIgnoreCase("huawei") || buildName.equalsIgnoreCase("honor"))
+                if(isHw && Constants.smsMap.containsKey(packagename))
                     return;
             }
             BaseDevice baseDevice = ISportAgent.getInstance().getCurrnetDevice();

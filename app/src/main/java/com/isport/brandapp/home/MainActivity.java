@@ -1,8 +1,11 @@
 package com.isport.brandapp.home;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +22,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.XXPermissions;
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.db.action.DeviceTypeTableAction;
 import com.isport.blelibrary.utils.Constants;
@@ -44,7 +49,6 @@ import com.isport.brandapp.util.AppSP;
 import com.isport.brandapp.util.DeviceTypeUtil;
 import com.isport.brandapp.util.UserAcacheUtil;
 import com.shuyu.gsyvideoplayer.GSYVideoManager;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.uber.autodispose.AutoDisposeConverter;
 
 import org.greenrobot.eventbus.EventBus;
@@ -60,7 +64,6 @@ import java.util.Observable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -71,8 +74,6 @@ import brandapp.isport.com.basicres.action.SportDataAction;
 import brandapp.isport.com.basicres.commonnet.interceptor.BaseObserver;
 import brandapp.isport.com.basicres.commonnet.interceptor.ExceptionHandle;
 import brandapp.isport.com.basicres.commonnet.net.RxScheduler;
-import brandapp.isport.com.basicres.commonpermissionmanage.PermissionGroup;
-import brandapp.isport.com.basicres.commonpermissionmanage.PermissionManageUtil;
 import brandapp.isport.com.basicres.commonutil.Logger;
 import brandapp.isport.com.basicres.commonutil.MessageEvent;
 import brandapp.isport.com.basicres.commonutil.ToastUtils;
@@ -113,14 +114,12 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     private List<Fragment> fragmentList = new ArrayList<>();
 
+
+    private AlertDialog.Builder permissionDialog;
+
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        //super.onRestoreInstanceState(savedInstanceState);
-        try {
-            super.onRestoreInstanceState(savedInstanceState);
-        } catch (Exception e) {
-        }
-        // savedInstanceState = null;
+
     }
 
     @Override
@@ -280,13 +279,14 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
         locationServiceHelper = new LocationServiceHelper(this);
         locationServiceHelper.startLocation();
-        cheackPremission();
+
         btnData.setChecked(true);
         SyncCacheUtils.setUnBindState(false);
 
 
         requestChangeBatteryOptimizations();
-
+        if(XXPermissions.isPermanentDenied(this,Manifest.permission.ACCESS_FINE_LOCATION))
+           showPermissDialog();
         //checkNet();
 
         try {
@@ -630,25 +630,14 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
 
     private void cheackPremission() {
-        PermissionManageUtil permissionManage = new PermissionManageUtil(context);
-        permissionManage.requestPermissionsGroup(new RxPermissions(this),
-                PermissionGroup.CAMERA_STORAGE, new PermissionManageUtil.OnGetPermissionListener() {
+        XXPermissions.with(this)
+                .permission(Manifest.permission.ACCESS_FINE_LOCATION)
+                .request(new OnPermissionCallback() {
                     @Override
-                    public void onGetPermissionYes() {
-                        //需要判断文件存在并且文件大小与服务器上大小一样才不要去下载
-
-                        //commonUserPresenter.getOssAliToken();
-                    }
-
-                    @Override
-                    public void onGetPermissionNo() {
+                    public void onGranted(List<String> list, boolean b) {
 
                     }
                 });
-
-
-        ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},0x00);
-
     }
 
 
@@ -728,6 +717,36 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 }
             }
         });
+    }
+
+
+
+
+    private void showPermissDialog(){
+        permissionDialog = new AlertDialog.Builder(this)
+                .setCancelable(false)
+                .setTitle(getResources().getString(R.string.tips))
+                .setMessage("搜索手机附近的蓝牙手表需要打开手机的位置权限，未打开改权限可能无法搜索到附件的蓝牙设备，是否确认打开?")
+                .setPositiveButton("打开", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        cheackPremission();
+                    }
+                })
+                .setNegativeButton("关闭", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog at = permissionDialog.create();
+        at.show();
+        Button sureBtn = at.getButton(DialogInterface.BUTTON_POSITIVE);
+        Button cancelBtn = at.getButton(DialogInterface.BUTTON_NEGATIVE);
+
+        sureBtn.setTextColor(Color.BLACK);
+        cancelBtn.setTextColor(Color.BLACK);
     }
 
 

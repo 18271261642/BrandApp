@@ -34,7 +34,6 @@ import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.SyncCacheUtils;
 import com.isport.brandapp.App;
 import com.isport.brandapp.AppConfiguration;
-import com.isport.brandapp.home.MainActivity;
 import com.isport.brandapp.R;
 import com.isport.brandapp.banner.recycleView.utils.ToastUtil;
 import com.isport.brandapp.bean.DeviceBean;
@@ -43,6 +42,7 @@ import com.isport.brandapp.bind.presenter.ScanPresenter;
 import com.isport.brandapp.bind.view.ScanBaseView;
 import com.isport.brandapp.device.bracelet.playW311.PlayW311Presenter.PlayerPresenter;
 import com.isport.brandapp.device.publicpage.GoActivityUtil;
+import com.isport.brandapp.home.MainActivity;
 import com.isport.brandapp.util.ActivitySwitcher;
 import com.isport.brandapp.util.AppSP;
 import com.isport.brandapp.util.DeviceTypeUtil;
@@ -398,7 +398,7 @@ public class ActivityScan extends BaseMVPTitleActivity<ScanBaseView, ScanPresent
 //            mActPresenter.connect(baseDevice, true);
             EventBus.getDefault().post(new MessageEvent(MessageEvent.BIND_DEVICE_SUCCESS_WITH_PROGRESS, baseDevice));
             // TODO: 2019/2/19 如果是睡眠带，连接成功后去同步数据，然后再回到首页
-            ActivityManager.getInstance().finishAllActivity(MainActivity.class.getSimpleName());
+           // ActivityManager.getInstance().finishAllActivity(MainActivity.class.getSimpleName());
             EventBus.getDefault().post(new MessageEvent(MessageEvent.BIND_DEVICE_SUCCESS, baseDevice));
 //            mActPresenter.connect(baseDevice, true);
             // TODO: 2019/2/19 如果是睡眠带，连接成功后去同步数据，然后再回到首页

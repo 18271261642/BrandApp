@@ -336,7 +336,7 @@ public class ActivitySettingUserInfo extends BaseMVPTitleActivity<ActivitySettin
             }
 
         }catch (Exception e){
-
+            e.printStackTrace();
         }
 
 

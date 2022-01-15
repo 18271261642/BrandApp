@@ -1,6 +1,7 @@
 package com.isport.brandapp.home.fragment;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -24,6 +25,8 @@ import com.amap.api.maps.model.PolygonOptions;
 import com.amap.api.maps.model.Polyline;
 import com.amap.api.maps.model.PolylineOptions;
 import com.gyf.immersionbar.ImmersionBar;
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.XXPermissions;
 import com.isport.blelibrary.utils.Constants;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.brandapp.App;
@@ -79,6 +82,8 @@ public class FragmentSport extends BaseMVPFragment<FragmentSportView, FragmentSp
     int sportType;
 
     MapView mMapView = null;
+
+    private AlertDialog.Builder permissionDialog;
 
 
     ImageView ivSportHistory, iv_sport_setting;
@@ -157,7 +162,6 @@ public class FragmentSport extends BaseMVPFragment<FragmentSportView, FragmentSp
     protected void initData() {
         initTab();
         isChina = true;
-        requestPermission();
         if (!EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().register(this);
 
@@ -347,7 +351,22 @@ public class FragmentSport extends BaseMVPFragment<FragmentSportView, FragmentSp
         return latLngs;
     }
 
+
+
+
     private void requestPermission() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            XXPermissions.with(this)
+                    .permission(Manifest.permission.ACTIVITY_RECOGNITION)
+                    .request(new OnPermissionCallback() {
+                        @Override
+                        public void onGranted(List<String> list, boolean b) {
+
+                        }
+                    });
+        }
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

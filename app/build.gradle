@@ -115,8 +115,8 @@ android {
         http {
             dimension "color"
             applicationId "com.isport.brandapp"
-            versionCode 109
-            versionName "2.1.0.2"
+            versionCode 110
+            versionName "2.1.2"
             buildConfigField 'String', 'PRODUCT', '"http"'
         }
     }
@@ -189,5 +189,6 @@ dependencies {
     api 'com.facebook.android:facebook-login:[5,6)'
 
    // api 'com.github.chrisbanes:PhotoView:2.3.0'
+
 
 }

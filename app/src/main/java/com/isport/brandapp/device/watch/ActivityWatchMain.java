@@ -1,7 +1,10 @@
 package com.isport.brandapp.device.watch;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.provider.Settings;
@@ -10,10 +13,13 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.RelativeSizeSpan;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.XXPermissions;
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.db.action.DeviceInformationTableAction;
 import com.isport.blelibrary.db.parse.ParseData;
@@ -92,6 +98,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import androidx.core.app.ActivityCompat;
@@ -173,6 +180,9 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
     private DeviceGoalCaloriePresenter deviceGoalCaloriePresenter;
     RxPermissions mRxPermission;
     private boolean tempUti = true;//华氏度false，摄氏度true
+
+
+    private AlertDialog.Builder watchAlert;
 
     @Override
     protected void onPause() {
@@ -948,7 +958,14 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
                     ivWatchCallRemind.setChecked(!isChecked);
                     return;
                 }
+                if(!isChecked){
+                    ivWatchCallRemind.setChecked(false);
+                    updateNotifySettingCall(false);
+                    return;
+                }
 
+                showAlertMsg(new String[]{Manifest.permission.READ_PHONE_STATE,Manifest.permission.READ_CALL_LOG,
+                        Manifest.permission.READ_CONTACTS},"电话提醒需要以下权限:\n获取手机状态权限\n获取手机电话号码\n读取联系人和通讯录权限\n是否同意授权?",0,isChecked);
                 ivWatchCallRemind.setChecked(isChecked);
                 updateNotifySettingCall(isChecked);
               //  checkPhonePerssion(isChecked);
@@ -961,12 +978,22 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
                     return;
                 }
 
-                if (!isChecked && !NotificationService.isEnabled(this)) {
+//                if (!isChecked && !NotificationService.isEnabled(this)) {
+//                    ivWatchMsgSetting.setChecked(false);
+//                    return;
+//                }
+                if(!isChecked){
                     ivWatchMsgSetting.setChecked(false);
+                    updateNotifySettingMsg(false);
                     return;
                 }
 
-                setMessageSwitchState(isChecked);
+                showAlertMsg(new String[]{Manifest.permission.READ_SMS,Manifest.permission.RECEIVE_SMS,
+                        Manifest.permission.READ_CONTACTS},"短信提醒需要以下权限:\n获取手机短信\n接收短信\n是否同意授权?",1,isChecked);
+//                setMessageSwitchState(isChecked);
+
+                ivWatchMsgSetting.setChecked(isChecked);
+                updateNotifySettingMsg(isChecked);
                 break;
         }
     }
@@ -1654,6 +1681,58 @@ public class ActivityWatchMain extends BaseMVPTitleActivity<WatchView, WatchPres
 
     @Override
     public void successSave(boolean isSave) {
+
+    }
+
+
+    private void showAlertMsg(String[] perss,String msg,int code,boolean isChecked){
+        watchAlert = new AlertDialog.Builder(this)
+                .setTitle(getResources().getString(R.string.tips))
+                .setCancelable(false)
+                .setMessage(msg)
+                .setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        getPermiss(perss,code,isChecked);
+                    }
+                }).setNegativeButton(getResources().getString(R.string.no), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog pAt = watchAlert.create();
+        pAt.show();
+        Button sureBtn = pAt.getButton(DialogInterface.BUTTON_POSITIVE);
+        Button cancleBtn = pAt.getButton(DialogInterface.BUTTON_NEGATIVE);
+        sureBtn.setTextColor(Color.BLACK);
+        cancleBtn.setTextColor(Color.BLACK);
+    }
+
+
+    private void getPermiss(String[] permiss,int code,boolean isCheck){
+        XXPermissions.with(this)
+                .permission(permiss)
+                .request(new OnPermissionCallback() {
+                    @Override
+                    public void onGranted(List<String> list, boolean b) {
+
+                    }
+                });
+
+        if(code == 0){  //电话
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                XXPermissions.with(ActivityWatchMain.this)
+                        .permission(Manifest.permission.ANSWER_PHONE_CALLS)
+                        .request(new OnPermissionCallback() {
+                            @Override
+                            public void onGranted(List<String> list, boolean b) {
+
+                            }
+                        });
+            }
+        }
 
     }
 }

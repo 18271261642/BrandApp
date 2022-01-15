@@ -1,6 +1,6 @@
 package com.isport.brandapp.home.fragment
 
-import android.Manifest
+
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
@@ -24,7 +24,6 @@ import brandapp.isport.com.basicres.commonutil.*
 import brandapp.isport.com.basicres.service.observe.BatteryLowObservable
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.listener.OnItemChildClickListener
-import com.example.utillibrary.PermissionUtil
 import com.google.gson.Gson
 import com.gyf.immersionbar.ImmersionBar
 import com.isport.blelibrary.ISportAgent
@@ -625,22 +624,22 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
 
 
     fun requestPermission() {
-        PermissionUtil.checkPermission(
-                activity!!,
-                arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.CAMERA
-                ),
-                permissonCallback = object : PermissionUtil.OnPermissonCallback {
-                    override fun isGrant(grant: Boolean) {
-                        if (grant) {
-                            //  toast("success")
-                            startScan(false, true)
-                        } else {
-                            // toast("failed")
-                        }
-                    }
-                })
+//        PermissionUtil.checkPermission(
+//                activity!!,
+//                arrayOf(
+//                        Manifest.permission.ACCESS_FINE_LOCATION,
+//                        Manifest.permission.CAMERA
+//                ),
+//                permissonCallback = object : PermissionUtil.OnPermissonCallback {
+//                    override fun isGrant(grant: Boolean) {
+//                        if (grant) {
+//                            //  toast("success")
+//                            startScan(false, true)
+//                        } else {
+//                            // toast("failed")
+//                        }
+//                    }
+//                })
     }
 
     fun openBlueDialog() {
@@ -828,6 +827,11 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
             connectWatchOrBracelet(false, JkConfiguration.DeviceType.Brand_W814)
         } else if (AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.ROPE_SKIPPING)) {
             connectWatchOrBracelet(false, JkConfiguration.DeviceType.ROPE_SKIPPING)
+        }
+
+        //F18
+        else if(AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_F18)){
+            connectWatchOrBracelet(false, JkConfiguration.DeviceType.Watch_F18)
         }
     }
 

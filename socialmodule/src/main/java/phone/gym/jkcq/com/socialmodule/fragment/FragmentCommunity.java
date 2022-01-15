@@ -1,5 +1,6 @@
 package phone.gym.jkcq.com.socialmodule.fragment;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -18,6 +19,8 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.NetworkUtils;
 import com.gyf.immersionbar.ImmersionBar;
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.XXPermissions;
 import com.shuyu.gsyvideoplayer.GSYVideoManager;
 import com.shuyu.gsyvideoplayer.model.VideoOptionModel;
 import com.shuyu.gsyvideoplayer.utils.GSYVideoType;
@@ -184,6 +187,7 @@ public class FragmentCommunity extends BaseMVPFragment<AddDynamView, AddDynamPre
         viewPager_community.setCurrentItem(1, false);
         layout_send_fail = view.findViewById(R.id.layout_send_fail);
 
+        requestPermiss();
     }
 
     Disposable disposableTimer;
@@ -209,7 +213,7 @@ public class FragmentCommunity extends BaseMVPFragment<AddDynamView, AddDynamPre
                 }
             });
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
 
@@ -737,4 +741,23 @@ public class FragmentCommunity extends BaseMVPFragment<AddDynamView, AddDynamPre
         EventBus.getDefault().unregister(this);
         getActivity().unregisterReceiver(networkChang);
     }
+
+
+    private void requestPermiss(){
+        XXPermissions.with(getActivity())
+                .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .request(onPermissionCallback);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            XXPermissions.with(getActivity())
+//                    .permission(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+//                    .request(onPermissionCallback);
+//        }
+    }
+
+    private final OnPermissionCallback onPermissionCallback = new OnPermissionCallback() {
+        @Override
+        public void onGranted(List<String> list, boolean b) {
+
+        }
+    };
 }

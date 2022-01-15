@@ -137,6 +137,8 @@ public class Constants {
     public static String WATCH_560_FILTER = "W560";
     public static String WATCH_W560_FILTER_2 = "FT_ReflexSW";
 
+    //F18
+    public static String WATCH_7018_FILTER = "F18";
 
     public static String WATCH_819_FILTER = "W819";
     public static String WATCH_910_FILTER = "P 4";

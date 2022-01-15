@@ -235,7 +235,7 @@ public class PlayW311Activity extends BaseTitleActivity implements View.OnClickL
             transaction.commitAllowingStateLoss();
 
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
 
@@ -248,7 +248,7 @@ public class PlayW311Activity extends BaseTitleActivity implements View.OnClickL
             tips_loading_msg.setText(UIUtils.getString(R.string.common_please_check_that_your_network_is_connected));
 
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
     }

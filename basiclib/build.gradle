@@ -45,7 +45,16 @@ dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
     api(name: 'crpblelib_141', ext: 'aar')
 
-   // api 'com.umeng.umsdk:share-sina:7.1.6'//新浪微博完整版
+    //F18拓步SDK
+    api(name:'libraryCore_v1.1.6', ext: 'aar')
+    //api(name:'libraryDfu_v1.0.4', ext: 'aar')
+
+    //RxAndroidBle
+    api 'com.polidea.rxandroidble2:rxandroidble:1.11.1'
+
+
+
+    // api 'com.umeng.umsdk:share-sina:7.1.6'//新浪微博完整版
 
 /*    api 'com.sina.weibo.sdk:core:10.10.0:openDefaultRelease@aar'//新浪微博官方SDK依*/
    // api(name:'facebook-share',ext: 'aar')
@@ -219,5 +228,7 @@ dependencies {
 
 
   //  api 'com.github.chrisbanes:PhotoView:2.3.0'
+    //权限申请
+    api 'com.github.getActivity:XXPermissions:13.2'
 
 }

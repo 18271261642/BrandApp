@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.alibaba.sdk.android.feedback.impl.FeedbackAPI;
 import com.alibaba.sdk.android.feedback.util.ErrorCode;
 import com.alibaba.sdk.android.feedback.util.FeedbackErrorCallback;
+import com.htsmart.wristband2.WristbandApplication;
 import com.isport.blelibrary.db.action.BleAction;
 
 import org.greenrobot.greendao.query.QueryBuilder;
@@ -57,12 +58,9 @@ public class BaseApp extends MultiDexApplication {
         initApp();
         BaseAction.init(this);
         BleAction.init(this);
-        Logger.d("getCurrentLogPath appPath = initApp");
         initBaidu(); // 百度地图
-        Logger.d("getCurrentLogPath appPath = initBaidu");
         // 加载友盟。
         initUMeng();
-        Logger.d("getCurrentLogPath appPath = initUMeng");
 
         //JPushUtils.getInstance().init(this);
         Logger.d("getCurrentLogPath appPath =  JPushUtils.getInstance()");
@@ -73,6 +71,10 @@ public class BaseApp extends MultiDexApplication {
 
         QueryBuilder.LOG_SQL = true;
         QueryBuilder.LOG_VALUES = true;
+
+        //拓步SDK初始化
+        WristbandApplication.init(this);
+        WristbandApplication.setDebugEnable(true);
 
 
         //CrashReport.initCrashReport(getApplicationContext(), "f27adcbc6d", BuildConfig.DEBUG);

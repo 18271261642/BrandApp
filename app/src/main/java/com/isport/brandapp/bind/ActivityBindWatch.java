@@ -242,6 +242,8 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
         list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W813, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_813_FILTER), R.drawable.icon_scan_w813));
         list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W817, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_817_FILTER), R.drawable.icon_scan_w817));
         list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W819, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_819_FILTER), R.drawable.icon_scan_w819));
+
+        list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_F18, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_7018_FILTER), R.drawable.icon_scan_f18));
         hasWatch = false;
 
         //此处AppConfiguration.deviceBeanList 更换为AppConfiguration.deviceMainBeanList
@@ -286,7 +288,10 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
                         break;
                     case JkConfiguration.DeviceType.Watch_W819:
                         updateList(10, deviceBean);
+                        break;
 
+                    case JkConfiguration.DeviceType.Watch_F18:
+                        updateList(11, deviceBean);
                         break;
                 }
                 hasWatch = true;
