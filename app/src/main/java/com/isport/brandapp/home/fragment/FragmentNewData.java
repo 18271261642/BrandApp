@@ -230,8 +230,6 @@ public class FragmentNewData extends BaseMVPFragment<FragmentDataView, FragmentD
     public static final int REQCODE_OPEN_BT = 0x100;
 
 
-    //    DataAllDeviceHolder dataDeviceAllHolder;//设备列表
-
     private boolean mHasSleepDevice;
     private boolean isHidden;
     private boolean mIsDirctConnect;
@@ -2580,51 +2578,12 @@ public class FragmentNewData extends BaseMVPFragment<FragmentDataView, FragmentD
     public void onDestroy() {
         super.onDestroy();
         W560HrSwtchObservable.getInstance().deleteObserver(this);
-        ISportAgent.getInstance().unregisterListener(mBleReciveListener);
         handler.removeCallbacks(null);
         //
         // ISportAgent.getInstance().clearCurrentDevice();
         if (itemSelectDialog != null) {
             itemSelectDialog.cancelDialog();
         }
-       /* if (AppSP.getInt(context, AppSP.DEVICE_CURRENTDEVICETYPE, JkConfiguration.DeviceType
-                .BODYFAT) == JkConfiguration.DeviceType
-                .BODYFAT) {
-            if (AppConfiguration.deviceBeanList.containsKey(JkConfiguration.DeviceType.Brand_W520)) {
-                AppSP.putInt(context, AppSP.DEVICE_CURRENTDEVICETYPE, JkConfiguration.DeviceType.Brand_W520);
-            }
-            if (AppConfiguration.deviceBeanList.containsKey(JkConfiguration.DeviceType.BRAND_W307J)) {
-                AppSP.putInt(context, AppSP.DEVICE_CURRENTDEVICETYPE, JkConfiguration.DeviceType.BRAND_W307J);
-            }
-            if (AppConfiguration.deviceBeanList.containsKey(JkConfiguration.DeviceType.WATCH_W516)) {
-                AppSP.putInt(context, AppSP.DEVICE_CURRENTDEVICETYPE, JkConfiguration.DeviceType.WATCH_W516);
-            }
-            if (AppConfiguration.deviceBeanList.containsKey(JkConfiguration.DeviceType.BRAND_W311)) {
-                AppSP.putInt(context, AppSP.DEVICE_CURRENTDEVICETYPE, JkConfiguration.DeviceType.BRAND_W311);
-            }
-            if (AppConfiguration.deviceBeanList.containsKey(JkConfiguration.DeviceType.Brand_W814)) {
-                AppSP.putInt(context, AppSP.DEVICE_CURRENTDEVICETYPE, JkConfiguration.DeviceType.Brand_W814);
-            }
-            if (AppConfiguration.deviceBeanList.containsKey(JkConfiguration.DeviceType.Brand_W811)) {
-                AppSP.putInt(context, AppSP.DEVICE_CURRENTDEVICETYPE, JkConfiguration.DeviceType.Brand_W811);
-            }
-            if (AppConfiguration.deviceBeanList.containsKey(JkConfiguration.DeviceType.Watch_W813)) {
-                AppSP.putInt(context, AppSP.DEVICE_CURRENTDEVICETYPE, JkConfiguration.DeviceType.Watch_W813);
-            }
-            if (AppConfiguration.deviceBeanList.containsKey(JkConfiguration.DeviceType.Watch_W819)) {
-                AppSP.putInt(context, AppSP.DEVICE_CURRENTDEVICETYPE, JkConfiguration.DeviceType.Watch_W819);
-            }
-            if (AppConfiguration.deviceBeanList.containsKey(JkConfiguration.DeviceType.Watch_W910)) {
-                AppSP.putInt(context, AppSP.DEVICE_CURRENTDEVICETYPE, JkConfiguration.DeviceType.Watch_W910);
-            }
-            if (AppConfiguration.deviceBeanList.containsKey(JkConfiguration.DeviceType.Watch_W812)) {
-                AppSP.putInt(context, AppSP.DEVICE_CURRENTDEVICETYPE, JkConfiguration.DeviceType.Watch_W812);
-            }
-            if (AppConfiguration.deviceBeanList.containsKey(JkConfiguration.DeviceType.Watch_W817)) {
-                AppSP.putInt(context, AppSP.DEVICE_CURRENTDEVICETYPE, JkConfiguration.DeviceType.Watch_W817);
-            }
-
-        }*/
         handler.removeCallbacks(null);
         // AppSP.putString(context, AppSP.DEVICE_CURRENTNAME, deviceBeanScale.deviceID);
         EventBus.getDefault().unregister(this);

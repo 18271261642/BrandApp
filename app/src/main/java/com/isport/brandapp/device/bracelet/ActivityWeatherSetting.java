@@ -172,7 +172,7 @@ public class ActivityWeatherSetting extends BaseTitleActivity implements BaseVie
                 startLocation();
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
     }

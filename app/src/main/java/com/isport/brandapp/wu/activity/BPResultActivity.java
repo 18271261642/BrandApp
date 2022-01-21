@@ -140,9 +140,7 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
 
 
     private void setDataFromLocal() {
-
         mCurrentInfo = mW81DeviceDataModelImp.getBloodPressureLastData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
-
         if (lastTimestamp == mCurrentInfo.getTimestamp().longValue()) {
             return;
         }

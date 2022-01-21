@@ -452,7 +452,7 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
     @Override
     public OxyInfo getOxygenLastData(String deviceId, String userId) {
         OxygenMode oxygenMode = deviceMeasuredDActionation.findOxyenMode(deviceId, userId, 0);
-        Logger.myLog("getOxygenLastData:" + oxygenMode + "deviceId");
+        Logger.myLog("----获取单次血氧getOxygenLastData:" + oxygenMode.toString() + "deviceId");
         OxyInfo oxyInfo = new OxyInfo();
         if (oxygenMode != null) {
             oxyInfo.setBoValue(oxygenMode.getBloodOxygen());
@@ -466,7 +466,7 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
     public BPInfo getBloodPressureLastData(String deviceId, String userId) {
         BloodPressureMode bloodPressureMode = deviceMeasuredDActionation.findBloodPressureMode(deviceId, userId, 0);
         BPInfo bpInfo = new BPInfo();
-        Logger.myLog("getBloodPressureLastData:" + bloodPressureMode);
+        Logger.myLog("--------getBloodPressureLastData:=" + bloodPressureMode.toString());
         if (bloodPressureMode != null) {
             bpInfo.setSpValue(bloodPressureMode.getSystolicBloodPressure());
             bpInfo.setDpValue(bloodPressureMode.getDiastolicBloodPressure());
@@ -535,7 +535,7 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
     @Override
     public OnceHrInfo getOneceHrLastData(String deviceId, String userId) {
         OneceHrMode oxygenMode = deviceMeasuredDActionation.findOnecHrMode(deviceId, userId, 0);
-        Logger.myLog("getOxygenLastData:" + oxygenMode + "deviceId" + deviceId + "userId:" + userId);
+        Logger.myLog("getOxygenLastData=:" + oxygenMode + "deviceId" + deviceId + "userId:" + userId);
         OnceHrInfo oxyInfo = new OnceHrInfo();
         if (oxygenMode != null) {
             oxyInfo.setHeartValue(oxygenMode.getBloodOxygen() + "");

@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.managers.Constants;
 import com.isport.blelibrary.utils.Logger;
@@ -21,7 +22,9 @@ import com.isport.brandapp.util.DeviceTypeUtil;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.commonsdk.UMConfigure;
 import com.umeng.socialize.PlatformConfig;
+
 import java.lang.reflect.Field;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import brandapp.isport.com.basicres.BaseActivity;
@@ -113,7 +116,7 @@ public class SpashActivity extends BaseActivity implements Runnable {
 
             return;
         }
-
+        
         DeviceTypeUtil.clearDevcieInfo(this);
 
         handler.removeCallbacks(SpashActivity.this);
@@ -174,7 +177,6 @@ public class SpashActivity extends BaseActivity implements Runnable {
             UserInfoBean bean = CommonUserAcacheUtil.getUserInfo(TokenUtil.getInstance().getPeopleIdStr(app));
 
             Log.e("run", "TokenUtil.getInstance().getIsRegidit(app)" + TokenUtil.getInstance().getIsRegidit(app));
-
 
             if (bean != null && TokenUtil.getInstance().getIsRegidit(app)) {
                 //缓存到本地

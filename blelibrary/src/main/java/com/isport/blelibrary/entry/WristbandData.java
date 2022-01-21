@@ -119,4 +119,18 @@ public class WristbandData implements Parcelable {
             return new WristbandData[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "WristbandData{" +
+                "lunar='" + lunar + '\'' +
+                ", festival='" + festival + '\'' +
+                ", pm25='" + pm25 + '\'' +
+                ", aqiValue='" + aqiValue + '\'' +
+                ", temp='" + temp + '\'' +
+                ", weatherId='" + weatherId + '\'' +
+                ", updatetime='" + updatetime + '\'' +
+                ", city='" + city + '\'' +
+                '}';
+    }
 }

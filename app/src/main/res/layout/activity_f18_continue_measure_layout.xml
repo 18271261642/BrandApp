@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:id="@+id/continueTmpDescTv"
+        android:layout_width="match_parent"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:padding="8dp"
+        android:gravity="left"
+        android:textSize="20sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_height="wrap_content"
+        android:text="手表将在持续的时间间隔内监测健康数据"/>
+
+
+    <LinearLayout
+        app:layout_constraintTop_toBottomOf="@+id/continueTmpDescTv"
+        android:layout_marginTop="5dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp15"
+        android:layout_marginRight="@dimen/dp15"
+        android:background="@drawable/shape_btn_white_20_bg"
+        android:orientation="vertical">
+
+
+        <phone.gym.jkcq.com.socialmodule.shadow.ShadowLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            app:hl_cornerRadius="20dp"
+            app:hl_shadowColor="#0d000000"
+            app:hl_shadowLimit="10dp"
+            app:hl_shadowOffsetY="5dp">
+
+
+            <bike.gymproject.viewlibray.ItemView
+                android:id="@+id/f18ContinueIsOpenItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                app:contentSize="@dimen/sp16"
+                app:contentTextColor="@color/common_white"
+                app:itemText="连续监测"
+                app:itemviewTitleSize="@dimen/sp16"
+                app:showArrow="false"
+                app:showBottomLine="true"
+                app:showCheckModel="true"
+                app:showRemind="false" />
+        </phone.gym.jkcq.com.socialmodule.shadow.ShadowLayout>
+
+
+        <bike.gymproject.viewlibray.ItemView
+            android:id="@+id/f18ContinueStartTimeItem"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp60"
+            android:onClick="onClick"
+            app:contentSize="@dimen/sp16"
+            app:contentTextColor="@color/common_white"
+            app:itemText="@string/watch_stable_remind_starttime"
+            app:itemviewTitleSize="@dimen/sp16"
+            app:showArrow="true"
+            app:showBottomLine="true"
+            app:showCheckModel="false"
+            app:showRemind="false" />
+
+        <bike.gymproject.viewlibray.ItemView
+            android:id="@+id/f18ContinueEndTimeItem"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp60"
+            android:onClick="onClick"
+            app:contentSize="@dimen/sp16"
+            app:contentTextColor="@color/common_white"
+            app:itemText="@string/watch_stable_remind_endtime"
+            app:itemviewTitleSize="@dimen/sp16"
+            app:showArrow="true"
+            app:showBottomLine="true"
+            app:showCheckModel="false"
+            app:showRemind="false" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

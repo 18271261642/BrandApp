@@ -61,7 +61,7 @@ public class WheelView extends View {
     int dividerColor;
 
     // 条目间距倍数
-    static final float lineSpacingMultiplier = 1.4F;
+    static final float lineSpacingMultiplier = 1.6F;
     boolean isLoop;
 
     // 第一条线Y坐标值

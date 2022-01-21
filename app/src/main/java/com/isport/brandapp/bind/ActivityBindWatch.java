@@ -231,6 +231,7 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
      */
     private void getDeviceList() {
         list.clear();
+        list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_F18, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_7018_FILTER), R.drawable.icon_scan_f18));
         list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W910, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_910_FILTER), R.drawable.icon_scan_w910));
         list.add(new DeviceBean(JkConfiguration.DeviceType.WATCH_W516, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_FILTER), R.drawable.icon_w516));
         list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W556, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_556_FILTER), R.drawable.icon_scan_w526));
@@ -243,7 +244,7 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
         list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W817, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_817_FILTER), R.drawable.icon_scan_w817));
         list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W819, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_819_FILTER), R.drawable.icon_scan_w819));
 
-        list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_F18, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_7018_FILTER), R.drawable.icon_scan_f18));
+
         hasWatch = false;
 
         //此处AppConfiguration.deviceBeanList 更换为AppConfiguration.deviceMainBeanList
@@ -254,45 +255,45 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
             for (int deviceType : AppConfiguration.deviceMainBeanList.keySet()) {
                 DeviceBean deviceBean = AppConfiguration.deviceMainBeanList.get(deviceType);
                 switch (deviceBean.currentType) {
-                    case JkConfiguration.DeviceType.Watch_W910:
+                    case JkConfiguration.DeviceType.Watch_F18:
                         updateList(0, deviceBean);
                         break;
-                    case JkConfiguration.DeviceType.WATCH_W516:
+                    case JkConfiguration.DeviceType.Watch_W910:
                         updateList(1, deviceBean);
                         break;
-                    case JkConfiguration.DeviceType.Watch_W556:
+                    case JkConfiguration.DeviceType.WATCH_W516:
                         updateList(2, deviceBean);
                         break;
-                    case JkConfiguration.DeviceType.Watch_W557:
+                    case JkConfiguration.DeviceType.Watch_W556:
                         updateList(3, deviceBean);
                         break;
-                    case JkConfiguration.DeviceType.Watch_W560:
+                    case JkConfiguration.DeviceType.Watch_W557:
                         updateList(4, deviceBean);
                         break;
-                    case JkConfiguration.DeviceType.Watch_W560B:
+                    case JkConfiguration.DeviceType.Watch_W560:
                         updateList(5, deviceBean);
                         break;
-                    case JkConfiguration.DeviceType.Watch_W812:
+                    case JkConfiguration.DeviceType.Watch_W560B:
                         updateList(6, deviceBean);
                         break;
-                    case JkConfiguration.DeviceType.Watch_W812B:
+                    case JkConfiguration.DeviceType.Watch_W812:
                         updateList(7, deviceBean);
                         break;
-                    case JkConfiguration.DeviceType.Watch_W813:
+                    case JkConfiguration.DeviceType.Watch_W812B:
                         updateList(8, deviceBean);
-
                         break;
-                    case JkConfiguration.DeviceType.Watch_W817:
+                    case JkConfiguration.DeviceType.Watch_W813:
                         updateList(9, deviceBean);
 
                         break;
-                    case JkConfiguration.DeviceType.Watch_W819:
+                    case JkConfiguration.DeviceType.Watch_W817:
                         updateList(10, deviceBean);
-                        break;
 
-                    case JkConfiguration.DeviceType.Watch_F18:
+                        break;
+                    case JkConfiguration.DeviceType.Watch_W819:
                         updateList(11, deviceBean);
                         break;
+
                 }
                 hasWatch = true;
 

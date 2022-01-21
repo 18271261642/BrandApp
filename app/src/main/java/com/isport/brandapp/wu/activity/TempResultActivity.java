@@ -2,6 +2,7 @@ package com.isport.brandapp.wu.activity;
 
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.view.View;
 import android.widget.Button;
@@ -9,8 +10,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.db.CommonInterFace.DeviceMessureData;
@@ -34,14 +33,20 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import androidx.annotation.NonNull;
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonutil.MessageEvent;
 import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.commonutil.UIUtils;
 import brandapp.isport.com.basicres.commonview.TitleBarView;
 import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
+import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 
+/**
+ * 体温测量页面
+ */
 public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, TempHistoryPresenter> implements TempHistoryView {
 
     private TempInfo mCurrentInfo;
@@ -212,7 +217,7 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
     }
 
 
-    Handler handler = new Handler() {
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
@@ -227,7 +232,13 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
 
     private void startMeasure() {
         if (AppConfiguration.isConnected) {
-            handler.sendEmptyMessageDelayed(0x01, 5000);
+            int measureDuring ;
+            if(Objects.requireNonNull(AppConfiguration.deviceMainBeanList.get(JkConfiguration.DeviceType.Watch_F18)).getDeviceType() == 7018){
+                measureDuring = 60 * 1000;
+            }else{
+                measureDuring = 5 * 1000;
+            }
+            handler.sendEmptyMessageDelayed(0x00,measureDuring);
             isMeasure = true;
             btn_measure.setText(R.string.measureing);
             ISportAgent.getInstance().requestBle(BleRequest.MEASURE_TEMP, true);

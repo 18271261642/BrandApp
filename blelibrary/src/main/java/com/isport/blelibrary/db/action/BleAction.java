@@ -24,6 +24,7 @@ import com.isport.blelibrary.gen.DeviceTimeFormatDao;
 import com.isport.blelibrary.gen.DeviceTypeTableDao;
 import com.isport.blelibrary.gen.Device_BacklightTimeAndScreenLuminanceModelDao;
 import com.isport.blelibrary.gen.Device_TempTableDao;
+import com.isport.blelibrary.gen.F18CommonDbBeanDao;
 import com.isport.blelibrary.gen.FaceWatchModeDao;
 import com.isport.blelibrary.gen.OneceHrModeDao;
 import com.isport.blelibrary.gen.OxygenModeDao;
@@ -116,6 +117,14 @@ public class BleAction {
     private static DailyBriefDao sDailyBriefDao;
     private static DailySummariesDao dailySummariesDao;
     private static SummaryDao summaryDao;
+
+
+    //F18设置项Dao
+    private static F18CommonDbBeanDao f18CommonDbBeanDao;
+
+    public static F18CommonDbBeanDao getF18CommonDbBeanDao() {
+        return f18CommonDbBeanDao;
+    }
 
 
     public static DeviceTimeFormatDao getsDeviceTimeFormatDao() {
@@ -299,6 +308,7 @@ public class BleAction {
         sDeviceInformationTableDao = sDaoSession.getDeviceInformationTableDao();
         sDeviceTypeTableDao = sDaoSession.getDeviceTypeTableDao();
 
+
         sScale_FourElectrode_DataModelDao = sDaoSession.getScale_FourElectrode_DataModelDao();
 
         sWatch_SmartBand_StepTargetModelDao = sDaoSession.getWatch_SmartBand_StepTargetModelDao();
@@ -345,6 +355,7 @@ public class BleAction {
         dailySummariesDao=sDaoSession.getDailySummariesDao();
         sDailyBriefDao=sDaoSession.getDailyBriefDao();
         summaryDao=sDaoSession.getSummaryDao();
+        f18CommonDbBeanDao = sDaoSession.getF18CommonDbBeanDao();
     }
 
     public static void dropDatas() {
@@ -405,6 +416,8 @@ public class BleAction {
                 sOneceHrModeDao.deleteAll();
                 sDeviceTempTableDao.deleteAll();
 
+
+                f18CommonDbBeanDao.deleteAll();
                 Logger.myLog("deletAll table");
             }
         });

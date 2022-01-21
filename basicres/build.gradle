@@ -44,7 +44,7 @@ android {
 }
 
 greendao {
-    schemaVersion 3
+    schemaVersion 4
     daoPackage 'brandapp.isport.com.basicres.gen'
     targetGenDir 'src/main/java'
 }

@@ -23,6 +23,7 @@ import com.isport.blelibrary.deviceEntry.impl.W526Device;
 import com.isport.blelibrary.deviceEntry.impl.W557Device;
 import com.isport.blelibrary.deviceEntry.impl.W560BDevice;
 import com.isport.blelibrary.deviceEntry.impl.W560Device;
+import com.isport.blelibrary.deviceEntry.impl.W7018Device;
 import com.isport.blelibrary.deviceEntry.impl.W812BDevice;
 import com.isport.blelibrary.deviceEntry.impl.W812Device;
 import com.isport.blelibrary.deviceEntry.impl.W813Device;
@@ -334,6 +335,9 @@ public class BaseAgent {
             case IDeviceType.TYPE_ROPE_S002:
                 scanS002(scanBackListener);
                 break;
+            case IDeviceType.TYPE_WATCH_7018:
+                scan7018(scanBackListener);
+                break;
             default:
                 break;
         }
@@ -439,6 +443,11 @@ public class BaseAgent {
 
     protected boolean scanW814(ScanBackListener scanBackListener) {
         scanFilter = Constants.BRAND_814_FILTER;
+        return startLeScanWithOutTimeOut(scanBackListener);
+    }
+
+    protected boolean scan7018(ScanBackListener scanBackListener){
+        scanFilter = Constants.WATCH_7018_FILTER;
         return startLeScanWithOutTimeOut(scanBackListener);
     }
 
@@ -868,6 +877,7 @@ public class BaseAgent {
        // Logger.myLog(TAG,"mBaseManager" + (mBaseManager!=null ? mBaseManager.getCurrentDevice().toString() : "mBaseManager为null了") + "mContext" + mContext + "------------device:" + device);
         if (mContext != null && device != null) {
             mBaseManager = getManager(device, mContext);
+            mBaseManager.setCurrentDevice(device);
             device.connect(isConnectByUser);
         }
         //InitDeviceManager.initManager(mContext,device.deviceType);
@@ -2288,6 +2298,10 @@ public class BaseAgent {
             else if(currentDevice instanceof W560BDevice){
                 ((W560BDevice) currentDevice).meassureOxy(isStart);
             }
+
+            if(currentDevice instanceof W7018Device){
+                ((W7018Device) currentDevice).measureOxygenBlood(isStart);
+            }
         }
     }
 
@@ -2319,6 +2333,10 @@ public class BaseAgent {
 
             else if(currentDevice instanceof W560BDevice){
                 ((W560BDevice) currentDevice).meassureOneHr(isStart);
+            }
+
+            if(currentDevice instanceof W7018Device){
+                ((W7018Device) currentDevice).measureOnceHrData(isStart);
             }
         }
     }
@@ -2408,6 +2426,10 @@ public class BaseAgent {
 
             else if(currentDevice instanceof W560BDevice){
                 ((W560BDevice) currentDevice).meassureBlood(isStart);
+            }
+
+            if(currentDevice instanceof W7018Device){
+                ((W7018Device) currentDevice).measureBloodPressure(isStart);
             }
         }
     }
@@ -2624,6 +2646,10 @@ public class BaseAgent {
             BaseDevice currentDevice = mBaseManager.getCurrentDevice();
             if (currentDevice instanceof W557Device) {
                 ((W557Device) currentDevice).startTemp(isStart);
+            }
+
+            if(currentDevice instanceof W7018Device){
+                ((W7018Device) currentDevice).startTemp(isStart);
             }
         }
     }

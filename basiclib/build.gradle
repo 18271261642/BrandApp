@@ -165,7 +165,7 @@ dependencies {
     //google fitness
     api 'com.google.android.gms:play-services-fitness:20.0.0'
 
-    api 'pl.droidsonroids.gif:android-gif-drawable:1.2.+'
+    api 'pl.droidsonroids.gif:android-gif-drawable:1.2.24'
 
     api 'com.alibaba:arouter-api:1.5.0'
     annotationProcessor 'com.alibaba:arouter-compiler:1.2.2'

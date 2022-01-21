@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/common_bg"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/dp15"
+            android:paddingRight="@dimen/dp15">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:background="@color/common_bg"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/dp20"
+                android:paddingRight="@dimen/dp20">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <com.isport.brandapp.view.VerBatteryView xmlns:tc="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/iv_battery"
+                        android:layout_width="@dimen/dp20"
+                        android:layout_height="@dimen/dp10"
+                        android:layout_below="@+id/tv_lock_tips"
+                        tc:ringColor="@color/common_view_color" />
+
+                    <TextView
+                        android:id="@+id/watch_bettery_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:layout_marginLeft="@dimen/dp5"
+                        android:textColor="@color/common_white"
+                        android:textSize="@dimen/sp16"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+
+                <TextView
+                    android:id="@+id/watch_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/sp10"
+                    android:textStyle="bold"
+                    android:textColor="@color/common_white"
+                    android:textSize="@dimen/sp16" />
+
+                <ImageView
+                    android:id="@+id/watch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/view_cetern"
+                    android:src="@drawable/icon_f18_device_set" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:background="@color/white"
+                android:paddingLeft="14dp"
+                android:paddingRight="14dp"
+                android:paddingBottom="20dp"
+                android:visibility="gone">
+
+                <bike.gymproject.viewlibray.WatchTypeDataView
+                    android:id="@+id/wdv_step"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    app:bg="@drawable/shape_watch_data_bg"
+                    app:typeColor="@color/white"
+                    app:typeSize="@dimen/sp26"
+                    app:typeText="@string/watch_type_step"
+                    app:uniteColor="@color/white"
+                    app:uniteSize="@dimen/sp13"
+                    app:uniteText=""
+                    app:valueColor="@color/white"
+                    app:valueSize="@dimen/sp26"
+                    app:valueText="--" />
+
+                <bike.gymproject.viewlibray.WatchTypeDataView
+                    android:id="@+id/wdv_dis"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    app:bg="@drawable/shape_watch_data_bg"
+                    app:typeColor="@color/white"
+                    app:typeSize="@dimen/sp26"
+                    app:typeText="@string/distance_unit"
+                    app:uniteColor="@color/white"
+                    app:uniteSize="@dimen/sp13"
+                    app:valueColor="@color/white"
+                    app:valueSize="@dimen/sp26"
+                    app:valueText="--" />
+
+                <bike.gymproject.viewlibray.WatchTypeDataView
+                    android:id="@+id/wdv_cal"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    app:bg="@drawable/shape_watch_data_bg"
+                    app:typeColor="@color/white"
+                    app:typeSize="@dimen/sp26"
+                    app:typeText="@string/sport_cal_unit"
+                    app:uniteColor="@color/white"
+                    app:uniteSize="@dimen/sp13"
+                    app:valueColor="@color/white"
+                    app:valueSize="@dimen/sp26"
+                    app:valueText="--" />
+
+
+            </LinearLayout>
+
+            <!--表盘设置-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceWatchFaceItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                android:onClick="onClick"
+                app:contentSize="@dimen/sp14"
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="表盘设置"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+            <!--遥控拍照-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceTakePhotoItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                android:onClick="onClick"
+                app:contentSize="@dimen/sp14"
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="摇一摇拍照"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+            <!--计步目标-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceStepGoalItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="计步目标"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+
+            <!--距离目标-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceDistanceGoalItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="距离目标"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+
+            <!--卡路里目标-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceKcalGoalItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="卡路里目标"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+
+            <!--闹钟设置-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceAlarmItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="闹钟设置"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+
+
+            <!--喝水提醒-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceDrinkItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                app:contentText=""
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="喝水提醒"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+            <!--久坐提醒-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceLongSitAlertItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                app:contentText=""
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="久坐提醒"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+            <!--勿扰模式-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceDNTItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                app:contentText=""
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="勿扰模式"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+            <!--APP消息提醒-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceAppMsgItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                android:onClick="onClick"
+                app:contentSize="@dimen/sp14"
+                app:contentText=""
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="APP消息提醒"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+            <!--常用联系人-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceContractItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                app:contentText=""
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="常用联系人"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="60dp"/>
+
+
+
+
+
+            <!--时间格式-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceTimeStyleItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="时间格式"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+            <!--温度单位-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceTempItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                app:contentText=""
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="温度单位"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="60dp"/>
+
+
+            <!--加强测量-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceStrongItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                android:onClick="onClick"
+                app:contentSize="@dimen/sp14"
+                app:contentText=""
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="加强测量"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="false"
+                app:showBottomLine="true"
+                app:showCheckModel="true"
+                app:showRemind="false" />
+
+            <!--连续监测-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18ContinueItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                android:onClick="onClick"
+                app:contentSize="@dimen/sp14"
+                app:contentText=""
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="定时监测"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="60dp"/>
+
+
+
+
+            <!--查找手表-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceFindWatchItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                android:onClick="onClick"
+                app:contentText=""
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="查找设备"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="false"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+
+
+
+            <!--抬腕亮屏-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceTurnScreenItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                android:onClick="onClick"
+                app:contentText=""
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="抬腕亮屏"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="false"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+
+            <!--天气设置-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceWeatherItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                app:contentText=""
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="天气设置"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+            <!--音频模式指引-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceAudioGuidItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                android:onClick="onClick"
+                app:contentSize="@dimen/sp14"
+                app:contentText=""
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="音频模式指引"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+            <!--玩转设备-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceGuidDeviceItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="玩转设备"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+
+
+
+
+
+            <!--公英制单位-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceUnitItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                android:visibility="gone"
+                app:contentText=""
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="公英制单位"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+            <!--24小时心率-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18Device24HourItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:visibility="gone"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                app:contentText=""
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="24小时心率"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="true"
+                app:showRemind="false" />
+
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp40" />
+
+
+
+            <!--固件版本号-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceOtaItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                app:contentText=""
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="固件版本号"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp20"
+                android:background="@color/common_bg" />
+
+            <TextView
+                android:id="@+id/f18DeviceUnbindItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp50"
+                android:background="@drawable/common_button_bg_selector"
+                android:gravity="center"
+                android:onClick="onClick"
+                android:text="@string/watch_unbind_str"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="15dp"
+                android:textColor="@drawable/common_button_text_selector"
+                android:textSize="@dimen/sp18"
+                android:visibility="visible" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

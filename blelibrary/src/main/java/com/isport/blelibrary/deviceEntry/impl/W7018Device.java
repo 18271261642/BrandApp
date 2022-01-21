@@ -5,6 +5,7 @@ import android.content.Context;
 import com.isport.blelibrary.deviceEntry.interfaces.IBraceletW311;
 import com.isport.blelibrary.deviceEntry.interfaces.IDeviceType;
 import com.isport.blelibrary.deviceEntry.interfaces.ITarget;
+import com.isport.blelibrary.deviceEntry.interfaces.IWatchW557;
 import com.isport.blelibrary.entry.AlarmEntry;
 import com.isport.blelibrary.entry.DisplaySet;
 import com.isport.blelibrary.entry.NotificationMsg;
@@ -21,7 +22,7 @@ import java.util.List;
  * Created by Admin
  * Date 2022/1/14
  */
-public class W7018Device extends BaseDevice implements IDeviceType, ITarget, IBraceletW311 {
+public class W7018Device extends BaseDevice implements IDeviceType, ITarget, IBraceletW311, IWatchW557 {
 
     public W7018Device(String name,String mac) {
         super();
@@ -104,17 +105,17 @@ public class W7018Device extends BaseDevice implements IDeviceType, ITarget, IBr
 
     @Override
     public void measureBloodPressure(boolean isState) {
-
+        Watch7018Manager.getWatch7018Manager().measureHealthData(4,isState);
     }
 
     @Override
     public void measureOxygenBlood(boolean isState) {
-
+        Watch7018Manager.getWatch7018Manager().measureHealthData(2,isState);
     }
 
     @Override
     public void measureOnceHrData(boolean isState) {
-
+        Watch7018Manager.getWatch7018Manager().measureHealthData(1,isState);
     }
 
     @Override
@@ -134,6 +135,22 @@ public class W7018Device extends BaseDevice implements IDeviceType, ITarget, IBr
 
     @Override
     public void getVersion() {
+
+    }
+
+    //开始测量温度
+    @Override
+    public void startTemp(boolean isStart) {
+        Watch7018Manager.getWatch7018Manager().measureHealthData(32,isStart);
+    }
+
+    @Override
+    public void setTempSub(int value) {
+
+    }
+
+    @Override
+    public void getTempSub() {
 
     }
 
@@ -179,7 +196,7 @@ public class W7018Device extends BaseDevice implements IDeviceType, ITarget, IBr
 
     @Override
     public void get_sedentary_reminder() {
-        Watch7018Manager.getWatch7018Manager().getSedentaryConfig();
+       // Watch7018Manager.getWatch7018Manager().getSedentaryConfig();
     }
 
     @Override

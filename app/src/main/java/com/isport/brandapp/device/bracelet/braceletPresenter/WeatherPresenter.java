@@ -1,8 +1,6 @@
 package com.isport.brandapp.device.bracelet.braceletPresenter;
 
-import com.isport.blelibrary.BaseAgent;
 import com.isport.blelibrary.ISportAgent;
-import com.isport.blelibrary.db.table.bracelet_w311.Bracelet_W311_AlarmModel;
 import com.isport.blelibrary.entry.WristbandData;
 import com.isport.blelibrary.entry.WristbandForecast;
 import com.isport.blelibrary.entry.WristbandWeather;
@@ -10,12 +8,8 @@ import com.isport.blelibrary.utils.BleRequest;
 import com.isport.blelibrary.utils.Constants;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.brandapp.AppConfiguration;
-import com.isport.brandapp.device.bracelet.braceletModel.IW311SettingModel;
-import com.isport.brandapp.device.bracelet.braceletModel.W311ModelSettingImpl;
-import com.isport.brandapp.device.bracelet.view.AlarmView;
 import com.isport.brandapp.repository.WheatherRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import brandapp.isport.com.basicres.BaseApp;
@@ -23,11 +17,6 @@ import brandapp.isport.com.basicres.commonnet.interceptor.BaseObserver;
 import brandapp.isport.com.basicres.commonnet.interceptor.ExceptionHandle;
 import brandapp.isport.com.basicres.mvp.BasePresenter;
 import brandapp.isport.com.basicres.mvp.BaseView;
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 public class WeatherPresenter extends BasePresenter<BaseView> {
     BaseView baseView;
@@ -109,7 +98,7 @@ public class WeatherPresenter extends BasePresenter<BaseView> {
             @Override
             public void onNext(WristbandWeather wristbandData) {
                 Constants.wristbandWeather = wristbandData;
-                Logger.myLog("wristbandData:" + wristbandData +AppConfiguration.isConnected);
+                Logger.myLog("wristbandData:" + wristbandData.toString() +AppConfiguration.isConnected);
                 if (AppConfiguration.isConnected) {
                     WristbandData wristbandData1 = wristbandData.getCondition();
                     List<WristbandForecast> list = wristbandData.getForecast15Days();

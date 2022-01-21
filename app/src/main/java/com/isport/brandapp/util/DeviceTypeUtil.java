@@ -503,6 +503,10 @@ public class DeviceTypeUtil {
 
     public static DeviceBean getBindDevcie() {
         DeviceBean mDeviceBean = null;
+        if(AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_F18)){
+            return AppConfiguration.deviceMainBeanList.get(JkConfiguration.DeviceType.Watch_F18);
+        }
+
         if (AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.WATCH_W516)) {
             mDeviceBean = AppConfiguration.deviceMainBeanList.get(JkConfiguration.DeviceType.WATCH_W516);
         } else if (AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.BRAND_W311)) {

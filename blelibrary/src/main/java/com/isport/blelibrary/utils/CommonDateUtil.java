@@ -3,11 +3,33 @@ package com.isport.blelibrary.utils;
 import org.apache.commons.lang.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
+import java.util.Date;
 
 public class CommonDateUtil {
     public static String formatOnePoint(double value) {
         String strNumber = String.format("%.1f", Math.round(value * 10) / 10.0f);
         return strNumber;
+    }
+
+
+    //将long时间类型格式化，只要分
+    public static int getLongMinute(long time){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date(time));
+        return calendar.get(Calendar.MINUTE);
+    }
+
+
+    //将HH：mm格式的时间格式化成小时，分钟
+    public static int[] getHourAdMinute(String timeStr){
+
+        if(!timeStr.contains(":"))
+            return new int[]{0,0};
+        String tmpHour = StringUtils.substringBefore(timeStr,":");
+        String tmpMinute = StringUtils.substringAfter(timeStr,":");
+        return new int[]{Integer.parseInt(tmpHour.trim()),Integer.parseInt(tmpMinute.trim())};
+
     }
 
 
@@ -125,5 +147,13 @@ public class CommonDateUtil {
 
     public static String getW81DeviceName(String name, String mac) {
         return name + "-" + Utils.replaceDeviceMacUpperCase(mac);
+    }
+
+
+    //小时和分钟格式化成HH:mm格式
+    public static String formatHourMinute(int hour,int minute){
+        String hourStr = hour<=9 ? "0"+hour : hour+"";
+        String minuteStr = minute<=9?"0"+minute : minute+"";
+        return hourStr+":"+minuteStr;
     }
 }

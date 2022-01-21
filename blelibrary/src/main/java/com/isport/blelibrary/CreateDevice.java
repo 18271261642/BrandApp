@@ -228,7 +228,6 @@ public class CreateDevice {
         return new W560BDevice(name, mac);
     }
     public BaseDevice createW560(String name, String mac) {
-        Logger.myLog(TAG,"----createW560 name="+name+" mac="+mac);
         return new W560Device(name, mac);
     }
 

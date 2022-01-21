@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/common_bg"
+    android:layout_marginStart="5dp"
+    android:layout_marginEnd="5dp"
+    android:layout_height="match_parent">
+
+
+
+    <TextView
+        android:id="@+id/tv_multiHyperLink"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp40"
+        android:layout_marginRight="@dimen/dp40"
+        android:gravity="center_vertical"
+        android:paddingTop="@dimen/dp10"
+        android:paddingBottom="@dimen/dp10"
+        android:text="@string/thride_tips"
+        android:textColor="@color/common_text_color"
+        android:textSize="@dimen/sp16" />
+
+    <bike.gymproject.viewlibray.ItemDeviceSettingView
+        android:id="@+id/f18AppsAllStatusItem"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp60"
+        android:layout_marginBottom="@dimen/dp15"
+        android:background="@drawable/item_comm_main_layout"
+        app:contentSize="@dimen/sp14"
+        app:contentTextColor="@color/common_gray_color"
+        app:itemText="消息提醒"
+        app:itemviewTitleSize="@dimen/sp15"
+        app:showArrow="false"
+        app:showBottomLine="true"
+        app:showCheckModel="true"
+        app:showRemind="false" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/f18ApsRecyclerView"
+        android:layout_margin="8dp"
+        android:layout_width="match_parent"
+        android:background="@color/white"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

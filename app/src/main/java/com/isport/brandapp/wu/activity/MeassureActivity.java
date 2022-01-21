@@ -22,6 +22,8 @@ import com.isport.brandapp.R;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.Objects;
+
 import androidx.annotation.NonNull;
 import brandapp.isport.com.basicres.BaseActivity;
 import brandapp.isport.com.basicres.commonutil.MessageEvent;
@@ -63,7 +65,13 @@ public class MeassureActivity extends BaseActivity {
 
     private void getIntentValue() {
         measueType = getIntent().getIntExtra("device_type", 0);
-        handler.sendEmptyMessageDelayed(0x00,30 * 1000);
+        int measureDuring ;
+        if(Objects.requireNonNull(AppConfiguration.deviceMainBeanList.get(JkConfiguration.DeviceType.Watch_F18)).getDeviceType() == 7018){
+            measureDuring = 60 * 1000;
+        }else{
+            measureDuring = 30 * 1000;
+        }
+        handler.sendEmptyMessageDelayed(0x00,measureDuring);
     }
 
     @Override

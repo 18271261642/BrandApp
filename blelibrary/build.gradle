@@ -39,7 +39,7 @@ android {
 }
 
 greendao {
-    schemaVersion 28
+    schemaVersion 32
     daoPackage 'com.isport.blelibrary.gen'
     targetGenDir 'src/main/java'
 }

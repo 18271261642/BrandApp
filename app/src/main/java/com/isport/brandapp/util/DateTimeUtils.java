@@ -81,4 +81,11 @@ public class DateTimeUtils {
         }
 
     }
+
+
+    public static String getHouAdMinute(int hour,int minute){
+        String hourStr = hour<=9?"0"+hour:hour+"";
+        String minuteStr = minute<=9?"0"+minute:minute+"";
+        return hourStr+":"+minuteStr;
+    }
 }

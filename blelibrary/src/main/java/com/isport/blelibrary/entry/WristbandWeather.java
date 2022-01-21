@@ -21,4 +21,6 @@ public class WristbandWeather {
     public void setForecast15Days(List<WristbandForecast> forecast15Days) {
         this.forecast15Days = forecast15Days;
     }
+
+
 }

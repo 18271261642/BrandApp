@@ -295,11 +295,28 @@
             android:name=".ropeskipping.realsport.RealRopeSkippingActivity"
             android:launchMode="singleTask" />
 
-
-
+        <!--F18设备-->
+        <activity android:name="com.isport.brandapp.device.f18.F18WatchManagerActivity">
+        </activity>
+        <!--久坐提醒-->
+        <activity android:name=".device.f18.F18LongSitActivity"/>
+        <!--勿扰-->
+        <activity android:name=".device.f18.F18DNTActivity"/>
+        <!--喝水-->
+        <activity android:name=".device.f18.F18DrinkAlertActivity"/>
+        <!--抬腕亮屏-->
+        <activity android:name=".device.f18.F18TurnWristActivity"/>
+        <!--连续监测-->
+        <activity android:name=".device.f18.F18ContinueMeasureActivity"/>
+        <!--app消息提醒-->
+        <activity android:name=".device.f18.F18AppsShowActivity"/>
         <!--权限展示判断-->
         <activity android:name=".login.ShowPermissionActivity"/>
-
+        <!--闹钟页面-->
+        <activity android:name=".device.f18.F18AlarmShowActivity"/>
+        <!--联系人页面-->
+        <activity android:name=".device.f18.F18ContactActivity"/>
+        <activity android:name=".device.f18.F18DeviceMainActivity"/>
 
 
         <!-- 表示当前项目已经适配了分区存储特性 -->
@@ -401,7 +418,10 @@
             android:enabled="true"
             android:exported="true"
             android:process=":CancelNoticeService" />
+
+        <service android:name="com.isport.brandapp.device.f18.F18ConnectStatusService"/>
         <!--
+
 <servi
             android:name=".blue.NotifService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">

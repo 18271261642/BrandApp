@@ -57,8 +57,10 @@ import com.isport.brandapp.bind.ActivityAllDevice
 import com.isport.brandapp.bind.ActivityDeviceSetting
 import com.isport.brandapp.device.bracelet.ActivityBraceletMain
 import com.isport.brandapp.device.bracelet.braceletPresenter.WeatherPresenter
+import com.isport.brandapp.device.f18.F18DeviceMainActivity
 import com.isport.brandapp.device.scale.ScaleMainActivity
 import com.isport.brandapp.device.watch.ActivityWatchMain
+import com.isport.brandapp.device.f18.F18WatchManagerActivity
 import com.isport.brandapp.dialog.CommuniteDeviceAddDialog
 import com.isport.brandapp.dialog.CommuniteDeviceSettingDialog
 import com.isport.brandapp.login.ActivityWebView
@@ -357,6 +359,12 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
 
                         if(context == null)
                             return
+
+
+                        val intent = Intent(context, F18WatchManagerActivity::class.java)
+                        intent.putExtra(JkConfiguration.DEVICE, AppConfiguration.deviceMainBeanList.get(deviceType))
+                        startActivity(intent)
+
                         if (!mCurrentMessage!!.isConn) {
                             if (mCurrentMessage!!.deviceType == JkConfiguration.DeviceType.BODYFAT) {   //体脂称
                                 val intent = Intent(context, ActivityDeviceSetting::class.java)
@@ -412,6 +420,11 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
                             JkConfiguration.DeviceType.BODYFAT -> {
                                 startActivity(Intent(context, ScaleMainActivity::class.java))
                             }
+
+                            JkConfiguration.DeviceType.Watch_F18->{
+                                startActivity(Intent(context, F18DeviceMainActivity::class.java))
+                            }
+
                             else -> {  //手表手环数据显示主页面
                                 startActivity(Intent(context, DeviceMainActivity::class.java))
                             }

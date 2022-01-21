@@ -63,5 +63,18 @@ public class DeviceDataSave {
 
     }
 
+    public static void saveTempData(final String devcieId, final String userId, float tempValue, final long timestamp, final String reportid) {
+        ThreadPoolUtils.getInstance().addTask(new Runnable() {
+            @Override
+            public void run() {
+                float ftempValueC = tempValue / 10.f;
 
+                DeviceMeasuredDActionation actionation = new DeviceMeasuredDActionation();
+                String tempValueC = CommonDateUtil.formatOnePoint(ftempValueC);
+                String tempValueF = CommonDateUtil.formatOnePoint(CommonDateUtil.ctof(ftempValueC));
+                actionation.saveOrUpdateTempData(devcieId, userId, tempValueC, tempValueF, timestamp, reportid);
+            }
+        });
+
+    }
 }

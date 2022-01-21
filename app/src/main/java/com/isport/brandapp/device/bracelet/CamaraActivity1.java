@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.brandapp.R;
 import com.isport.brandapp.banner.recycleView.utils.ToastUtil;
 import com.otaliastudios.cameraview.BitmapCallback;
@@ -261,6 +262,7 @@ public class CamaraActivity1 extends BaseActivity implements View.OnClickListene
 
     @Override
     protected void onDestroy() {
+        Watch7018Manager.getWatch7018Manager().intoTakePhotoStatus(false);
         handler.removeCallbacksAndMessages(null);
         super.onDestroy();
     }
