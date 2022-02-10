@@ -215,7 +215,7 @@ public class BaseAgent {
                 return createDevice.createDevcie(name, address, scanFilter, isDFUMode);
             }
         } else {
-            Logger.myLog(TAG,"scanFilter:" + scanFilter + "name:" + name + "name.contains(scanFilter):" + name.contains(scanFilter));
+           // Logger.myLog(TAG,"scanFilter:" + scanFilter + "name:" + name + "name.contains(scanFilter):" + name.contains(scanFilter));
 
 
             if ( name.contains(scanFilter) || scanFilter.equals("all") || (scanFilter.equals(Constants.WATCH_560_FILTER) && name.contains("FT_ReflexSW"))) {
@@ -691,7 +691,7 @@ public class BaseAgent {
         for (BluetoothDevice bluetoothDevice : devices) {
             BaseDevice tpbaseDevice = getBondDevice(bluetoothDevice.getName(), bluetoothDevice.getAddress());
             if (tpbaseDevice != null && !macListTp.contains(bluetoothDevice.getAddress())) {
-                Logger.myLog("getBondedDevices:Utils.isContainsDFU(tpbaseDevice.deviceName)" + Utils.isContainsDFU(tpbaseDevice.deviceName));
+                //Logger.myLog("getBondedDevices:Utils.isContainsDFU(tpbaseDevice.deviceName)" + Utils.isContainsDFU(tpbaseDevice.deviceName));
                 if (Utils.isContainsDFU(tpbaseDevice.deviceName)) {
                     continue;
                 }
@@ -738,7 +738,7 @@ public class BaseAgent {
                 public void run() {
                     for (final ScanResult result : results) {
                         final BluetoothDevice device = result.getDevice();
-                        Logger.myLog(TAG,"onBatchScanResults: device.getName()=" + device.getName() + ",device.getAddress()=" + device.getAddress() + ",result.getScanRecord()=" + result.getScanRecord().getDeviceName());
+                       // Logger.myLog(TAG,"onBatchScanResults: device.getName()=" + device.getName() + ",device.getAddress()=" + device.getAddress() + ",result.getScanRecord()=" + result.getScanRecord().getDeviceName());
                         BaseDevice tpbaseDevice = handleActionFount(device, result.getScanRecord().getBytes(), result.getRssi());
                         if (tpbaseDevice != null && Utils.isContainsDFU(tpbaseDevice.deviceName)) {
                             listDevicesMap.put(tpbaseDevice.address, tpbaseDevice);
@@ -750,7 +750,7 @@ public class BaseAgent {
                                 listDevicesTp.add(tpbaseDevice);
                                 macListTp.add(tpbaseDevice.address);
                                 addtpbaseDevice(tpbaseDevice);
-                                Logger.myLog("没有添加过的设备 =deviceName= " + tpbaseDevice.deviceName + " address == " + tpbaseDevice.address + "类型：" + tpbaseDevice.deviceType);
+                                //Logger.myLog("没有添加过的设备 =deviceName= " + tpbaseDevice.deviceName + " address == " + tpbaseDevice.address + "类型：" + tpbaseDevice.deviceType);
                             } else {
                                 if (tpbaseDevice != null) {
 //                        Logger.myLog("已经添加过的设备 == " + tpbaseDevice.deviceName);
@@ -761,7 +761,7 @@ public class BaseAgent {
                         }
 
                     }
-                    Logger.myLog("onBatchScanResults sumSize=" + sumSize + ",macListTp.size()=" + listDevicesTp.size() + ",Thread.currentThread()=" + Thread.currentThread());
+                   // Logger.myLog("onBatchScanResults sumSize=" + sumSize + ",macListTp.size()=" + listDevicesTp.size() + ",Thread.currentThread()=" + Thread.currentThread());
 
                     if (sumSize == listDevicesTp.size()) {
                         return;
@@ -858,7 +858,7 @@ public class BaseAgent {
             listDevicesMap.put(tpbaseDevice.getDeviceName(), tpbaseDevice);
             // sendMessage(tpbaseDevice);
         }
-        Logger.myLog(TAG,"没有添加过的设备 =deviceName= " + tpbaseDevice.deviceName + " address == " + tpbaseDevice.address);
+        //Logger.myLog(TAG,"没有添加过的设备 =deviceName= " + tpbaseDevice.deviceName + " address == " + tpbaseDevice.address);
     }
 
     //*************************************************通用方法**********************************************************//

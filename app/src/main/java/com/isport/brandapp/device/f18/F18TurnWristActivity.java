@@ -2,12 +2,17 @@ package com.isport.brandapp.device.f18;
 
 import android.text.TextUtils;
 import android.view.View;
+
+import com.google.gson.Gson;
+import com.isport.blelibrary.db.table.f18.F18DbType;
 import com.isport.blelibrary.db.table.f18.F18DeviceSetData;
 import com.isport.blelibrary.db.table.f18.listener.CommAlertListener;
 import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.utils.CommonDateUtil;
+import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 import bike.gymproject.viewlibray.ItemView;
+import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.commonview.TitleBarView;
 import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
 
@@ -22,9 +27,11 @@ public class F18TurnWristActivity extends BaseMVPTitleActivity<F18SetView,F18Set
     private ItemView f18TurnWristStartTimeItem;
     private ItemView f18TurnWristEndTimeItem;
 
+    private F18DeviceSetData turnWristBean;
+
     @Override
     public void backAllSetData(F18DeviceSetData f18DeviceSetData) {
-
+        this.turnWristBean = f18DeviceSetData;
     }
 
     @Override
@@ -65,12 +72,22 @@ public class F18TurnWristActivity extends BaseMVPTitleActivity<F18SetView,F18Set
 
     @Override
     protected void initData() {
+        if(AppConfiguration.braceletID != null){
+            mActPresenter.getAllDeviceSet(TokenUtil.getInstance().getPeopleIdStr(this),AppConfiguration.braceletID);
+        }
         Watch7018Manager.getWatch7018Manager().getTurnWristLightingConfig(new CommAlertListener() {
             @Override
             public void backCommAlertData(boolean isOpen, int startHour, int startMinute, int endHour, int endMinute, int interval) {
                 f18TurnWristStatusTimeItem.setChecked(isOpen);
                 f18TurnWristStartTimeItem.setContentText(CommonDateUtil.formatHourMinute(startHour,startMinute));
                 f18TurnWristEndTimeItem.setContentText(CommonDateUtil.formatHourMinute(endHour,endMinute));
+
+
+                if(turnWristBean != null){
+                    turnWristBean.setTurnWrist(isOpen ? (CommonDateUtil.formatHourMinute(startHour,startMinute)+"-"+CommonDateUtil.formatHourMinute(endHour,endMinute)) : "未开启");
+                    mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(F18TurnWristActivity.this), AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(turnWristBean));
+                }
+
             }
         });
     }
@@ -127,6 +144,10 @@ public class F18TurnWristActivity extends BaseMVPTitleActivity<F18SetView,F18Set
             int[] endTimeArray = CommonDateUtil.getHourAdMinute(endTimeStr);
             Watch7018Manager.getWatch7018Manager().setTurnWristLightingConfig(f18TurnWristStatusTimeItem.isChecked(),startTimeArray[0],startTimeArray[1],endTimeArray[0],endTimeArray[1]);
 
+            if(turnWristBean != null){
+                turnWristBean.setTurnWrist(f18TurnWristStatusTimeItem.isChecked() ? (startTimeStr+"-"+endTimeStr) : "未开启");
+                mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(this), AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(turnWristBean));
+            }
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -6,14 +6,13 @@ import com.isport.blelibrary.utils.Logger;
 import com.isport.brandapp.App;
 import com.isport.brandapp.device.bracelet.braceletModel.DeviceMeasureDataImp;
 import com.isport.brandapp.device.bracelet.braceletModel.IDeviceMeasureData;
+import com.isport.brandapp.device.f18.dial.F18DialBean;
 import com.isport.brandapp.net.RetrofitClient;
 import com.isport.brandapp.util.DeviceTypeUtil;
 import com.isport.brandapp.util.InitCommonParms;
 import com.isport.brandapp.wu.bean.BPInfo;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import brandapp.isport.com.basicres.commonbean.BaseDbPar;
 import brandapp.isport.com.basicres.commonbean.BaseUrl;
 import brandapp.isport.com.basicres.mvp.NetworkBoundResource;
@@ -193,5 +192,52 @@ public class BPRepository {
 
             }
         }.getAsObservable();
+    }
+
+
+    public static List<F18DialBean>  getF18DialCenterData(){
+
+        List<F18DialBean> list = new ArrayList<>();
+
+        new NetworkBoundResource<List<F18DialBean>>(){
+
+            @Override
+            public Observable<List<F18DialBean>> getFromDb() {
+                return null;
+            }
+
+            @Override
+            public Observable<List<F18DialBean>> getNoCacheData() {
+                return null;
+            }
+
+            @Override
+            public boolean shouldFetchRemoteSource() {
+                return false;
+            }
+
+            @Override
+            public boolean shouldStandAlone() {
+                return false;
+            }
+
+            @Override
+            public Observable<List<F18DialBean>> getRemoteSource() {
+                InitCommonParms<List<F18DialBean>, BaseUrl, BaseDbPar> initCommonParms = new InitCommonParms<>();
+                BaseUrl baseUrl = new BaseUrl();
+                baseUrl.object = 7018;
+                return (Observable<List<F18DialBean>>) RetrofitClient.getInstance().post(initCommonParms
+                        .setPostBody
+                                (!(App.appType() == App.httpType)).setBaseUrl(baseUrl).setType(JkConfiguration.RequstType.GET_F18_DEVICE_DIAL_LIST).getPostBody());
+
+            }
+
+            @Override
+            public void saveRemoteSource(List<F18DialBean> remoteSource) {
+                list.clear();
+                list.addAll(remoteSource);
+            }
+        }.getAsObservable();
+        return list;
     }
 }

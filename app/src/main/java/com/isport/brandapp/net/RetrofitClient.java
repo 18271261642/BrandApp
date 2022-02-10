@@ -921,6 +921,9 @@ public class RetrofitClient {
             case JkConfiguration.RequstType.W81_TOTAL_EXERCISE_TIMES:
                 return getW81Retrofit().create(APIW81Service.class).getTotalPractiseTimes(url.deviceid, url.userid, url.dataType).compose(RxScheduler.Obs_io_main()).compose(transformer);
 
+            case JkConfiguration.RequstType.GET_F18_DEVICE_DIAL_LIST:   //
+
+                break;
         }
         return null;
     }
@@ -933,6 +936,10 @@ public class RetrofitClient {
         }
         BaseUrl url = (BaseUrl) body.requseturl;
         switch (body.type) {
+            case JkConfiguration.RequstType.GET_F18_DEVICE_DIAL_LIST:
+
+                return getBasicRetrofit().create(APIService.class).getF18DialListData((Integer) url.object).compose(RxScheduler.Obs_io_main()).compose(transformer);
+
             case JkConfiguration.RequstType.adviceList:
                 return getBasicRetrofit().create(APIService.class).getAdvertisements("APP", "STANDBY", url.userid)
                         .compose(RxScheduler.Obs_io_main()).compose(transformer);

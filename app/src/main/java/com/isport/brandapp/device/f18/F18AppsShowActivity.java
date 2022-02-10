@@ -13,6 +13,7 @@ import com.isport.blelibrary.db.table.f18.F18DeviceSetData;
 import com.isport.blelibrary.entry.F18AppsItemBean;
 import com.isport.blelibrary.entry.F18AppsStatusListener;
 import com.isport.blelibrary.managers.Watch7018Manager;
+import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 
 import java.util.ArrayList;
@@ -46,8 +47,8 @@ public class F18AppsShowActivity extends BaseMVPTitleActivity<F18SetView,F18SetP
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             if(mF18DeviceData != null){
-                mF18DeviceData.setAppMsgs(f18AppsAdapter.getAllSelectSize() == 0 ? "未开启":("已开启:"+f18AppsAdapter.getAllSelectSize()+"个"));
-                mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdInt(F18AppsShowActivity.this),Watch7018Manager.getWatch7018Manager().getConnectedMac(), F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(mF18DeviceData));
+                mF18DeviceData.setAppMsgs(f18AppsAdapter.getAllSelectSize());
+                mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdInt(F18AppsShowActivity.this), AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(mF18DeviceData));
             }
 
 

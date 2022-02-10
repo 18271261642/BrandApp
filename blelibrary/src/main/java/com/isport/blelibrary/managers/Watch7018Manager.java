@@ -2,6 +2,7 @@ package com.isport.blelibrary.managers;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -73,6 +74,9 @@ public class Watch7018Manager extends BaseManager {
 
     private static final String TAG = "Watch7018Manager";
 
+    //数据同步完成
+    public static final String SYNC_DATA_COMPLETE = "com.isport.blelibrary.managers.sync_complete";
+
     private static Watch7018Manager watch7018Manager;
     private static Context mContext;
 
@@ -93,6 +97,7 @@ public class Watch7018Manager extends BaseManager {
             if (isListenerNull)
                 return;
             if (whatCode == HandlerContans.mHandlerConnetSuccessState) {  //连接成功
+                getCommonSet(); //连接成功获取一下设置相关
                 if (mCurrentDevice != null) {
                     for (int i = 0; i < mBleReciveListeners.size(); i++) {
                         mBleReciveListeners.get(i).onConnResult(true, true, mCurrentDevice);
@@ -124,7 +129,6 @@ public class Watch7018Manager extends BaseManager {
             if (whatCode == HandlerContans.mHandlerbattery) {
                 if (mCurrentDevice != null) {
                     for (int i = 0; i < mBleReciveListeners.size(); i++) {
-
                         mBleReciveListeners.get(i).onBattreyOrVersion(mCurrentDevice);
                     }
                 }
@@ -176,8 +180,8 @@ public class Watch7018Manager extends BaseManager {
     public void connectDevice(String bleMac, boolean isBind) {
         setConnectListener();
         boolean isBindDevice = mWristbandManager.isBindOrLogin();
-        Log.e(TAG,"----isBindDevice="+isBindDevice);
-        mWristbandManager.connect(bleMac, "1", isBindDevice, true, 25, 175, 60);
+        Log.e(TAG,"----isBindDevice="+isBindDevice+" userId="+mUserId+" "+mCurrentDevice.getDeviceName());
+        mWristbandManager.connect(bleMac, mUserId, !isBindDevice, true, mAge, mHeight, mWeight);
     }
 
     public void connectDevice(BaseDevice baseDevice,boolean isBind){
@@ -194,6 +198,8 @@ public class Watch7018Manager extends BaseManager {
     //解绑，解绑后需要使用bind模式
     @SuppressLint("CheckResult")
     public void unBindDevice() {
+        if(!mWristbandManager.isConnected())
+            return;
         mWristbandManager.userUnBind().subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<Boolean>() {
             @Override
@@ -372,32 +378,34 @@ public class Watch7018Manager extends BaseManager {
                 stringBuilder.append("温度1="+healthyDataResult.getTemperatureBody()+"\n");
                 stringBuilder.append("温度2="+healthyDataResult.getTemperatureWrist());
                 Log.e(TAG,"-----手动测量数据="+stringBuilder.toString());
+
                 if(healthType == WristbandManager.HEALTHY_TYPE_HEART_RATE){ //心率
                     int htV = healthyDataResult.getHeartRate();
                     if(htV == 0)
                         return;
-                    DeviceDataSave.saveOneceHrData(mWristbandManager.getConnectedDevice().getName(), String.valueOf(BaseManager.mUserId), healthyDataResult.getHeartRate(), System.currentTimeMillis(), String.valueOf(0));
+                    DeviceDataSave.saveOneceHrData(mCurrentDevice.getDeviceName(), String.valueOf(BaseManager.mUserId), healthyDataResult.getHeartRate(), System.currentTimeMillis(), String.valueOf(0));
                     mHandler.sendEmptyMessageDelayed(HandlerContans.mDevcieMeasureHrSuccess, 500);
                 }
 
+                //血压
                 if(healthType == WristbandManager.HEALTHY_TYPE_BLOOD_PRESSURE){
                     int hBp = healthyDataResult.getDiastolicPressure();
                     int lBp = healthyDataResult.getSystolicPressure();
                     if(hBp == 0 && lBp == 0)
                         return;
-                    DeviceDataSave.saveBloodPressureData(mWristbandManager.getConnectedDevice().getName(), String.valueOf(BaseManager.mUserId), hBp, lBp, System.currentTimeMillis(), String.valueOf(0));
+                    DeviceDataSave.saveBloodPressureData(mCurrentDevice.getDeviceName(), String.valueOf(BaseManager.mUserId), hBp, lBp, System.currentTimeMillis(), String.valueOf(0));
                 }
-
+                //血氧
                 if(healthType == WristbandManager.HEALTHY_TYPE_OXYGEN){
                     if(healthyDataResult.getOxygen() == 0)
                         return;
-                    DeviceDataSave.saveOxyenModelData(mWristbandManager.getConnectedDevice().getName(), String.valueOf(BaseManager.mUserId), healthyDataResult.getOxygen(), System.currentTimeMillis(), String.valueOf(0));
+                    DeviceDataSave.saveOxyenModelData(mCurrentDevice.getDeviceName(), String.valueOf(BaseManager.mUserId), healthyDataResult.getOxygen(), System.currentTimeMillis(), String.valueOf(0));
                 }
-
+                //温度
                 if(healthType == WristbandManager.HEALTHY_TYPE_TEMPERATURE){
                     if(healthyDataResult.getTemperatureWrist()==0)
                         return;
-                    DeviceDataSave.saveTempData(mWristbandManager.getConnectedDevice().getName(), String.valueOf(BaseManager.mUserId), healthyDataResult.getTemperatureWrist(), System.currentTimeMillis(), String.valueOf(0));
+                    DeviceDataSave.saveTempData(mCurrentDevice.getDeviceName(), String.valueOf(BaseManager.mUserId), healthyDataResult.getTemperatureWrist(), System.currentTimeMillis(), String.valueOf(0));
                 }
 
             }
@@ -428,7 +436,8 @@ public class Watch7018Manager extends BaseManager {
         if(!mWristbandManager.isConnected())
             return;
         setSyncStatusListener();
-        mWristbandManager.syncData().observeOn(Schedulers.io(), true)
+        mWristbandManager.syncData()
+                .observeOn(Schedulers.io(), true)
                 .flatMapCompletable(new Function<SyncDataRaw, CompletableSource>() {
                     @Override
                     public CompletableSource apply(@NonNull SyncDataRaw syncDataRaw) throws Exception {
@@ -482,7 +491,14 @@ public class Watch7018Manager extends BaseManager {
 
                         return Completable.complete();
                     }
-                }).subscribe(new Action() {
+                }).doOnComplete(new Action() {  //数据同步完成
+            @Override
+            public void run() throws Exception {
+                Log.e(TAG,"-----数据同步完成---");
+                sendActionBroad(SYNC_DATA_COMPLETE,"");
+            }
+        })
+                .subscribe(new Action() {
 
             @Override
             public void run() throws Exception {
@@ -491,7 +507,7 @@ public class Watch7018Manager extends BaseManager {
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
-
+                Log.e(TAG,"-----Throwable---="+throwable.getMessage());
             }
         });
     }
@@ -500,12 +516,16 @@ public class Watch7018Manager extends BaseManager {
     @SuppressLint("CheckResult")
     private void setSyncStatusListener() {
         mWristbandManager.observerSyncDataState()
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<Integer>() {
 
                     @Override
                     public void accept(Integer integer) throws Exception {
                         if (integer == null)
                             return;
+
+                        Log.e(TAG,"----同步状态码="+integer);
+
                         if (integer < 0) {      //同步失败
                             if (integer == WristbandManager.SYNC_STATE_FAILED_DISCONNECTED) {
 
@@ -525,7 +545,8 @@ public class Watch7018Manager extends BaseManager {
                 long currentTime = System.currentTimeMillis();
                 W81DeviceDataAction w81DeviceDataAction = new W81DeviceDataAction();
                 int kcal = todayTotalData.getCalorie() ==0 ? 0 : todayTotalData.getCalorie()/10000;
-                w81DeviceDataAction.saveW81DeviceStepData(mWristbandManager.getConnectedDevice().getName(), String.valueOf(BaseManager.mUserId),
+
+                w81DeviceDataAction.saveW81DeviceStepData(mCurrentDevice.getDeviceName(), String.valueOf(BaseManager.mUserId),
                         "0", TimeUtils.getTimeByyyyyMMdd(currentTime), currentTime, todayTotalData.getStep(), todayTotalData.getDistance(), kcal, false);
             }
         });
@@ -544,7 +565,8 @@ public class Watch7018Manager extends BaseManager {
     //解析睡眠数据
     private void analysisSleepData(List<SleepData> sleepDataList) {
         Log.e(TAG,"--------睡眠数据="+new Gson().toJson(sleepDataList));
-
+        if(sleepDataList == null)
+            return;
         List<SleepItemData> f18SleepList = sleepDataList.get(sleepDataList.size()-1).getItems();
 
         final ArrayList<ArrayList<String>> sleepDetail = new ArrayList<>();
@@ -599,7 +621,7 @@ public class Watch7018Manager extends BaseManager {
             public void run() {
                 Gson gson = new Gson();
                 W81DeviceDataAction w81DeviceDataAction = new W81DeviceDataAction();
-                w81DeviceDataAction.saveW81DeviceSleepData(mWristbandManager.getConnectedDevice().getName(), String.valueOf(BaseManager.mUserId),
+                w81DeviceDataAction.saveW81DeviceSleepData(mCurrentDevice.getDeviceName(), String.valueOf(BaseManager.mUserId),
                         "0", TimeUtils.getTimeByyyyyMMdd(sleepDataList.get(sleepDataList.size()-1).getTimeStamp()), System.currentTimeMillis(), finalDeepSleepTime+ finalLightSleepTime+finalSoberTime, finalDeepSleepTime, finalLightSleepTime, finalSoberTime, gson.toJson(sleepDetail));
             }
         });
@@ -680,7 +702,7 @@ public class Watch7018Manager extends BaseManager {
             f18DeviceSetData.setIsKmUnit(isKmUnit ? 1 : 0);
             f18DeviceSetData.setCityName(!isWeather ? "未开启" : "已开启");
             f18DeviceSetData.setStrengthMeasure(isStrength);
-            F18DeviceSetAction.saveOrUpdateF18DeviceSet(mUserId, mWristbandManager.getConnectedAddress(), mWristbandManager.getConnectedDevice().getName(), F18DbType.F18_DEVICE_SET_TYPE, "", new Gson().toJson(f18DeviceSetData));
+            F18DeviceSetAction.saveOrUpdateF18DeviceSet(mUserId, mCurrentDevice.getDeviceName(),  F18DbType.F18_DEVICE_SET_TYPE, new Gson().toJson(f18DeviceSetData));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1391,17 +1413,14 @@ public class Watch7018Manager extends BaseManager {
     }
 
 
-    //    //设置手表识别的联系人
-//    public void setDeviceContactCreate(WristbandContacts wristbandContacts){
-//        try {
-//            if(!mWristbandManager.isConnected())
-//                return;
-//            WristbandContacts.create()
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
-//
-//    }}
+
+    //发送广播
+    private void sendActionBroad(String action,String ... params){
+        Intent intent = new Intent();
+        intent.setAction(action);
+        intent.putExtra("params_key",params);
+        mContext.sendBroadcast(intent);
+    }
 
 }
 

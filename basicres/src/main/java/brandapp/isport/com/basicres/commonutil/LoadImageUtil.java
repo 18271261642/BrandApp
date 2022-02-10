@@ -222,7 +222,7 @@ public class LoadImageUtil {
                     }
                 });*/
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -266,7 +266,7 @@ public class LoadImageUtil {
                     }
                 });*/
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 

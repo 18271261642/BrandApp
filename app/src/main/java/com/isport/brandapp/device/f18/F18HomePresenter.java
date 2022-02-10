@@ -14,7 +14,6 @@ import com.isport.brandapp.wu.bean.BPInfo;
 import com.isport.brandapp.wu.bean.OnceHrInfo;
 import com.isport.brandapp.wu.bean.OxyInfo;
 import com.isport.brandapp.wu.bean.TempInfo;
-
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonnet.interceptor.BaseObserver;
 import brandapp.isport.com.basicres.commonnet.interceptor.ExceptionHandle;

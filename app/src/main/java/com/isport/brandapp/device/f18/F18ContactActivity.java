@@ -14,12 +14,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.XXPermissions;
 import com.htsmart.wristband2.bean.WristbandContacts;
+import com.isport.blelibrary.db.table.f18.F18DbType;
 import com.isport.blelibrary.db.table.f18.F18DeviceSetData;
 import com.isport.blelibrary.entry.F18ContactListener;
 import com.isport.blelibrary.managers.Watch7018Manager;
+import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 import com.isport.brandapp.device.f18.model.F18ContactBean;
 
@@ -29,6 +32,7 @@ import java.util.List;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.commonview.TitleBarView;
 import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
 
@@ -38,6 +42,9 @@ import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
  */
 public class F18ContactActivity extends BaseMVPTitleActivity<F18SetView,F18SetPresent> implements F18SetView {
 
+
+    private F18DeviceSetData contactSetBean;
+
     private F18ContactAdapter f18ContactAdapter;
     private List<F18ContactBean> beanList;
 
@@ -45,7 +52,7 @@ public class F18ContactActivity extends BaseMVPTitleActivity<F18SetView,F18SetPr
 
     @Override
     public void backAllSetData(F18DeviceSetData f18DeviceSetData) {
-
+        this.contactSetBean = f18DeviceSetData;
     }
 
     @Override
@@ -72,6 +79,7 @@ public class F18ContactActivity extends BaseMVPTitleActivity<F18SetView,F18SetPr
     @Override
     protected void initData() {
         beanList.clear();
+        mActPresenter.getAllDeviceSet(TokenUtil.getInstance().getPeopleIdStr(this), AppConfiguration.braceletID);
         Watch7018Manager.getWatch7018Manager().redDeviceContact(new F18ContactListener() {
             @Override
             public void onContactAllData(List<WristbandContacts> list) {
@@ -83,6 +91,11 @@ public class F18ContactActivity extends BaseMVPTitleActivity<F18SetView,F18SetPr
                 }
 
                 f18ContactAdapter.notifyDataSetChanged();
+
+                if(contactSetBean != null){
+                    contactSetBean.setContactNumber(f18ContactAdapter.getItemCount());
+                    mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(F18ContactActivity.this),AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(contactSetBean));
+                }
             }
         });
     }
@@ -174,6 +187,10 @@ public class F18ContactActivity extends BaseMVPTitleActivity<F18SetView,F18SetPr
             wristbandContactsList.clear();
             for(F18ContactBean fb : beanList){
                 wristbandContactsList.add(new WristbandContacts(fb.getContactName(), fb.getContactNumber()));
+            }
+            if(contactSetBean != null){
+                contactSetBean.setContactNumber(f18ContactAdapter.getItemCount());
+                mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(this),AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(contactSetBean));
             }
             Watch7018Manager.getWatch7018Manager().setDeviceContact(wristbandContactsList);
 

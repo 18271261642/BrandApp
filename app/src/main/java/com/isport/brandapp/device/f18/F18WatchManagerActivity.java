@@ -9,28 +9,47 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.isport.blelibrary.ISportAgent;
+import com.isport.blelibrary.db.table.f18.F18DbType;
 import com.isport.blelibrary.db.table.f18.F18DeviceSetData;
 import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
 import com.isport.blelibrary.deviceEntry.impl.W7018Device;
+import com.isport.blelibrary.deviceEntry.interfaces.IDeviceType;
 import com.isport.blelibrary.managers.Watch7018Manager;
+import com.isport.blelibrary.utils.BleRequest;
+import com.isport.blelibrary.utils.BleSPUtils;
+import com.isport.blelibrary.utils.Constants;
+import com.isport.blelibrary.utils.Logger;
+import com.isport.blelibrary.utils.TimeUtils;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 import com.isport.brandapp.bean.DeviceBean;
 import com.isport.brandapp.device.bracelet.ActivityWeatherSetting;
 import com.isport.brandapp.device.bracelet.CamaraActivity1;
+import com.isport.brandapp.device.f18.dial.F18DialActivity;
+import com.isport.brandapp.device.publicpage.ActivityDeviceUnbindGuide;
 import com.isport.brandapp.device.publicpage.GoActivityUtil;
+import com.isport.brandapp.dialog.UnBindDeviceDialog;
+import com.isport.brandapp.dialog.UnbindStateCallBack;
+import com.isport.brandapp.util.DeviceTypeUtil;
 
 import org.apache.commons.lang.StringUtils;
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 import bike.gymproject.viewlibray.ItemDeviceSettingView;
 import brandapp.isport.com.basicres.BaseApp;
+import brandapp.isport.com.basicres.commonutil.MessageEvent;
+import brandapp.isport.com.basicres.commonutil.NetUtils;
+import brandapp.isport.com.basicres.commonutil.ToastUtils;
 import brandapp.isport.com.basicres.commonutil.TokenUtil;
+import brandapp.isport.com.basicres.commonutil.UIUtils;
 import brandapp.isport.com.basicres.commonview.TitleBarView;
 import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
+import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 
 /**
  * F18设备设置页面
@@ -47,6 +66,8 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
     private final static int SET_TEMP_UNIT_CODE = 0x02;
     //公英制
     private final static int SET_KM_UNIT_CODE = 0x03;
+
+    private F18DeviceSetData setData;
 
 
     //表盘设置
@@ -158,13 +179,10 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
     protected void onResume() {
         super.onResume();
 
-        String macStr = Watch7018Manager.getWatch7018Manager().getConnectedMac();
-        if(macStr != null){
-            Message message = handler.obtainMessage();
-            message.obj = macStr;
-            message.what = 0x00;
-            handler.sendMessageDelayed(message,500);
-        }
+        String macStr = AppConfiguration.braceletID;
+        if(macStr != null)
+          mActPresenter.getAllDeviceSet(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()),macStr);
+
     }
 
     private void findViews(){
@@ -272,8 +290,7 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
     public void onClick(View v) {
         int vId = v.getId();
         if(vId == R.id.f18DeviceWatchFaceItem){  //表盘设置
-            ISportAgent.getInstance().connect(create7018Device("F18-C36","A1:23:B4:C6:1C:36"),false,true);
-           // Watch7018Manager.getWatch7018Manager(this).connectDevice("A1:23:B4:C6:1C:36",true);
+           startActivity(new Intent(F18WatchManagerActivity.this, F18DialActivity.class));
         }
         if(vId == R.id.f18DeviceTakePhotoItem){  //遥控拍照
             requestCameraPermission();
@@ -368,15 +385,75 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
         }
 
         if(vId == R.id.f18DeviceUnbindItem){    //解绑
-            Watch7018Manager.getWatch7018Manager().disConnectDevice();
+            unBindF18Device();
         }
 
         if(vId == R.id.f18DeviceAppMsgItem){    //APP消息提醒
             startActivity(new Intent(F18WatchManagerActivity.this,F18AppsShowActivity.class));
         }
 
+    }
 
 
+    private void unBindF18Device(){
+        new UnBindDeviceDialog(this, JkConfiguration.DeviceType.Watch_F18, true, new UnbindStateCallBack() {
+            @Override
+            public void synUnbind() {
+                if (!NetUtils.hasNetwork(BaseApp.getApp())) {
+                    ToastUtils.showToast(context, UIUtils.getString(R.string.common_please_check_that_your_network_is_connected));
+                    return;
+                }
+                if (AppConfiguration.isConnected) {
+                    // TODO: 2018/11/8 同步解绑的逻辑
+//                                        if (FragmentData.mWristbandstep != null) {
+//                                            mActPresenter.updateSportData(FragmentData.mWristbandstep, mDeviceBean);
+//                                        }
+                    Constants.isSyncUnbind = true;
+                    BaseDevice device = ISportAgent.getInstance().getCurrnetDevice();
+
+                    Logger.myLog(TAG,"--------解绑="+new Gson().toJson(device));
+                    if (device != null) {
+                        int currentDevice = device.deviceType;
+                        if (DeviceTypeUtil.isContainWatch(currentDevice)) {
+                            //睡眠带连接
+                            String string = BleSPUtils.getString(BaseApp.getApp(), BleSPUtils.WATCH_LAST_SYNCTIME, TimeUtils.getTodayYYYYMMDD());
+                            ISportAgent.getInstance().requestBle(BleRequest.Watch_W516_GET_DAILY_RECORD, string);
+                           // canUnBind = true;
+                        } else {
+                            ToastUtils.showToast(context, UIUtils.getString(R.string.app_disconnect_device));
+                        }
+                    }
+                } else {
+                    ToastUtils.showToast(context, UIUtils.getString(R.string.app_disconnect_device));
+                }
+            }
+
+            @Override
+            public void dirctUnbind() {
+                if (!NetUtils.hasNetwork(BaseApp.getApp())) {
+                    ToastUtils.showToast(context, UIUtils.getString(R.string.common_please_check_that_your_network_is_connected));
+                    return;
+                }
+                DeviceBean device = AppConfiguration.deviceMainBeanList.get(IDeviceType.TYPE_WATCH_7018);
+                unBindDevice(device, true);
+            }
+
+            @Override
+            public void cancel() {
+
+            }
+        }, JkConfiguration.DeviceType.SLEEP);
+    }
+
+
+
+    private void unBindDevice(DeviceBean deviceBean, boolean dirct) {
+//        isDerictUnBind = true;
+//        currentType = deviceBean.currentType;
+//        Logger.myLog("点击去解绑 == " + currentType+"\n"+deviceBean.toString());
+        //解绑前断连设备
+        Watch7018Manager.getWatch7018Manager().unBindDevice();
+        mActPresenter.unBind(deviceBean, dirct);
     }
 
 
@@ -408,6 +485,10 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
     @Override
     public void backAllSetData(F18DeviceSetData f18DeviceSetData) {
         Log.e(TAG,"---------查找返回="+f18DeviceSetData.toString());
+        this.setData = f18DeviceSetData;
+
+        //计步目标
+        f18DeviceStepGoalItem.setContentText(f18DeviceSetData.getStepGoal()+"步");
         //闹钟数量
         f18DeviceAlarmItem.setContentText(f18DeviceSetData.getAlarmCount() == 0 ? "未开启" : ("已开启"+f18DeviceSetData.getAlarmCount()+"个"));
         //时间格式
@@ -426,7 +507,16 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
         f18DeviceContractItem.setContentText(f18DeviceSetData.getContinuMonitor());
         //抬腕亮屏
         f18DeviceTurnScreenItem.setContentText(f18DeviceSetData.getTurnWrist());
-
+        //勿扰模式
+        f18DeviceDNTItem.setContentText(f18DeviceSetData.getDNT());
+        //喝水提醒
+        f18DeviceDrinkItem.setContentText(f18DeviceSetData.getDrinkAlert());
+        //久坐提醒
+        f18DeviceLongSitAlertItem.setContentText(f18DeviceSetData.getLongSitStr());
+        //联系人
+        f18DeviceContractItem.setContentText("已设置"+f18DeviceSetData.getContactNumber()+"个");
+        //定时检测
+        f18ContinueItem.setContentText(f18DeviceSetData.getContinuMonitor());
     }
 
     @Override
@@ -436,23 +526,54 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
             f18DeviceStepGoalItem.setContentText(timeStr+"步");
             String tmpGoal = StringUtils.substringBefore(timeStr,"步");
             Watch7018Manager.getWatch7018Manager().setDeviceSportGoal(Integer.parseInt(tmpGoal.trim()),10,100);
+            if(setData != null){
+                setData.setStepGoal(Integer.parseInt(tmpGoal.trim()));
+                mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(F18WatchManagerActivity.this),AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(setData));
+            }
+
         }
         if(selectType == SET_TIME_STYLE_CODE){      //时间格式
             f18DeviceTimeStyleItem.setContentText(timeStr);
             Watch7018Manager.getWatch7018Manager().setTimeStyle(timeStr.contains("12"));
+            if(setData != null){
+                setData.setTimeStyle(timeStr.contains("12") ? 1 : 0);
+                mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(F18WatchManagerActivity.this),AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(setData));
+            }
         }
         if(selectType == SET_TEMP_UNIT_CODE){   //温度单位
             f18DeviceTempItem.setContentText(timeStr);
             Watch7018Manager.getWatch7018Manager().setTemperUnit(timeStr.contains("℃"));
-
+            if(setData != null){
+                setData.setTempStyle(timeStr.contains("℃") ? 1 : 0);
+                mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(F18WatchManagerActivity.this),AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(setData));
+            }
         }
 
         if(selectType == SET_KM_UNIT_CODE){     //公英制
             f18DeviceUnitItem.setContentText(timeStr);
             Watch7018Manager.getWatch7018Manager().setKmUnit(timeStr.contains("公"));
+            if(setData != null){
+                setData.setTempStyle(timeStr.contains("公") ? 1 : 0);
+                mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(F18WatchManagerActivity.this),AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(setData));
+            }
         }
 
-
+        if(selectType == -1){
+            //解绑的是当前连接的设备,需要断连设备
+//            if (AppConfiguration.isConnected) {
+//                BaseDevice currnetDevice = ISportAgent.getInstance().getCurrnetDevice();
+//                if (currnetDevice != null && currnetDevice.deviceType == currentType) {
+//                    Logger.myLog("currnetDevice == " + currentType);
+//                    //解绑设备，不用重连
+//                    ISportAgent.getInstance().unbind(false);
+//                }
+//            }
+            EventBus.getDefault().post(new MessageEvent(MessageEvent.UNBIND_DEVICE_SUCCESS));
+            Intent intent = new Intent(context, ActivityDeviceUnbindGuide.class);
+            context.startActivity(intent);
+            finish();
+        }
 
     }
+
 }

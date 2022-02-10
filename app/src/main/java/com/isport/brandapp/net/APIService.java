@@ -4,6 +4,7 @@ package com.isport.brandapp.net;
 import com.isport.blelibrary.entry.WristbandData;
 import com.isport.blelibrary.entry.WristbandForecast;
 import com.isport.blelibrary.entry.WristbandWeather;
+import com.isport.brandapp.device.f18.dial.F18DialBean;
 import com.isport.brandapp.home.bean.AdviceBean;
 import com.isport.brandapp.home.bean.http.BindDeviceList;
 import com.isport.brandapp.home.bean.http.DeviceHomeData;
@@ -406,4 +407,7 @@ public interface APIService {
     Observable<BaseResponse<List<Long>>> fatsteelyardTarget(@Query("userId") String userId);
 
 
+    //获取F18表盘市场图片
+    @GET("dialPlate/queryAllDialPlate")
+    Observable<BaseResponse<List<F18DialBean>>> getF18DialListData(@Query("type") int type);
 }

@@ -1,7 +1,5 @@
 package com.isport.brandapp.util;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.util.Log;
 
 import com.isport.brandapp.R;
@@ -17,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonutil.UIUtils;
 import phone.gym.jkcq.com.commonres.commonutil.Arith;
@@ -57,16 +57,11 @@ public class DownloadUtils {
     long increaseLength, fileTotalLength;
 
     public void downBin(String url, String path, String fileName,final onDownloadListener listener) {
-
         File file = null;
-
-
         file = new File(path);
         if (file == null) {
             return;
         }
-
-
         task = new DownloadTask.Builder(url, file)
                 .setFilename(fileName)
                 // the minimal interval millisecond for callback progress

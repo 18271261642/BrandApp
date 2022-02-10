@@ -317,7 +317,8 @@
         <!--联系人页面-->
         <activity android:name=".device.f18.F18ContactActivity"/>
         <activity android:name=".device.f18.F18DeviceMainActivity"/>
-
+        <activity android:name=".device.f18.dial.F18DialActivity"
+            android:screenOrientation="portrait"/>
 
         <!-- 表示当前项目已经适配了分区存储特性 -->
         <meta-data

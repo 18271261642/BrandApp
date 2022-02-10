@@ -35,9 +35,8 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/view_car_remind_arrow"
-        android:text=""
         android:textSize="14sp"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <ImageView
         android:id="@+id/view_car_remind_arrow"

@@ -2,12 +2,17 @@ package com.isport.brandapp.device.f18;
 
 import android.text.TextUtils;
 import android.view.View;
+
+import com.google.gson.Gson;
+import com.isport.blelibrary.db.table.f18.F18DbType;
 import com.isport.blelibrary.db.table.f18.F18DeviceSetData;
 import com.isport.blelibrary.db.table.f18.listener.CommAlertListener;
 import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.utils.CommonDateUtil;
+import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 import bike.gymproject.viewlibray.ItemView;
+import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.commonview.TitleBarView;
 import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
 
@@ -22,10 +27,11 @@ public class F18DNTActivity extends BaseMVPTitleActivity<F18SetView,F18SetPresen
     private ItemView f18DNTStartTimeItem;
     private ItemView f18DNTEndTimeItem;
 
+    private F18DeviceSetData dntSetBean;
 
     @Override
     public void backAllSetData(F18DeviceSetData f18DeviceSetData) {
-
+        this.dntSetBean = f18DeviceSetData;
     }
 
     @Override
@@ -67,12 +73,22 @@ public class F18DNTActivity extends BaseMVPTitleActivity<F18SetView,F18SetPresen
 
     @Override
     protected void initData() {
+        if(AppConfiguration.braceletID != null){
+            mActPresenter.getAllDeviceSet(TokenUtil.getInstance().getPeopleIdStr(this),AppConfiguration.braceletID);
+        }
+
+
         Watch7018Manager.getWatch7018Manager().getNotDisturbConfig(new CommAlertListener() {
             @Override
             public void backCommAlertData(boolean isOpen, int startHour, int startMinute, int endHour, int endMinute, int interval) {
                 f18DNTIsOpenItem.setChecked(isOpen);
                 f18DNTStartTimeItem.setContentText(CommonDateUtil.formatHourMinute(startHour,startMinute));
                 f18DNTEndTimeItem.setContentText(CommonDateUtil.formatHourMinute(endHour,endMinute));
+
+                if(dntSetBean != null){
+                    dntSetBean.setDNT(isOpen ? (CommonDateUtil.formatHourMinute(startHour,startMinute)+"-"+CommonDateUtil.formatHourMinute(endHour,endMinute)) : "未开启");
+                    mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(F18DNTActivity.this),AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(dntSetBean));
+                }
             }
         });
     }
@@ -133,6 +149,10 @@ public class F18DNTActivity extends BaseMVPTitleActivity<F18SetView,F18SetPresen
             int[] endTimeArray = CommonDateUtil.getHourAdMinute(endTimeStr);
             Watch7018Manager.getWatch7018Manager().setNotDisturbConfig(f18DNTIsOpenItem.isChecked(),startTimeArray[0],startTimeArray[1],endTimeArray[0],endTimeArray[1]);
 
+            if(dntSetBean != null){
+                dntSetBean.setDNT(f18DNTIsOpenItem.isChecked() ? (startTimeStr+"-"+endTimeStr) : "未开启");
+                mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(F18DNTActivity.this),AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(dntSetBean));
+            }
         }catch (Exception e){
             e.printStackTrace();
         }

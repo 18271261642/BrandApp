@@ -34,6 +34,7 @@ public class DaoMaster extends AbstractDaoMaster {
         DeviceInformationTableDao.createTable(db, ifNotExists);
         DeviceTempUnitlTableDao.createTable(db, ifNotExists);
         DeviceTypeTableDao.createTable(db, ifNotExists);
+        F18CommonDbBeanDao.createTable(db, ifNotExists);
         DailyBriefDao.createTable(db, ifNotExists);
         DailySummariesDao.createTable(db, ifNotExists);
         S002_Detail_DataDao.createTable(db, ifNotExists);
@@ -63,7 +64,6 @@ public class DaoMaster extends AbstractDaoMaster {
         Watch_W516_SleepAndNoDisturbModelDao.createTable(db, ifNotExists);
         Watch_W516_SleepDataModelDao.createTable(db, ifNotExists);
         Watch_W560_AlarmModelDao.createTable(db, ifNotExists);
-        F18CommonDbBeanDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
@@ -81,6 +81,7 @@ public class DaoMaster extends AbstractDaoMaster {
         DeviceInformationTableDao.dropTable(db, ifExists);
         DeviceTempUnitlTableDao.dropTable(db, ifExists);
         DeviceTypeTableDao.dropTable(db, ifExists);
+        F18CommonDbBeanDao.dropTable(db, ifExists);
         DailyBriefDao.dropTable(db, ifExists);
         DailySummariesDao.dropTable(db, ifExists);
         S002_Detail_DataDao.dropTable(db, ifExists);
@@ -110,7 +111,6 @@ public class DaoMaster extends AbstractDaoMaster {
         Watch_W516_SleepAndNoDisturbModelDao.dropTable(db, ifExists);
         Watch_W516_SleepDataModelDao.dropTable(db, ifExists);
         Watch_W560_AlarmModelDao.dropTable(db, ifExists);
-        F18CommonDbBeanDao.dropTable(db, ifExists);
     }
 
     /**
@@ -142,6 +142,7 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(DeviceInformationTableDao.class);
         registerDaoClass(DeviceTempUnitlTableDao.class);
         registerDaoClass(DeviceTypeTableDao.class);
+        registerDaoClass(F18CommonDbBeanDao.class);
         registerDaoClass(DailyBriefDao.class);
         registerDaoClass(DailySummariesDao.class);
         registerDaoClass(S002_Detail_DataDao.class);
@@ -171,7 +172,6 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(Watch_W516_SleepAndNoDisturbModelDao.class);
         registerDaoClass(Watch_W516_SleepDataModelDao.class);
         registerDaoClass(Watch_W560_AlarmModelDao.class);
-        registerDaoClass(F18CommonDbBeanDao.class);
     }
 
     public DaoSession newSession() {

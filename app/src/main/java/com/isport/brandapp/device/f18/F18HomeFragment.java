@@ -1,8 +1,10 @@
 package com.isport.brandapp.device.f18;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.util.Log;
 import android.view.View;
 
@@ -10,10 +12,13 @@ import com.google.gson.Gson;
 import com.gyf.immersionbar.ImmersionBar;
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
+import com.isport.blelibrary.deviceEntry.interfaces.IDeviceType;
 import com.isport.blelibrary.interfaces.BleReciveListener;
+import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.result.IResult;
 import com.isport.blelibrary.utils.Constants;
 import com.isport.blelibrary.utils.Logger;
+import com.isport.blelibrary.utils.SyncCacheUtils;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 import com.isport.brandapp.banner.recycleView.RefrushRecycleView;
@@ -41,12 +46,20 @@ import com.isport.brandapp.wu.bean.OnceHrInfo;
 import com.isport.brandapp.wu.bean.OxyInfo;
 import com.isport.brandapp.wu.bean.TempInfo;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Vector;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import brandapp.isport.com.basicres.BaseApp;
+import brandapp.isport.com.basicres.commonalertdialog.AlertDialogStateCallBack;
+import brandapp.isport.com.basicres.commonalertdialog.PublicAlertDialog;
+import brandapp.isport.com.basicres.commonutil.AppUtil;
 import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.commonutil.UIUtils;
 import brandapp.isport.com.basicres.mvp.BaseMVPFragment;
@@ -69,6 +82,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
         return new F18HomeFragment();
     }
 
+    public BaseDevice mCurrentDevice;
 
 
     //item数据源
@@ -100,12 +114,45 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
 
     @Override
     protected void initView(View view) {
-        AppConfiguration.braceletID = "F18-C36";
+       // AppConfiguration.braceletID = "F18-C36";
         setViews(view);
 
         ISportAgent.getInstance().registerListener(bleReciveListener);
+        IntentFilter intentFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+        intentFilter.addAction(Watch7018Manager.SYNC_DATA_COMPLETE);
+        Objects.requireNonNull(getActivity()).registerReceiver(broadcastReceiver,intentFilter);
 
+        initHomeMenu();
 
+        //下拉刷新
+        home_refresh.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                //没有打开蓝牙，进制刷新
+                if(!AppUtil.isOpenBle()){
+                    home_refresh.finishRefresh();
+                    return;
+                }
+
+              if(mCurrentDevice == null){
+                  home_refresh.finishRefresh();
+                  return;
+              }
+                //设备未连接
+              if(!AppConfiguration.isConnected){
+                  home_refresh.finishRefresh();
+                  return;
+              }
+
+                SyncCacheUtils.saveStartSync(BaseApp.getApp());
+                Watch7018Manager.getWatch7018Manager().syncDeviceData();
+                startSyncDevice();
+            }
+        });
+
+    }
+
+    private void initHomeMenu() {
         lists = new Vector<>();
         lists.add(JkConfiguration.BODY_HEADER);//手表步数展示,默认项
         lists.add(JkConfiguration.BODY_SLEEP);//睡眠
@@ -119,7 +166,6 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         refrushRecycleView.setLayoutManager(manager);
         refrushRecycleView.setAdapter(adapter);
-
     }
 
 
@@ -130,12 +176,88 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
         mainHeadLayout.setViewClickLister(this);
 
         mainHeadLayout.setIconDeviceIcon(R.drawable.icon_home_f18_connstatus_img);
+        mainHeadLayout.setViewClickLister(viewMainHeadClickLister);
     }
+
+    //正在同步数据
+    public void startSyncDevice() {
+        AppConfiguration.hasSynced = false;
+        mainHeadLayout.showProgressBar(true);
+        mainHeadLayout.showOptionButton(false, UIUtils.getString(R.string.sync_data));
+    }
+
+    //同步数据完成
+    public void endSyncDevice() {
+        home_refresh.finishRefresh();
+        AppConfiguration.hasSynced = true;
+        mainHeadLayout.showProgressBar(false);
+        mainHeadLayout.showOptionButton(false, UIUtils.getString(R.string.connected));
+    }
+
+
+    //展示头部的状态
+    private void showMainHeadLayoutStatus(){
+
+        //判断是否是已连接
+        if(AppConfiguration.isConnected){
+            mainHeadLayout.showProgressBar(false);
+            mainHeadLayout.showOptionButton(false, UIUtils.getString(R.string.connected));
+            return;
+        }
+
+        //判断蓝牙是否开启
+        boolean isOpenBle =  AppUtil.isOpenBle();
+        mainHeadLayout.setIconDeviceAlp(0.5f);
+        if (!isOpenBle) {
+            mainHeadLayout.showOptionButton(true, UIUtils.getString(R.string.app_enable), MainHeadLayout.TAG_OPENBLE, UIUtils.getString(R.string.fragment_main_no_connect_open_ble));
+        } else {
+            mainHeadLayout.showOptionButton(true, UIUtils.getString(R.string.fragment_main_click_connect), MainHeadLayout.TAG_CONNECT, UIUtils.getString(R.string.disConnect));
+        }
+    }
+
+
+    //打开蓝牙
+    public void openBlueDialog() {
+        PublicAlertDialog.getInstance().showDialog("", context.getResources().getString(R.string.bonlala_open_blue), context, getResources().getString(R.string.app_bluetoothadapter_turnoff), getResources().getString(R.string.app_bluetoothadapter_turnon), new AlertDialogStateCallBack() {
+            @Override
+            public void determine() {
+                BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                if (bluetoothAdapter != null) {
+                    bluetoothAdapter.enable();
+                }
+            }
+            @Override
+            public void cancel() {
+            }
+        }, false);
+    }
+
+
+
+    private final MainHeadLayout.ViewMainHeadClickLister viewMainHeadClickLister = new MainHeadLayout.ViewMainHeadClickLister() {
+        @Override
+        public void onViewOptionClikelister(String type) {
+
+        }
+
+        @Override
+        public void onMainBack() {
+            getActivity().finish();
+        }
+    };
 
 
     @Override
     public void onResume() {
         super.onResume();
+
+        getHomeData();
+        showMainHeadLayoutStatus();
+    }
+
+
+
+    private void getHomeData(){
         mFragPresenter.getDeviceBloodPressure();
         mFragPresenter.getDevcieOxygenData();
         mFragPresenter.getDevcieOnceHrData();
@@ -147,8 +269,13 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
     protected void initData() {
         String deviceId = AppConfiguration.braceletID;
         String userId = TokenUtil.getInstance().getPeopleIdInt(getActivity());
+
+        mCurrentDevice = ISportAgent.getInstance().getCurrnetDevice();
+
         mFragPresenter.uploadOxyData(deviceId,userId);
         mFragPresenter.uploadF18BloodData(deviceId,userId);
+
+
     }
 
     @Override
@@ -331,7 +458,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
             //运动进度条
             case JkConfiguration.BODY_HEADER: {
                 Intent intent1 = new Intent(context, ReportActivity.class);
-                intent1.putExtra(JkConfiguration.DEVICE, JkConfiguration.DeviceType.Watch_F18);
+                intent1.putExtra(JkConfiguration.DEVICE, AppConfiguration.deviceBeanList.get(IDeviceType.TYPE_WATCH_7018));
                 startActivity(intent1);
 
             }
@@ -370,7 +497,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
     public void onSleepItemClick() {
         Intent intent = new Intent(context, ActivityWatchSleep.class);
         intent.putExtra(JkConfiguration.CURRENTDEVICETPE, JkConfiguration.DeviceType.Watch_F18);
-        intent.putExtra(JkConfiguration.DEVICE, JkConfiguration.DeviceType.Watch_F18);
+        intent.putExtra(JkConfiguration.DEVICE, AppConfiguration.deviceBeanList.get(IDeviceType.TYPE_WATCH_7018));
         startActivity(intent);
     }
 
@@ -412,7 +539,16 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action == null)
+                return;
+            if(action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)){
+                showMainHeadLayoutStatus();
+            }
 
+            if(action.equals(Watch7018Manager.SYNC_DATA_COMPLETE)){ //同步完成
+                endSyncDevice();
+            }
         }
     };
 

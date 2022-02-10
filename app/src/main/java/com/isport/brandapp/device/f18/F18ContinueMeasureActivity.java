@@ -2,12 +2,17 @@ package com.isport.brandapp.device.f18;
 
 import android.text.TextUtils;
 import android.view.View;
+
+import com.google.gson.Gson;
+import com.isport.blelibrary.db.table.f18.F18DbType;
 import com.isport.blelibrary.db.table.f18.F18DeviceSetData;
 import com.isport.blelibrary.db.table.f18.listener.CommAlertListener;
 import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.utils.CommonDateUtil;
+import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 import bike.gymproject.viewlibray.ItemView;
+import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.commonview.TitleBarView;
 import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
 
@@ -18,6 +23,8 @@ import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
  */
 public class F18ContinueMeasureActivity extends BaseMVPTitleActivity<F18SetView,F18SetPresent> implements F18SetView, View.OnClickListener {
 
+    private F18DeviceSetData continueSetData;
+
     //是否开启
     private ItemView f18ContinueIsOpenItem;
     //开始时间
@@ -27,7 +34,7 @@ public class F18ContinueMeasureActivity extends BaseMVPTitleActivity<F18SetView,
 
     @Override
     public void backAllSetData(F18DeviceSetData f18DeviceSetData) {
-
+        this.continueSetData = f18DeviceSetData;
     }
 
     //时间选择返回
@@ -52,7 +59,7 @@ public class F18ContinueMeasureActivity extends BaseMVPTitleActivity<F18SetView,
         findViews();
 
         titleBarView.setLeftIconEnable(true);
-        titleBarView.setTitle("连续监测");
+        titleBarView.setTitle("定时监测");
         titleBarView.setRightText("");
 
         titleBarView.setOnTitleBarClickListener(new TitleBarView.OnTitleBarClickListener() {
@@ -70,12 +77,18 @@ public class F18ContinueMeasureActivity extends BaseMVPTitleActivity<F18SetView,
 
     @Override
     protected void initData() {
+        mActPresenter.getAllDeviceSet(TokenUtil.getInstance().getPeopleIdStr(this), AppConfiguration.braceletID);
         Watch7018Manager.getWatch7018Manager().getHealthyConfig(new CommAlertListener() {
             @Override
             public void backCommAlertData(boolean isOpen, int startHour, int startMinute, int endHour, int endMinute, int interval) {
                 f18ContinueIsOpenItem.setChecked(isOpen);
                 f18ContinueStartTimeItem.setContentText(CommonDateUtil.formatHourMinute(startHour,startMinute));
                 f18ContinueEndTimeItem.setContentText(CommonDateUtil.formatHourMinute(endHour,endMinute));
+
+                if(continueSetData != null){
+                    continueSetData.setContinuMonitor(isOpen ? (CommonDateUtil.formatHourMinute(startHour,startMinute)+"-"+CommonDateUtil.formatHourMinute(endHour,endMinute)) : "未开启");
+                    mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(F18ContinueMeasureActivity.this),AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(continueSetData));
+                }
             }
         });
     }
@@ -136,7 +149,10 @@ public class F18ContinueMeasureActivity extends BaseMVPTitleActivity<F18SetView,
             int[] startTimeArray = CommonDateUtil.getHourAdMinute(startTimeStr);
             int[] endTimeArray = CommonDateUtil.getHourAdMinute(endTimeStr);
             Watch7018Manager.getWatch7018Manager().setHealthyConfig(f18ContinueIsOpenItem.isChecked(),startTimeArray[0],startTimeArray[1],endTimeArray[0],endTimeArray[1]);
-
+            if(continueSetData != null){
+                continueSetData.setContinuMonitor(f18ContinueIsOpenItem.isChecked() ? (startTimeStr+"-"+endTimeStr) : "未开启");
+                mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(F18ContinueMeasureActivity.this),AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(continueSetData));
+            }
         }catch (Exception e){
             e.printStackTrace();
         }

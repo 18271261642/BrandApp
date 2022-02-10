@@ -205,6 +205,12 @@ public class ItemDeviceSettingView extends LinearLayout {
         setContentText(getContext().getString(resId));
     }
 
+    public void setRightContentTxt(String txt){
+        contentTextView.setVisibility(VISIBLE);
+        contentTextView.setText(txt);
+        postInvalidate();
+    }
+
     public void setContentText(String text) {
         if (null == contentTextView) {
             return;
@@ -212,6 +218,7 @@ public class ItemDeviceSettingView extends LinearLayout {
         this.contentText = text;
         contentTextView.setVisibility(View.VISIBLE);
         contentTextView.setText(TextUtils.isEmpty(text) ? "" : text);
+        invalidate();
     }
 
     public void showBottomLine(boolean isShow) {

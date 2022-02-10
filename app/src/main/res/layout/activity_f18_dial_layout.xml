@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent">
+
+
+    <brandapp.isport.com.basicres.commonview.TitleBarView
+        android:layout_marginTop="28dp"
+        android:id="@+id/f18DialTitleBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp60"/>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_margin="8dp"
+        android:background="@drawable/item_comm_main_layout"
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/tmpDialView"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_width="1dp"
+            android:layout_height="1dp"/>
+
+        <TextView
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="@id/tmpDialView"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:id="@+id/dialCenterTv"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="10dp"
+            android:textColor="#6E6E77"
+            android:textSize="20sp"
+            android:layout_height="wrap_content"
+            android:text="表盘中心"/>
+
+        <TextView
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="@id/tmpDialView"
+            android:id="@+id/dialCusTv"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="10dp"
+            android:textSize="20sp"
+            android:layout_height="wrap_content"
+            android:text="自定义表盘"/>
+
+
+
+        <View
+            android:id="@+id/dialCenterView"
+            app:layout_constraintTop_toBottomOf="@id/dialCenterTv"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="@id/tmpDialView"
+            android:layout_width="5dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="10dp"
+            android:background="#4DDA64"
+            android:textSize="20sp"
+            android:layout_height="3dp" />
+
+
+        <View
+            android:id="@+id/dialCusView"
+            app:layout_constraintTop_toBottomOf="@id/dialCusTv"
+            app:layout_constraintLeft_toLeftOf="@id/tmpDialView"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_width="5dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="10dp"
+            android:background="#4DDA64"
+            android:textSize="20sp"
+            android:layout_height="3dp" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    <FrameLayout
+        android:id="@+id/f18DialHomeLayout"
+        android:layout_margin="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</LinearLayout>

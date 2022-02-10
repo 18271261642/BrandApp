@@ -46,7 +46,7 @@ dependencies {
     api(name: 'crpblelib_141', ext: 'aar')
 
     //F18拓步SDK
-    api(name:'libraryCore_v1.1.6', ext: 'aar')
+    api(name:'libraryCore_v1.1.7', ext: 'aar')
     //api(name:'libraryDfu_v1.0.4', ext: 'aar')
 
     //RxAndroidBle

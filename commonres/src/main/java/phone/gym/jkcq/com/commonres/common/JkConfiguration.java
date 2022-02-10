@@ -379,6 +379,9 @@ public class JkConfiguration {
         int GET_WEATHER = 57;
         int EMAIL_VERIFY = 58;
 
+
+        int GET_F18_DEVICE_DIAL_LIST = 88;
+
         int ONCE_HR_UPGRADE = 59;
         int ONCE_HR_NUM_DATA = 60;
         int ONCE_HR_PAGE_NUM_DATA = 61;

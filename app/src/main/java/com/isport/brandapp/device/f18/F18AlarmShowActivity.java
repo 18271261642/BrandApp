@@ -6,19 +6,27 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+
+import com.google.gson.Gson;
 import com.htsmart.wristband2.bean.WristbandAlarm;
+import com.isport.blelibrary.ISportAgent;
+import com.isport.blelibrary.db.table.f18.F18DbType;
 import com.isport.blelibrary.db.table.f18.F18DeviceSetData;
 import com.isport.blelibrary.entry.F18AlarmAllListener;
 import com.isport.blelibrary.entry.F18CommStatusListener;
 import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.utils.CommonDateUtil;
+import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 import com.isport.brandapp.banner.recycleView.utils.ToastUtil;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.commonview.TitleBarView;
 import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
 
@@ -29,10 +37,14 @@ import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
  */
 public class F18AlarmShowActivity extends BaseMVPTitleActivity<F18SetView,F18SetPresent> implements F18SetView {
 
+    private F18DeviceSetData alarmSetData;
 
      private List<WristbandAlarm> alarmList;
      private CusF18AlarmAdapter f18AlarmAdapter;
      private RecyclerView alarmRecyclerView;
+
+     private String mUserId;
+     private String deviceId;
 
      private final Handler handler = new Handler(Looper.getMainLooper()){
          @Override
@@ -44,7 +56,7 @@ public class F18AlarmShowActivity extends BaseMVPTitleActivity<F18SetView,F18Set
 
     @Override
     public void backAllSetData(F18DeviceSetData f18DeviceSetData) {
-
+        this.alarmSetData = f18DeviceSetData;
     }
 
     @Override
@@ -114,6 +126,8 @@ public class F18AlarmShowActivity extends BaseMVPTitleActivity<F18SetView,F18Set
     @Override
     protected void initData() {
         readDeviceAlarm();
+        mUserId = TokenUtil.getInstance().getPeopleIdStr(this);
+        deviceId = AppConfiguration.braceletID;
     }
 
 
@@ -124,6 +138,12 @@ public class F18AlarmShowActivity extends BaseMVPTitleActivity<F18SetView,F18Set
                 alarmList.clear();
                 alarmList.addAll(alarmLists);
                 f18AlarmAdapter.notifyDataSetChanged();
+
+                if(alarmSetData != null){
+                    alarmSetData.setAlarmCount(f18AlarmAdapter.getOpenCount());
+                    mActPresenter.saveAllSetData(mUserId,deviceId,F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(alarmSetData));
+                }
+
             }
         });
     }
@@ -137,6 +157,12 @@ public class F18AlarmShowActivity extends BaseMVPTitleActivity<F18SetView,F18Set
     @Override
     protected void initHeader() {
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mActPresenter.getAllDeviceSet(TokenUtil.getInstance().getPeopleIdInt(this), ISportAgent.getInstance().getCurrnetDevice().getDeviceName());
     }
 
     @Override

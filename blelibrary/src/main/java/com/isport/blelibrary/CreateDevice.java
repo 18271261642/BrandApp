@@ -41,7 +41,8 @@ public class CreateDevice {
 
         if(name.startsWith(Constants.WATCH_7018_FILTER)){
 
-            return create7018Device(name,address);
+            baseDevice =  create7018Device(name,address);
+            return baseDevice;
         }
 
 
@@ -268,6 +269,7 @@ public class CreateDevice {
     }
 
     public BaseDevice create7018Device(String name,String mac){
-        return new W7018Device(name,mac);
+        String newName = "F18-"+mac.replace(":","");
+        return new W7018Device(newName,mac);
     }
 }

@@ -8,12 +8,21 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.isport.blelibrary.ISportAgent;
+import com.isport.blelibrary.db.action.BleAction;
 import com.isport.blelibrary.db.action.f18.F18DeviceSetAction;
 import com.isport.blelibrary.db.table.f18.F18CommonDbBean;
 import com.isport.blelibrary.db.table.f18.F18DbType;
 import com.isport.blelibrary.db.table.f18.F18DeviceSetData;
+import com.isport.blelibrary.utils.SyncCacheUtils;
 import com.isport.brandapp.R;
+import com.isport.brandapp.bean.DeviceBean;
+import com.isport.brandapp.bind.bean.BindInsertOrUpdateBean;
 import com.isport.brandapp.device.dialog.BaseDialog;
+import com.isport.brandapp.device.history.util.HistoryParmUtil;
+import com.isport.brandapp.parm.db.DeviceTypeParms;
+import com.isport.brandapp.repository.UpdateResposition;
+import com.isport.brandapp.util.AppSP;
 
 import java.util.ArrayList;
 
@@ -22,10 +31,14 @@ import bike.gymproject.viewlibray.ItemView;
 import bike.gymproject.viewlibray.pickerview.ArrayPickerView;
 import bike.gymproject.viewlibray.pickerview.DatePickerView;
 import brandapp.isport.com.basicres.BaseApp;
+import brandapp.isport.com.basicres.action.BaseAction;
+import brandapp.isport.com.basicres.commonbean.BaseUrl;
 import brandapp.isport.com.basicres.commonnet.interceptor.BaseObserver;
 import brandapp.isport.com.basicres.commonnet.interceptor.ExceptionHandle;
+import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.commonutil.ViewMultiClickUtil;
 import brandapp.isport.com.basicres.mvp.BasePresenter;
+import brandapp.isport.com.basicres.service.observe.NetProgressObservable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -38,6 +51,8 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class F18SetPresent extends BasePresenter<F18SetView> {
 
+    private static final String TAG = "F18SetPresent";
+
     F18SetView view;
 
     private F18AlarmRepeatView f18AlarmRepeatView;
@@ -48,12 +63,14 @@ public class F18SetPresent extends BasePresenter<F18SetView> {
 
 
     public void getAllDeviceSet(String userId,String deviceMac){
+        Log.e(TAG,"----查询设置="+userId+" "+deviceMac);
         if(TextUtils.isEmpty(userId) || TextUtils.isEmpty(deviceMac))
             return;
         Observable.create(new ObservableOnSubscribe<F18DeviceSetData>() {
             @Override
             public void subscribe(@NonNull ObservableEmitter<F18DeviceSetData> observableEmitter) throws Exception {
                 F18CommonDbBean f18CommonDbBean = F18DeviceSetAction.querySingleBean(userId,deviceMac, F18DbType.F18_DEVICE_SET_TYPE);
+
                 if(f18CommonDbBean != null){
                     String str = f18CommonDbBean.getTypeDataStr();
                     F18DeviceSetData f18DeviceSetData = new Gson().fromJson(str,F18DeviceSetData.class);
@@ -297,6 +314,58 @@ public class F18SetPresent extends BasePresenter<F18SetView> {
         // if (isEdit) {
       //  datePicker.setDefaultItemAdapter(itemTimeString);
         datePicker.setCyclic(false);
+    }
+
+
+    /**
+     * 解绑操作
+     *
+     * @param deviceBean
+     */
+    public void unBind(DeviceBean deviceBean, boolean isDirctUnbind) {
+        SyncCacheUtils.clearSetting(BaseApp.getApp());
+        SyncCacheUtils.clearStartSync(BaseApp.getApp());
+        SyncCacheUtils.clearSysData(BaseApp.getApp());
+//        if (isDirctUnbind) {
+//            deletCurrentDay(deviceBean.deviceName, deviceBean.currentType);
+//        }
+        //scanModel.unBind(userId, deviceId, deviceType);
+        //如果是isDirctUnbind 需要把当天不完整的数据给删除了，需要把当天的数据删除
+
+        UpdateResposition<Integer, BindInsertOrUpdateBean, BaseUrl, DeviceTypeParms> customRepository = new
+                UpdateResposition();
+        customRepository.update(HistoryParmUtil.setDevice(deviceBean)).as(view.bindAutoDispose()).subscribe(new BaseObserver<Integer>(context) {
+            @Override
+            protected void hideDialog() {
+
+            }
+
+            @Override
+            protected void showDialog() {
+
+            }
+
+            @Override
+            public void onError(ExceptionHandle.ResponeThrowable e) {
+                //假网状态
+                NetProgressObservable.getInstance().hide();
+                SyncCacheUtils.setUnBindState(false);
+            }
+
+            @Override
+            public void onNext(Integer s) {
+                SyncCacheUtils.setUnBindState(false);
+                NetProgressObservable.getInstance().hide();
+                com.isport.blelibrary.utils.Logger.myLog("解绑成功");
+                AppSP.putString(context, AppSP.FORM_DFU, "false");
+                ISportAgent.getInstance().deleteDeviceType(deviceBean.currentType, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
+                BleAction.deletAll();
+                BaseAction.dropDatas();
+
+              //  mActView.get().onUnBindSuccess();
+                mActView.get().backSelectDateStr(-1,-1,"");
+            }
+        });
     }
 
 }

@@ -2,15 +2,18 @@ package com.isport.brandapp.device.f18;
 
 import android.text.TextUtils;
 import android.view.View;
+
+import com.google.gson.Gson;
+import com.isport.blelibrary.db.table.f18.F18DbType;
 import com.isport.blelibrary.db.table.f18.F18DeviceSetData;
 import com.isport.blelibrary.db.table.f18.listener.CommAlertListener;
 import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.utils.CommonDateUtil;
+import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
-
 import org.apache.commons.lang.StringUtils;
-
 import bike.gymproject.viewlibray.ItemView;
+import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.commonview.TitleBarView;
 import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
 
@@ -20,6 +23,8 @@ import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
  * Date 2022/1/18
  */
 public class F18DrinkAlertActivity extends BaseMVPTitleActivity<F18SetView, F18SetPresent> implements F18SetView, View.OnClickListener {
+
+    private F18DeviceSetData drinkSetBean;
 
     //开关
     private ItemView f18DrinkIsOpenItem;
@@ -34,7 +39,7 @@ public class F18DrinkAlertActivity extends BaseMVPTitleActivity<F18SetView, F18S
 
     @Override
     public void backAllSetData(F18DeviceSetData f18DeviceSetData) {
-
+        this.drinkSetBean = f18DeviceSetData;
     }
 
     @Override
@@ -78,6 +83,11 @@ public class F18DrinkAlertActivity extends BaseMVPTitleActivity<F18SetView, F18S
 
     @Override
     protected void initData() {
+        String deviceId = AppConfiguration.braceletID;
+        if(deviceId != null){
+            mActPresenter.getAllDeviceSet(TokenUtil.getInstance().getPeopleIdStr(this),deviceId);
+        }
+
         Watch7018Manager.getWatch7018Manager().getDrinkData(new CommAlertListener() {
             @Override
             public void backCommAlertData(boolean isOpen, int startHour, int startMinute, int endHour, int endMinute, int interval) {
@@ -85,6 +95,11 @@ public class F18DrinkAlertActivity extends BaseMVPTitleActivity<F18SetView, F18S
                 f18DrinkIntervalItem.setContentText(interval+"分钟");
                 f18DrinkStartTimeItem.setContentText(CommonDateUtil.formatHourMinute(startHour,startMinute));
                 f18DrinkEndTimeItem.setContentText(CommonDateUtil.formatHourMinute(endHour,endMinute));
+
+                if(drinkSetBean != null){
+                    drinkSetBean.setDrinkAlert(isOpen ? (CommonDateUtil.formatHourMinute(startHour,startMinute)+"-"+CommonDateUtil.formatHourMinute(endHour,endMinute)):"未开启");
+                    mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(F18DrinkAlertActivity.this),AppConfiguration.braceletID,F18DbType.F18_DEVICE_SET_TYPE , new Gson().toJson(drinkSetBean));
+                }
 
             }
         });
@@ -150,8 +165,12 @@ public class F18DrinkAlertActivity extends BaseMVPTitleActivity<F18SetView, F18S
             //间隔
             String intervalStr = f18DrinkIntervalItem.getContentText();
             String tmpInterval = StringUtils.substringBefore(intervalStr,"分");
-            Watch7018Manager.getWatch7018Manager().setDrinkData(f18DrinkIsOpenItem.isChecked(),startTimeArray[0],startTimeArray[1],endTimeArray[0],endTimeArray[1],Integer.parseInt(tmpInterval.trim()));
 
+            Watch7018Manager.getWatch7018Manager().setDrinkData(f18DrinkIsOpenItem.isChecked(),startTimeArray[0],startTimeArray[1],endTimeArray[0],endTimeArray[1],Integer.parseInt(tmpInterval.trim()));
+            if(drinkSetBean != null){
+                drinkSetBean.setDrinkAlert(f18DrinkIsOpenItem.isChecked() ? (startTimeStr+"-"+endTimeStr):"未开启");
+                mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(this),AppConfiguration.braceletID,F18DbType.F18_DEVICE_SET_TYPE , new Gson().toJson(drinkSetBean));
+            }
         }catch (Exception e){
             e.printStackTrace();
         }

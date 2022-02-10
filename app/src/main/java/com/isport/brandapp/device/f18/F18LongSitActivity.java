@@ -2,15 +2,20 @@ package com.isport.brandapp.device.f18;
 
 import android.text.TextUtils;
 import android.view.View;
+
+import com.google.gson.Gson;
+import com.isport.blelibrary.db.table.f18.F18DbType;
 import com.isport.blelibrary.db.table.f18.F18DeviceSetData;
 import com.isport.blelibrary.db.table.f18.listener.CommAlertListener;
 import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.utils.CommonDateUtil;
+import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 
 import org.apache.commons.lang.StringUtils;
 
 import bike.gymproject.viewlibray.ItemView;
+import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.commonview.TitleBarView;
 import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
 
@@ -20,6 +25,8 @@ import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
  * Date 2022/1/18
  */
 public class F18LongSitActivity extends BaseMVPTitleActivity<F18SetView,F18SetPresent> implements F18SetView, View.OnClickListener {
+
+    private F18DeviceSetData longSetData;
 
     //是否打开
     private ItemView iv_watch_stable_remind_open;
@@ -34,13 +41,14 @@ public class F18LongSitActivity extends BaseMVPTitleActivity<F18SetView,F18SetPr
 
     @Override
     public void backAllSetData(F18DeviceSetData f18DeviceSetData) {
-
+        this.longSetData = f18DeviceSetData;
     }
 
     @Override
     public void backSelectDateStr(int selectType,int type, String timeStr) {
         if(selectType == 1){    //开始
             iv_watch_stable_remind_start_time.setContentText(timeStr);
+
         }
         else if(selectType == 2){   //结束
             iv_watch_stable_remind_end_time.setContentText(timeStr);
@@ -48,6 +56,7 @@ public class F18LongSitActivity extends BaseMVPTitleActivity<F18SetView,F18SetPr
         else if(selectType == 3){
             iv_watch_stable_remind_time.setContentText(timeStr+"分钟");
         }
+        setDataToDevice();
     }
 
     @Override
@@ -58,7 +67,7 @@ public class F18LongSitActivity extends BaseMVPTitleActivity<F18SetView,F18SetPr
     @Override
     protected void initView(View view) {
         findViews();
-
+        mActPresenter.getAllDeviceSet(TokenUtil.getInstance().getPeopleIdStr(this),AppConfiguration.braceletID);
         titleBarView.setLeftIconEnable(true);
         titleBarView.setTitle("久坐提醒");
         titleBarView.setRightText("");
@@ -79,13 +88,20 @@ public class F18LongSitActivity extends BaseMVPTitleActivity<F18SetView,F18SetPr
     @Override
     protected void initData() {
 
+
+
         Watch7018Manager.getWatch7018Manager().getSedentaryConfig(new CommAlertListener() {
             @Override
             public void backCommAlertData(boolean isOpen, int startHour, int startMinute, int endHour, int endMinute, int interval) {
-                iv_watch_stable_remind_open.setChecked(true);
+                iv_watch_stable_remind_open.setChecked(isOpen);
                 iv_watch_stable_remind_start_time.setContentText(CommonDateUtil.formatHourMinute(startHour,startMinute));
                 iv_watch_stable_remind_end_time.setContentText(CommonDateUtil.formatHourMinute(endHour,endMinute));
                 iv_watch_stable_remind_time.setContentText(interval+"分钟");
+
+                if(longSetData != null){
+                    longSetData.setLongSitStr(isOpen ? (CommonDateUtil.formatHourMinute(startHour,startMinute)+"-"+CommonDateUtil.formatHourMinute(endHour,endMinute)) : "未开启");
+                    mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(F18LongSitActivity.this), AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(longSetData));
+                }
             }
         });
     }
@@ -119,7 +135,7 @@ public class F18LongSitActivity extends BaseMVPTitleActivity<F18SetView,F18SetPr
             @Override
             public void onCheckedChanged(int id, boolean isChecked) {
                 iv_watch_stable_remind_open.setChecked(isChecked);
-
+                setDataToDevice();
             }
         });
 
@@ -153,6 +169,10 @@ public class F18LongSitActivity extends BaseMVPTitleActivity<F18SetView,F18SetPr
             String tmpInterval = StringUtils.substringBefore(intervalStr,"分");
             Watch7018Manager.getWatch7018Manager().setSedentaryConfig(iv_watch_stable_remind_open.isChecked(),startTimeArray[0],startTimeArray[1],endTimeArray[0],endTimeArray[1],Integer.parseInt(tmpInterval.trim()));
 
+            if(longSetData != null){
+                longSetData.setLongSitStr(iv_watch_stable_remind_open.isChecked() ? (startTimeStr+"-"+endTimeStr) : "未开启");
+                mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(this), AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(longSetData));
+            }
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -90,6 +90,19 @@ public class CusF18AlarmAdapter extends RecyclerView.Adapter<CusF18AlarmAdapter.
         return list.size();
     }
 
+
+    public int getOpenCount(){
+        int count = 0;
+        if(getItemCount() == 0)
+            return 0;
+        for(WristbandAlarm wb : list){
+            if(wb.isEnable()){
+                count++;
+            }
+        }
+        return count;
+    }
+
     class F18ViewHolder extends RecyclerView.ViewHolder{
 
         private TextView alarmName;
