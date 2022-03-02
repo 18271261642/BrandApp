@@ -4,6 +4,61 @@
     <string name="app_name">奔啦啦</string>//iSport健康管家
 
 
+    <string name="string_f18_device_per">設備鍛煉</string>
+    <string name="string_f18_walking">健走</string>
+    <string name="string_f18_Swim">游泳</string>
+    <string name="string_f18_tennis">網球</string>
+    <string name="string_f18_baseball">棒球</string>
+    <string name="string_f18_rugby">橄欖球</string>
+    <string name="string_f18_hula_hoop">呼啦圈</string>
+    <string name="string_f18_golf">高爾夫</string>
+    <string name="string_f18_jump">跳遠</string>
+    <string name="string_f18_sit_up">仰臥起坐</string>
+    <string name="string_f18_volley_ball">排球</string>
+
+    <string name="string_dial_center">錶盤中心</string>
+    <string name="string_set_dial">設為錶盤</string>
+    <string name="string_cus_dial">自定義錶盤</string>
+    <string name="string_cus_txt_style">自定義字體顏色</string>
+    <string name="string_style_1">樣式1</string>
+    <string name="string_style_2">樣式2</string>
+    <string name="string_style_3">樣式3</string>
+    <string name="string_style_4">樣式4</string>
+    <string name="string_choose_pick">選擇圖片</string>
+    <string name="string_alert_delete">是否刪除?</string>
+    <string name="string_upgrad_so_on">升級中..</string>
+    <string name="string_curr_no_file">當前文件不存在!</string>
+    <string name="string_no_read_permission">沒有授權讀取存儲權限!</string>
+    <string name="string_open_number">已開啟%1$s個</string>
+    <string name="string_drink_alert">喝水提醒</string>
+    <string name="string_dnt_midday">午休免打擾</string>
+    <string name="string_period_open">時間段開啟</string>
+    <string name="string_open_notication">打開通知</string>
+    <string name="string_set_permission">權限設置</string>
+    <string name="string_apps_notice">消息提醒</string>
+    <string name="string_phone_alert">電話</string>
+    <string name="string_sms_alert">短信</string>
+    <string name="string_mail">郵件</string>
+    <string name="string_calendar">日曆</string>
+    <string name="string_other_txt">其它</string>
+    <string name="string_often_contact">常用聯繫人</string>
+    <string name="string_contact_desc">可從手機通訊錄中添加最多10個常用聯繫人同步到設備，以便通過設備快速發起通話</string>
+    <string name="string_strength_txt">加強測量</string>
+    <string name="string_timing_detect">定時檢測</string>
+    <string name="string_timing_open">定時檢測開啟</string>
+    <string name="string_timing_desc">手錶將在持續的時間間隔內檢測健康數據</string>
+    <string name="string_wrist_desc">在設定時間內，抬起手腕將手錶屏幕朝向自己即可點亮屏幕</string>
+    <string name="string_audio_guid">音頻模式指引</string>
+
+
+
+
+
+
+
+
+    <string name="string_no_duty">*所提供的數據及建議僅供參考，不可作為臨床診斷和治療依據</string>
+
     <string name="string_permiss_title">奔啦啦權限使用說明</string>
     <string name="string_permiss_desc">為保證APP的正常使用,請開啟以下權限</string>
     <string name="string_permiss_ble">使用藍牙功能</string>

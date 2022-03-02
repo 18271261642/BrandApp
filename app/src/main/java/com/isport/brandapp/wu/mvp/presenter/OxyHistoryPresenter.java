@@ -26,7 +26,7 @@ public class OxyHistoryPresenter extends BasePresenter<OxyHistoryView> implement
     @Override
     public void getOxyNumData() {
 
-        OxygenRepository.requstNumOxygenData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), 7).as(mActView.get().bindAutoDispose()).subscribe(new BaseObserver<List<OxyInfo>>(BaseApp.getApp(), false) {
+        OxygenRepository.requstNumOxygenData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), 50).as(mActView.get().bindAutoDispose()).subscribe(new BaseObserver<List<OxyInfo>>(BaseApp.getApp(), false) {
 
             @Override
             public void onNext(List<OxyInfo> infos) {

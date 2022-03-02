@@ -32,7 +32,7 @@ public class UnBindDeviceDialog {
 
     public UnBindDeviceDialog(Activity activity, int deviceType, boolean showSynUnbind, final UnbindStateCallBack callBack, int type) {
 
-       // Logger.myLog("UnBindDeviceDialog deviceType=" + deviceType + "type=" + type);
+        Logger.myLog("UnBindDeviceDialog deviceType=" + deviceType + "type=" + type);
 
         this.mActivity = activity;
         dialog = new AlertDialog.Builder(mActivity, R.style.alert_dialog).create();

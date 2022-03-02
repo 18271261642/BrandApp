@@ -17,7 +17,6 @@ import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.XXPermissions
 import com.isport.brandapp.R
 import kotlinx.android.synthetic.main.activity_show_permission_layout.*
-import no.nordicsemi.android.dfu.internal.manifest.Manifest
 import test.Test2Activity
 
 /**

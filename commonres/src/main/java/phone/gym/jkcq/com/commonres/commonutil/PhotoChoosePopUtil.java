@@ -86,6 +86,16 @@ public class PhotoChoosePopUtil implements View.OnClickListener {
         }
     }
 
+
+    public void setPhotoTxt(String txt){
+        tvPhotograph.setText(txt);
+    }
+
+
+    public void setTvCameraVisiable(boolean isVisiable){
+        tvCamera.setVisibility(isVisiable ? View.VISIBLE : View.GONE);
+    }
+
     private void initEvent() {
         viewChooseHide.setOnClickListener(this);
         tvCamera.setOnClickListener(this);

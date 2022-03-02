@@ -41,6 +41,7 @@ import com.isport.brandapp.bind.Adapter.AdapterScanPageDeviceList;
 import com.isport.brandapp.bind.presenter.ScanPresenter;
 import com.isport.brandapp.bind.view.ScanBaseView;
 import com.isport.brandapp.device.bracelet.playW311.PlayW311Presenter.PlayerPresenter;
+import com.isport.brandapp.device.f18.F18DufActivity;
 import com.isport.brandapp.device.publicpage.GoActivityUtil;
 import com.isport.brandapp.home.MainActivity;
 import com.isport.brandapp.util.ActivitySwitcher;
@@ -267,6 +268,8 @@ public class ActivityScan extends BaseMVPTitleActivity<ScanBaseView, ScanPresent
 
 
     private void startScan() {
+        if(!ActivitySwitcher.isForeground(ActivityScan.this))
+            return;
         Logger.myLog("onStart startScan");
         if (AppUtil.isOpenBle()) {
             mActPresenter.scan(deviceType);
@@ -535,13 +538,19 @@ public class ActivityScan extends BaseMVPTitleActivity<ScanBaseView, ScanPresent
             Logger.myLog(TAG,"连接页面onConnResult:" + isConn+" "+baseDevice.toString());
             mHandler.removeMessages(0x02);
             if (isConn) {
-
+                if(!ActivitySwitcher.isForeground(ActivityScan.this))
+                    return;
                 BleProgressObservable.getInstance().hide();
                 if (deviceType == JkConfiguration.DeviceType.DFU) {
                     //TODO 去固件升级页面
                     if (baseDevice != null) {
                         Logger.myLog("连接成功,去同步数据,去固件升级页面");
-                        ActivitySwitcher.goDFUAct(ActivityScan.this, baseDevice.deviceType, baseDevice.deviceName, baseDevice.address, false);
+                        if(DeviceTypeUtil.isContainF18()){
+                          startActivity(F18DufActivity.class);
+                        }else{
+                            ActivitySwitcher.goDFUAct(ActivityScan.this, baseDevice.deviceType, baseDevice.deviceName, baseDevice.address, false);
+                        }
+
                         // finish();
                     }
                 } else {

@@ -212,7 +212,7 @@ public class Utils {
 
 
     public static boolean isContainsDFU(String deviceName) {
-        Logger.myLog("isContainsDFU:" + deviceName + "deviceName.contains(Constants.DFU_W814_MODE):" + deviceName.contains(Constants.DFU_W814_MODE));
+        //Logger.myLog("isContainsDFU:" + deviceName + "deviceName.contains(Constants.DFU_W814_MODE):" + deviceName.contains(Constants.DFU_W814_MODE));
         deviceName = deviceName.toUpperCase();
         return (deviceName.contains(Constants.DFU_MODE) || deviceName.contains(Constants.DFU_W814_MODE));
     }

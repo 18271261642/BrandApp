@@ -9,11 +9,17 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.isport.blelibrary.ISportAgent;
+import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
+import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.utils.Logger;
+import com.isport.brandapp.R;
+import com.isport.brandapp.util.DeviceTypeUtil;
 
 import java.util.Locale;
 
 import androidx.core.app.ActivityCompat;
+import brandapp.isport.com.basicres.commonutil.UIUtils;
 
 
 public class CallListener extends PhoneStateListener {
@@ -66,6 +72,12 @@ public class CallListener extends PhoneStateListener {
                 if (isHandup) {
                     isCalling = true;
                 }
+                BaseDevice device = ISportAgent.getInstance().getCurrnetDevice();
+                if (device == null) {
+                    return;
+                }
+                if(DeviceTypeUtil.isContainF18(device.getDeviceType()))
+                  Watch7018Manager.getWatch7018Manager().sendNoticeToDevice((byte) 0x02,"", UIUtils.getString(R.string.incomingNumber));
                 break;
         }
     }

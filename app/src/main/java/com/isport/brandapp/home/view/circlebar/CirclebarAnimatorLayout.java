@@ -111,7 +111,7 @@ public class CirclebarAnimatorLayout extends RelativeLayout {
                         drawable.getMinimumHeight());
                 tvStepTarget.setCompoundDrawables(null,null,null,drawable);
                 tvStepTarget.setText(String.format(UIUtils.getString(R.string.fragment_data_target), target + ""));
-                updateProgress(currentStep, currentTargetStep);
+                updateProgress(currentStep, target);
             } else if(goalType == 1){   //距离目标
                 Drawable drawable = getResources().getDrawable(R.drawable.icon_main_distance_tage);
                 // 这一步必须要做，否则不会显示。

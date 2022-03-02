@@ -22,6 +22,7 @@ import com.isport.blelibrary.db.table.DeviceInformationTable;
 import com.isport.blelibrary.db.table.DeviceTempUnitlTable;
 import com.isport.blelibrary.db.table.DeviceTypeTable;
 import com.isport.blelibrary.db.table.f18.F18CommonDbBean;
+import com.isport.blelibrary.db.table.f18.F18DetailStepBean;
 import com.isport.blelibrary.db.table.s002.DailyBrief;
 import com.isport.blelibrary.db.table.s002.DailySummaries;
 import com.isport.blelibrary.db.table.s002.S002_Detail_Data;
@@ -66,6 +67,7 @@ import com.isport.blelibrary.gen.DeviceInformationTableDao;
 import com.isport.blelibrary.gen.DeviceTempUnitlTableDao;
 import com.isport.blelibrary.gen.DeviceTypeTableDao;
 import com.isport.blelibrary.gen.F18CommonDbBeanDao;
+import com.isport.blelibrary.gen.F18DetailStepBeanDao;
 import com.isport.blelibrary.gen.DailyBriefDao;
 import com.isport.blelibrary.gen.DailySummariesDao;
 import com.isport.blelibrary.gen.S002_Detail_DataDao;
@@ -119,6 +121,7 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig deviceTempUnitlTableDaoConfig;
     private final DaoConfig deviceTypeTableDaoConfig;
     private final DaoConfig f18CommonDbBeanDaoConfig;
+    private final DaoConfig f18DetailStepBeanDaoConfig;
     private final DaoConfig dailyBriefDaoConfig;
     private final DaoConfig dailySummariesDaoConfig;
     private final DaoConfig s002_Detail_DataDaoConfig;
@@ -163,6 +166,7 @@ public class DaoSession extends AbstractDaoSession {
     private final DeviceTempUnitlTableDao deviceTempUnitlTableDao;
     private final DeviceTypeTableDao deviceTypeTableDao;
     private final F18CommonDbBeanDao f18CommonDbBeanDao;
+    private final F18DetailStepBeanDao f18DetailStepBeanDao;
     private final DailyBriefDao dailyBriefDao;
     private final DailySummariesDao dailySummariesDao;
     private final S002_Detail_DataDao s002_Detail_DataDao;
@@ -238,6 +242,9 @@ public class DaoSession extends AbstractDaoSession {
 
         f18CommonDbBeanDaoConfig = daoConfigMap.get(F18CommonDbBeanDao.class).clone();
         f18CommonDbBeanDaoConfig.initIdentityScope(type);
+
+        f18DetailStepBeanDaoConfig = daoConfigMap.get(F18DetailStepBeanDao.class).clone();
+        f18DetailStepBeanDaoConfig.initIdentityScope(type);
 
         dailyBriefDaoConfig = daoConfigMap.get(DailyBriefDao.class).clone();
         dailyBriefDaoConfig.initIdentityScope(type);
@@ -340,6 +347,7 @@ public class DaoSession extends AbstractDaoSession {
         deviceTempUnitlTableDao = new DeviceTempUnitlTableDao(deviceTempUnitlTableDaoConfig, this);
         deviceTypeTableDao = new DeviceTypeTableDao(deviceTypeTableDaoConfig, this);
         f18CommonDbBeanDao = new F18CommonDbBeanDao(f18CommonDbBeanDaoConfig, this);
+        f18DetailStepBeanDao = new F18DetailStepBeanDao(f18DetailStepBeanDaoConfig, this);
         dailyBriefDao = new DailyBriefDao(dailyBriefDaoConfig, this);
         dailySummariesDao = new DailySummariesDao(dailySummariesDaoConfig, this);
         s002_Detail_DataDao = new S002_Detail_DataDao(s002_Detail_DataDaoConfig, this);
@@ -384,6 +392,7 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(DeviceTempUnitlTable.class, deviceTempUnitlTableDao);
         registerDao(DeviceTypeTable.class, deviceTypeTableDao);
         registerDao(F18CommonDbBean.class, f18CommonDbBeanDao);
+        registerDao(F18DetailStepBean.class, f18DetailStepBeanDao);
         registerDao(DailyBrief.class, dailyBriefDao);
         registerDao(DailySummaries.class, dailySummariesDao);
         registerDao(S002_Detail_Data.class, s002_Detail_DataDao);
@@ -430,6 +439,7 @@ public class DaoSession extends AbstractDaoSession {
         deviceTempUnitlTableDaoConfig.getIdentityScope().clear();
         deviceTypeTableDaoConfig.getIdentityScope().clear();
         f18CommonDbBeanDaoConfig.getIdentityScope().clear();
+        f18DetailStepBeanDaoConfig.getIdentityScope().clear();
         dailyBriefDaoConfig.getIdentityScope().clear();
         dailySummariesDaoConfig.getIdentityScope().clear();
         s002_Detail_DataDaoConfig.getIdentityScope().clear();
@@ -515,6 +525,10 @@ public class DaoSession extends AbstractDaoSession {
 
     public F18CommonDbBeanDao getF18CommonDbBeanDao() {
         return f18CommonDbBeanDao;
+    }
+
+    public F18DetailStepBeanDao getF18DetailStepBeanDao() {
+        return f18DetailStepBeanDao;
     }
 
     public DailyBriefDao getDailyBriefDao() {

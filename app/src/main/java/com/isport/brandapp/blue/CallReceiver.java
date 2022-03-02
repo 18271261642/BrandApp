@@ -10,7 +10,14 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.isport.blelibrary.ISportAgent;
+import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
+import com.isport.blelibrary.managers.Watch7018Manager;
+import com.isport.brandapp.R;
+import com.isport.brandapp.util.DeviceTypeUtil;
+
 import androidx.core.app.ActivityCompat;
+import brandapp.isport.com.basicres.commonutil.UIUtils;
 
 /**
  * @author Created by Marcos Cheng on 2016/12/30.
@@ -45,6 +52,12 @@ public class CallReceiver extends BroadcastReceiver {
             Log.e(TAG, "999999999999999" + incomingNumber);
             if (state != null) {
                 if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
+                    BaseDevice device = ISportAgent.getInstance().getCurrnetDevice();
+                    if (device == null) {
+                        return;
+                    }
+                    if(DeviceTypeUtil.isContainF18(device.getDeviceType()))
+                        Watch7018Manager.getWatch7018Manager().sendNoticeToDevice((byte) 0x02,"", UIUtils.getString(R.string.incomingNumber));
                     //电话空闲
                     if (isHandup && !isCalling) {
                         isHandup = false;
@@ -58,6 +71,12 @@ public class CallReceiver extends BroadcastReceiver {
                         ContentUtils.sendCall(incomingNumber, context);
                     }
                 } else if (state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
+                    BaseDevice device = ISportAgent.getInstance().getCurrnetDevice();
+                    if (device == null) {
+                        return;
+                    }
+                    if(DeviceTypeUtil.isContainF18(device.getDeviceType()))
+                        Watch7018Manager.getWatch7018Manager().sendNoticeToDevice((byte) 0x02,"", UIUtils.getString(R.string.incomingNumber));
                     Log.e(TAG, "999999999999999 EXTRA_STATE_OFFHOOK" );
                     if (isHandup) {
                         isCalling = true;

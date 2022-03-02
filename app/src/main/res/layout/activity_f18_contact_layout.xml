@@ -6,10 +6,13 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:textSize="18sp"
-        android:padding="5dp"
+        android:textSize="15sp"
+        android:paddingLeft="@dimen/dp30"
+        android:paddingTop="@dimen/dp10"
+        android:paddingRight="@dimen/dp30"
+        android:paddingBottom="@dimen/dp10"
         android:layout_margin="8dp"
-        android:text="可从手机通讯录中添加最多10个常用联系人同步到设备，以便通过设备快速发起通话"
+        android:text="@string/string_contact_desc"
         android:layout_height="wrap_content"/>
 
 

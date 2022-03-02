@@ -5,6 +5,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -34,6 +36,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.Serializable;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -512,12 +515,15 @@ public abstract class BaseActivity extends BasicActivity implements Observer {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-
                         try {
-                            if (!syncDataProgressDialog.isShowing()) {
-                                syncDataProgressDialog.show();
-                                syncDataProgressDialog.showProgress(times);
+                            Context context = ((ContextWrapper)syncDataProgressDialog.getContext()).getBaseContext();
+                            if(context instanceof Activity){
+                                if ( !((Activity) context).isFinishing() && !syncDataProgressDialog.isShowing()) {
+                                    syncDataProgressDialog.show();
+                                    syncDataProgressDialog.showProgress(times);
+                                }
                             }
+
                             // 设置让返回按键失效，dialog以外的空间失效！
                             syncDataProgressDialog.setCancelable(isCancelable);
                         } catch (Exception e) {
@@ -533,25 +539,28 @@ public abstract class BaseActivity extends BasicActivity implements Observer {
     }
 
     public void showProgress(final String desc, final boolean isCancelable) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (isOnPause) {
-                    return;
+        try {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (isOnPause) {
+                        return;
+                    }
+                    if (null == netReqProgressBar) {
+                        netReqProgressBar = new LoadProgressDialog(BaseActivity.this);
+                        netReqProgressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    }
+                    netReqProgressBar.setMessage(desc);
+                    if (!netReqProgressBar.isShowing()) {
+                        netReqProgressBar.show();
+                    }
+                    // 设置让返回按键失效，dialog以外的空间失效！
+                    netReqProgressBar.setCancelable(isCancelable);
                 }
-                if (null == netReqProgressBar) {
-                    netReqProgressBar = new LoadProgressDialog(BaseActivity.this);
-                    netReqProgressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                }
-                netReqProgressBar.setMessage(desc);
-                if (!netReqProgressBar.isShowing()) {
-                    netReqProgressBar.show();
-                }
-                // 设置让返回按键失效，dialog以外的空间失效！
-                netReqProgressBar.setCancelable(isCancelable);
-            }
-        });
-
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void showBleProgress(final String desc, final boolean isCancelable) {
@@ -586,8 +595,14 @@ public abstract class BaseActivity extends BasicActivity implements Observer {
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (syncDataProgressDialog != null && syncDataProgressDialog.isShowing()) {
-                                syncDataProgressDialog.dismiss();
+                            Context context = ((ContextWrapper)syncDataProgressDialog.getContext()).getBaseContext();
+
+                            if (syncDataProgressDialog != null && syncDataProgressDialog.isShowing()   ) {
+                                if(context instanceof Activity){
+                                    if(!((Activity) context).isFinishing())
+                                        syncDataProgressDialog.dismiss();
+                                }
+
                             }
                         }
                     }, 500);
@@ -598,14 +613,19 @@ public abstract class BaseActivity extends BasicActivity implements Observer {
     }
 
     public void dismissProgressBar() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (netReqProgressBar != null && netReqProgressBar.isShowing()) {
-                    netReqProgressBar.dismiss();
+        try {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (netReqProgressBar != null && netReqProgressBar.isShowing()) {
+                        netReqProgressBar.dismiss();
+                    }
                 }
-            }
-        });
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -874,4 +894,25 @@ public abstract class BaseActivity extends BasicActivity implements Observer {
     }
 
 
+    public void startActivity(Class<?> goalClass){
+        Intent intent = new Intent(this,goalClass);
+        startActivity(intent);
+    }
+
+
+    public void startActivity(String[] keyStr,String[] value,Class<?> goalClass){
+        Intent intent = new Intent(this,goalClass);
+        if(keyStr.length == value.length){
+            for(int i = 0;i<keyStr.length;i++){
+                intent.putExtra(keyStr[i],  value[i]);
+            }
+        }
+        startActivity(intent);
+    }
+
+    public void startSerializableActivity(String key, Serializable serializable,Class<?> goalClass){
+        Intent intent = new Intent(this,goalClass);
+        intent.putExtra(key,serializable);
+        startActivity(intent);
+    }
 }

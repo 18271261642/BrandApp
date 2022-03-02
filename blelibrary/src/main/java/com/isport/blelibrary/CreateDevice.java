@@ -39,7 +39,7 @@ public class CreateDevice {
         Logger.myLog(TAG,"---createDevcie="+name+"\n"+address+"\n"+filterStr+"\n"+isDFU);
         BaseDevice baseDevice = null;
 
-        if(name.startsWith(Constants.WATCH_7018_FILTER)){
+        if(name.startsWith(Constants.WATCH_7018_FILTER) || name.startsWith("BL")){
 
             baseDevice =  create7018Device(name,address);
             return baseDevice;
@@ -269,7 +269,12 @@ public class CreateDevice {
     }
 
     public BaseDevice create7018Device(String name,String mac){
-        String newName = "F18-"+mac.replace(":","");
+        String newName;
+        if(name.contains("BL")){
+            newName = "BL-F18X-"+mac.replace(":","");
+        }else {
+            newName = "F18-"+mac.replace(":","");
+        }
         return new W7018Device(newName,mac);
     }
 }

@@ -52,7 +52,7 @@ public class F18ContactActivity extends BaseMVPTitleActivity<F18SetView,F18SetPr
 
     @Override
     public void backAllSetData(F18DeviceSetData f18DeviceSetData) {
-        this.contactSetBean = f18DeviceSetData;
+        //this.contactSetBean = f18DeviceSetData;
     }
 
     @Override
@@ -68,7 +68,7 @@ public class F18ContactActivity extends BaseMVPTitleActivity<F18SetView,F18SetPr
     @Override
     protected void initView(View view) {
 
-        titleBarView.setTitle("常用联系人");
+        titleBarView.setTitle(getResources().getString(R.string.string_often_contact));
         titleBarView.setRightText("");
         titleBarView.setRightIcon(R.drawable.icon_add_device);
         frameBodyLine.setVisibility(View.VISIBLE);
@@ -78,13 +78,23 @@ public class F18ContactActivity extends BaseMVPTitleActivity<F18SetView,F18SetPr
 
     @Override
     protected void initData() {
+        contactSetBean = (F18DeviceSetData) getIntent().getSerializableExtra("comm_key");
         beanList.clear();
-        mActPresenter.getAllDeviceSet(TokenUtil.getInstance().getPeopleIdStr(this), AppConfiguration.braceletID);
+       // mActPresenter.getAllDeviceSet(TokenUtil.getInstance().getPeopleIdStr(this), AppConfiguration.braceletID);
+        showProgress("Loading...",true);
         Watch7018Manager.getWatch7018Manager().redDeviceContact(new F18ContactListener() {
             @Override
             public void onContactAllData(List<WristbandContacts> list) {
-                if(list.isEmpty())
+                dismissProgressBar();
+
+                if(list.isEmpty()){
+                    if(contactSetBean != null){
+                        contactSetBean.setContactNumber(0);
+                        mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(F18ContactActivity.this),AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(contactSetBean));
+                    }
                     return;
+                }
+
 
                 for(WristbandContacts wb : list){
                     beanList.add(new F18ContactBean(wb.getName(),wb.getNumber()));

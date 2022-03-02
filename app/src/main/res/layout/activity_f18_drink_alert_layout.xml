@@ -34,9 +34,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dp60"
                 app:contentSize="@dimen/sp16"
-                app:contentText=""
                 app:contentTextColor="@color/common_white"
-                app:itemText="喝水提醒"
+                app:itemText="@string/string_drink_alert"
                 app:itemviewTitleSize="@dimen/sp16"
                 app:showArrow="false"
                 app:showBottomLine="true"
@@ -44,45 +43,141 @@
                 app:showRemind="false" />
         </phone.gym.jkcq.com.socialmodule.shadow.ShadowLayout>
 
-        <bike.gymproject.viewlibray.ItemView
-            android:id="@+id/f18DrinkIntervalItem"
+
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/f18DrinkIntervalLayout"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dp60"
             android:background="@drawable/common_item_bg_selector"
-            app:contentSize="@dimen/sp16"
-            app:contentTextColor="@color/common_white"
-            app:itemText="@string/watch_stable_remind_time"
-            app:itemviewTitleSize="@dimen/sp16"
-            app:showArrow="true"
-            app:showBottomLine="true"
-            app:showCheckModel="false"
-            app:showRemind="false" />
+            android:layout_height="@dimen/dp60">
 
-        <bike.gymproject.viewlibray.ItemView
-            android:id="@+id/f18DrinkStartTimeItem"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dp60"
-            app:contentSize="@dimen/sp16"
-            app:contentTextColor="@color/common_white"
-            app:itemText="@string/watch_stable_remind_starttime"
-            app:itemviewTitleSize="@dimen/sp16"
-            app:showArrow="true"
-            app:showBottomLine="true"
-            app:showCheckModel="false"
-            app:showRemind="false" />
+            <TextView
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="16sp"
+                android:layout_marginStart="15dp"
+                android:textColor="@color/common_text_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/watch_stable_remind_time"/>
 
-        <bike.gymproject.viewlibray.ItemView
-            android:id="@+id/f18DrinkEndTimeItem"
+
+            <TextView
+                android:id="@+id/f18DrinkIntervalItem"
+                app:layout_constraintRight_toLeftOf="@id/drImg"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="17sp"
+                android:padding="5dp"
+                android:textColor="@color/common_text_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+            <ImageView
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginEnd="17dp"
+                android:id="@+id/drImg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/icon_arrow_left" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/f18DrinkStartLayout"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dp60"
-            app:contentSize="@dimen/sp16"
-            app:contentTextColor="@color/common_white"
-            app:itemText="@string/watch_stable_remind_endtime"
-            app:itemviewTitleSize="@dimen/sp16"
-            app:showArrow="true"
-            app:showBottomLine="true"
-            app:showCheckModel="false"
-            app:showRemind="false" />
+            android:background="@drawable/common_item_bg_selector"
+            android:layout_height="@dimen/dp60">
+
+            <TextView
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="16sp"
+                android:layout_marginStart="15dp"
+                android:textColor="@color/common_text_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/watch_disturb_setting_start"/>
+
+
+            <TextView
+                android:id="@+id/f18DrinkStartTimeItem"
+                app:layout_constraintRight_toLeftOf="@id/drImg1"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="17sp"
+                android:padding="5dp"
+                android:textColor="@color/common_text_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+            <ImageView
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginEnd="17dp"
+                android:id="@+id/drImg1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/icon_arrow_left" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/f18DrinkEndLayout"
+            android:layout_width="match_parent"
+            android:background="@drawable/common_item_bg_selector"
+            android:layout_height="@dimen/dp60">
+
+            <TextView
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="16sp"
+                android:layout_marginStart="15dp"
+                android:textColor="@color/common_text_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/watch_disturb_setting_end"/>
+
+
+            <TextView
+                android:id="@+id/f18DrinkEndTimeItem"
+                app:layout_constraintRight_toLeftOf="@id/drImg2"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="17sp"
+                android:padding="5dp"
+                android:textColor="@color/common_text_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+            <ImageView
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginEnd="17dp"
+                android:id="@+id/drImg2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/icon_arrow_left" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -56,7 +56,7 @@ public class WatchSleepPresenter extends BasePresenter<WatchSleepView> {
                 } else if (DeviceTypeUtil.isContainWatch(deviceType)) {
                     watchSleepDayData = iw516Model.getWatchSleepDayData(dateStr, deviceId);
 
-                } else if (DeviceTypeUtil.isContainW81(deviceType)) {
+                } else if (DeviceTypeUtil.isContainW81(deviceType) || DeviceTypeUtil.isContainF18(deviceId)) {
                     watchSleepDayData = iw81DeviceDataModel.getStrDateSleepData(userId, deviceId, dateStr);
                 }
                 if (watchSleepDayData != null) {
@@ -108,7 +108,7 @@ public class WatchSleepPresenter extends BasePresenter<WatchSleepView> {
                 } else if (DeviceTypeUtil.isContainWatch(deviceType)) {
                     watchSleepDayData = iw516Model.getWatchSleepDayLastData(deviceId);
 
-                } else if (DeviceTypeUtil.isContainW81(deviceType)) {
+                } else if (DeviceTypeUtil.isContainW81(deviceType) || DeviceTypeUtil.isContainF18(deviceId)) {
                     watchSleepDayData = iw81DeviceDataModel.getLastSleepData(userId, deviceId, false);
                 }
                 if (watchSleepDayData == null) {
@@ -161,7 +161,7 @@ public class WatchSleepPresenter extends BasePresenter<WatchSleepView> {
                     strDates = iw516Model.getSleepMonthData(deviceId, strYearAndMonth);
                 } else if (DeviceTypeUtil.isContainWrishBrand(deviceType)) {
                     strDates = iw311DataModel.getSleepMonthData(strYearAndMonth, deviceId);
-                } else if (DeviceTypeUtil.isContainW81(deviceType)) {
+                } else if (DeviceTypeUtil.isContainW81(deviceType) || DeviceTypeUtil.isContainF18(deviceType)) {
                     strDates = iw81DeviceDataModel.getSleepMonthData(strYearAndMonth, userId, deviceId);
                 }
 

@@ -67,7 +67,7 @@ public class DeviceDataSave {
         ThreadPoolUtils.getInstance().addTask(new Runnable() {
             @Override
             public void run() {
-                float ftempValueC = tempValue / 10.f;
+                float ftempValueC = tempValue ;/// 10.f;
 
                 DeviceMeasuredDActionation actionation = new DeviceMeasuredDActionation();
                 String tempValueC = CommonDateUtil.formatOnePoint(ftempValueC);

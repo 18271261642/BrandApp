@@ -29,6 +29,8 @@ import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 
 public class PlayW311FragmentList extends Fragment {
 
+    private static final String TAG = "PlayW311FragmentList";
+
     public static final int TYPE_ONE = 0;
     public static final int TYPE_TWO = 1;
     public static final int TYPE_THREE = 2;
@@ -51,7 +53,7 @@ public class PlayW311FragmentList extends Fragment {
         super.onCreate(savedInstanceState);
         currentType = getArguments().getInt(JkConfiguration.DEVICE, JkConfiguration.DeviceType.BRAND_W311);
         playBeans = UserAcacheUtil.getPlayBandImagelist(currentType);
-        Logger.myLog("currentType:" + currentType + "playBeans.size()" + playBeans.size() + "playBeans:" + playBeans);
+        Logger.myLog("PlayW311FragmentList","currentType:" + currentType + "playBeans.size()" + playBeans.size() + "playBeans:" + playBeans);
         if (playBeans.size() == 4) {
             playBean1 = playBeans.get(0);
             playBean2 = playBeans.get(1);
@@ -64,12 +66,13 @@ public class PlayW311FragmentList extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_list, null);
+        View view = inflater.inflate(R.layout.fragment_list, container,false);
         viewPager = (ViewPager) view;
 
         pagerAdapter = new FragmentStatePagerAdapter(getChildFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
+
                 Fragment fragment = new PlayW311Fragment();
                 Bundle bundle = new Bundle();
                 String strBottom0 = "";
@@ -84,7 +87,7 @@ public class PlayW311FragmentList extends Fragment {
                         strBottom0 = playBeans.get(position).getTitleEn1Content2();
                     }
 
-                    if (currentType == JkConfiguration.DeviceType.WATCH_W516) {
+                    if (currentType == JkConfiguration.DeviceType.WATCH_W516 || currentType == 70180) {
                         if (AppUtil.isZh(getActivity())) {
                             bundle.putString("strRes", playBeans.get(position).getUrl1());
                         } else {
@@ -110,6 +113,7 @@ public class PlayW311FragmentList extends Fragment {
                 return playBeans.size();
             }
         };
+
 
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

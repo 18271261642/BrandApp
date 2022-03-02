@@ -171,7 +171,7 @@ public class BraceletStepPresenter extends BasePresenter<BraceletStepView> {//im
                                 wristbandstep1.setCalorie(CommonDateUtil.formatInterger(bracelet_w311_realTimeData.getCal()));
                             }
                         }
-                    } else if (DeviceTypeUtil.isContainW81(currentType)) {
+                    } else if (DeviceTypeUtil.isContainW81(currentType) || DeviceTypeUtil.isContainF18(currentType)) {
                         wristbandstep1 = iw81DeviceDataModel.getStepData(String.valueOf(userId), deviceId, strDate);
                     }
                     if (wristbandstep1 == null) {
@@ -279,7 +279,7 @@ public class BraceletStepPresenter extends BasePresenter<BraceletStepView> {//im
                             }
                         }
 
-                    } else if (DeviceTypeUtil.isContainW81(currentType)) {
+                    } else if (DeviceTypeUtil.isContainW81(currentType) || DeviceTypeUtil.isContainF18(currentType)) {
                         wristbandstep1 = iw81DeviceDataModel.getStepData(String.valueOf(userid), deviceid, strDate);
                     }
                     if (wristbandstep1 == null) {
@@ -385,7 +385,7 @@ public class BraceletStepPresenter extends BasePresenter<BraceletStepView> {//im
                         }
                         wristbandstep.setMothAndDay(strDate);
                     }
-                } else if (DeviceTypeUtil.isContainW81(currentType)) {
+                } else if (DeviceTypeUtil.isContainW81(currentType) || DeviceTypeUtil.isContainF18(currentType)) {
                     wristbandstep = iw81DeviceDataModel.getStepData(String.valueOf(userid), deviceId, strDate);
                 } else {
                     wristbandstep = new Wristbandstep();

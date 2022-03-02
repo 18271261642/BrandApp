@@ -6,7 +6,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
-
+import android.widget.LinearLayout;
 import com.google.gson.Gson;
 import com.htsmart.wristband2.bean.WristbandAlarm;
 import com.isport.blelibrary.ISportAgent;
@@ -19,13 +19,13 @@ import com.isport.blelibrary.utils.CommonDateUtil;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 import com.isport.brandapp.banner.recycleView.utils.ToastUtil;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import brandapp.isport.com.basicres.commonalertdialog.AlertDialogStateCallBack;
+import brandapp.isport.com.basicres.commonalertdialog.PublicAlertDialog;
 import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.commonview.TitleBarView;
 import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
@@ -39,6 +39,9 @@ public class F18AlarmShowActivity extends BaseMVPTitleActivity<F18SetView,F18Set
 
     private F18DeviceSetData alarmSetData;
 
+    //emptyview
+    private LinearLayout f18Alarm_layout_emty;
+
      private List<WristbandAlarm> alarmList;
      private CusF18AlarmAdapter f18AlarmAdapter;
      private RecyclerView alarmRecyclerView;
@@ -50,13 +53,14 @@ public class F18AlarmShowActivity extends BaseMVPTitleActivity<F18SetView,F18Set
          @Override
          public void handleMessage(@NonNull Message msg) {
              super.handleMessage(msg);
+             handler.removeMessages(0x00);
               readDeviceAlarm();
          }
      };
 
     @Override
     public void backAllSetData(F18DeviceSetData f18DeviceSetData) {
-        this.alarmSetData = f18DeviceSetData;
+       // this.alarmSetData = f18DeviceSetData;
     }
 
     @Override
@@ -79,7 +83,7 @@ public class F18AlarmShowActivity extends BaseMVPTitleActivity<F18SetView,F18Set
             updateAlarm.setRepeat(type);
             alarmList.set(selectType,updateAlarm);
         }
-
+        showProgress("loading...",false);
         Watch7018Manager.getWatch7018Manager().setDeviceAlarm(alarmList, new F18CommStatusListener() {
             @Override
             public void isSetStatus(boolean isSuccess, String error) {
@@ -97,7 +101,7 @@ public class F18AlarmShowActivity extends BaseMVPTitleActivity<F18SetView,F18Set
     @Override
     protected void initView(View view) {
         findViews();
-
+        showProgress("loading...",true);
         titleBarView.setLeftIconEnable(true);
         titleBarView.setTitle(getResources().getString(R.string.watch_alarm_setting_title));
         titleBarView.setRightText("");
@@ -112,11 +116,12 @@ public class F18AlarmShowActivity extends BaseMVPTitleActivity<F18SetView,F18Set
             @Override
             public void onRightClicked(View view) {
                 if(alarmList.size()>=5){
+                    ToastUtil.init(F18AlarmShowActivity.this);
                     ToastUtil.showTextToast("最多设置5个闹钟!");
                     return;
                 }
                 //新增闹钟
-                mActPresenter.setAlarmOrUpdateAlarm(F18AlarmShowActivity.this,-1,0);
+                mActPresenter.setAlarmOrUpdateAlarm(F18AlarmShowActivity.this,-1,0,null);
             }
         });
 
@@ -125,6 +130,8 @@ public class F18AlarmShowActivity extends BaseMVPTitleActivity<F18SetView,F18Set
     @SuppressLint("CheckResult")
     @Override
     protected void initData() {
+        alarmSetData = (F18DeviceSetData) getIntent().getSerializableExtra("comm_key");
+        titleBarView.setRightIconVisible(false);
         readDeviceAlarm();
         mUserId = TokenUtil.getInstance().getPeopleIdStr(this);
         deviceId = AppConfiguration.braceletID;
@@ -132,20 +139,31 @@ public class F18AlarmShowActivity extends BaseMVPTitleActivity<F18SetView,F18Set
 
 
     private void readDeviceAlarm(){
-        Watch7018Manager.getWatch7018Manager().getDeviceAlarmList(new F18AlarmAllListener() {
-            @Override
-            public void backAllDeviceAlarm(List<WristbandAlarm> alarmLists) {
-                alarmList.clear();
-                alarmList.addAll(alarmLists);
-                f18AlarmAdapter.notifyDataSetChanged();
+        try {
+            showProgress("loading...",true);
+            Watch7018Manager.getWatch7018Manager().getDeviceAlarmList(new F18AlarmAllListener() {
+                @Override
+                public void backAllDeviceAlarm(List<WristbandAlarm> alarmLists) {
+                    dismissProgressBar();
+                    titleBarView.setRightIconVisible(true);
+                    alarmList.clear();
+                    alarmList.addAll(alarmLists);
+                    f18AlarmAdapter.notifyDataSetChanged();
 
-                if(alarmSetData != null){
-                    alarmSetData.setAlarmCount(f18AlarmAdapter.getOpenCount());
-                    mActPresenter.saveAllSetData(mUserId,deviceId,F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(alarmSetData));
+                    Log.e(TAG,"------读取闹钟="+new Gson().toJson(alarmLists));
+
+                    f18Alarm_layout_emty.setVisibility(alarmList.isEmpty() ? View.VISIBLE : View.GONE);
+
+                    if(alarmSetData != null){
+                        alarmSetData.setAlarmCount(f18AlarmAdapter.getOpenCount());
+                        mActPresenter.saveAllSetData(mUserId,deviceId, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(alarmSetData));
+                    }
                 }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
-            }
-        });
     }
 
 
@@ -171,6 +189,8 @@ public class F18AlarmShowActivity extends BaseMVPTitleActivity<F18SetView,F18Set
     }
 
     private void findViews(){
+
+        f18Alarm_layout_emty = findViewById(R.id.f18Alarm_layout_emty);
         alarmRecyclerView = findViewById(R.id.f18AlarmRecyclerView);
         alarmList = new ArrayList<>();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -180,15 +200,65 @@ public class F18AlarmShowActivity extends BaseMVPTitleActivity<F18SetView,F18Set
         alarmRecyclerView.setAdapter(f18AlarmAdapter);
 
         f18AlarmAdapter.setOnF18ItemClickListener(new OnF18ItemClickListener() {
+            //修改
             @Override
             public void onItemClick(int position) {
-                mActPresenter.setAlarmOrUpdateAlarm(F18AlarmShowActivity.this,position,alarmList.get(position).getRepeat());
+                mActPresenter.setAlarmOrUpdateAlarm(F18AlarmShowActivity.this,position,alarmList.get(position).getRepeat(),(alarmList.get(position).getHour()+":"+alarmList.get(position).getMinute()));
             }
 
+            //开关
             @Override
-            public void onChildClick(int position) {
+            public void onChildClick(int position,boolean isCheck) {
+                alarmList.get(position).setEnable(isCheck);
+                showProgress("loading...",true);
+                Watch7018Manager.getWatch7018Manager().setDeviceAlarm(alarmList, new F18CommStatusListener() {
+                    @Override
+                    public void isSetStatus(boolean isSuccess, String error) {
+                        handler.sendEmptyMessage(0x00);
+                    }
+                });
+            }
 
+            //删除
+            @Override
+            public void onLongClick(int position) {
+                deleteAlarmItem(position);
             }
         });
+    }
+
+
+    //开关
+    private void operateSwitch(WristbandAlarm f18AlarmBean){
+        Watch7018Manager.getWatch7018Manager().setDeviceAlarm(alarmList, new F18CommStatusListener() {
+            @Override
+            public void isSetStatus(boolean isSuccess, String error) {
+                handler.sendEmptyMessage(0x00);
+            }
+        });
+    }
+
+
+    //删除
+    private void deleteAlarmItem(int position){
+        PublicAlertDialog.getInstance().showDialog("", this.getString(R.string.ensure_delete), context, this.getString(R.string.common_dialog_cancel), this.getString(R.string.common_dialog_ok), new AlertDialogStateCallBack() {
+                    @Override
+                    public void determine() {
+                        alarmList.remove(position);
+
+                        Watch7018Manager.getWatch7018Manager().setDeviceAlarm(alarmList, new F18CommStatusListener() {
+                            @Override
+                            public void isSetStatus(boolean isSuccess, String error) {
+                                handler.sendEmptyMessage(0x00);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void cancel() {
+
+                    }
+                }
+                , false);
     }
 }

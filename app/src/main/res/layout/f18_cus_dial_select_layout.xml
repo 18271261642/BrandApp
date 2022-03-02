@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:ignore="MissingDefaultResource">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:padding="10dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shap_bg"
+        android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/f18CusDialDialogCancelTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:text="@string/alarm_del"
+            android:textSize="18sp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+
+        <TextView
+            android:id="@+id/f18CusDialDialogSureTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:text="@string/app_close"
+            android:textColor="#4DDA64"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+
+    <brandapp.isport.com.basicres.commonview.RoundImageView
+        android:id="@+id/cusDialPreviewImgView"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:layout_gravity="center"
+        android:layout_margin="20dp"
+        android:src="@drawable/icon_facebook_img" />
+
+
+    <TextView
+        android:id="@+id/setCusDialBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/shape_layout_green_bg_19"
+        android:gravity="center"
+        android:paddingLeft="@dimen/dp15"
+        android:paddingTop="@dimen/dp6"
+        android:paddingRight="@dimen/dp15"
+        android:paddingBottom="@dimen/dp6"
+        android:tag="start"
+        android:text="@string/string_set_dial"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/string_style_1" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/string_style_2" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/string_style_3" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/string_style_4" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="3dp"
+                android:layout_weight="1">
+
+
+                <View
+                    android:id="@+id/styleV1"
+                    android:visibility="invisible"
+                    android:layout_width="73dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/f18_select_style_shap"
+                    android:layout_height="73dp"/>
+
+
+                <brandapp.isport.com.basicres.commonview.RoundImageView
+                    android:id="@+id/f18SelectStyle1"
+                    android:layout_width="@dimen/dp70"
+                    android:layout_height="@dimen/dp70"
+                    android:layout_gravity="center"
+                    android:src="@drawable/icon_f18_diai_add" />
+
+                <ImageView
+                    android:id="@+id/f18SelectStyle1Small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_gravity="center|top"
+                    android:background="@drawable/style1_small" />
+
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_margin="3dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <View
+                    android:id="@+id/styleV2"
+                    android:layout_width="73dp"
+                    android:visibility="invisible"
+                    android:layout_gravity="center"
+                    android:background="@drawable/f18_select_style_shap"
+                    android:layout_height="73dp"/>
+
+
+                <brandapp.isport.com.basicres.commonview.RoundImageView
+                    android:id="@+id/f18SelectStyle2"
+                    android:layout_width="@dimen/dp70"
+                    android:layout_height="@dimen/dp70"
+                    android:layout_gravity="center"
+                    android:background="@drawable/icon_f18_diai_add" />
+
+
+                <ImageView
+                    android:id="@+id/f18SelectStyle2Small"
+                    android:layout_width="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|left"
+                    android:src="@drawable/style_small" />
+
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_margin="3dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <View
+                    android:id="@+id/styleV3"
+                    android:visibility="invisible"
+                    android:layout_width="73dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/f18_select_style_shap"
+                    android:layout_height="73dp"/>
+
+                <brandapp.isport.com.basicres.commonview.RoundImageView
+                    android:id="@+id/f18SelectStyle3"
+                    android:layout_width="@dimen/dp70"
+                    android:layout_height="@dimen/dp70"
+                    android:layout_gravity="center"
+                    android:background="@drawable/icon_f18_diai_add" />
+
+                <ImageView
+                    android:id="@+id/f18SelectStyle3Small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_gravity="center|right"
+                    android:src="@drawable/style_small" />
+
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_margin="3dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <View
+                    android:id="@+id/styleV4"
+                    android:layout_width="73dp"
+                    android:layout_gravity="center"
+                    android:visibility="invisible"
+                    android:background="@drawable/f18_select_style_shap"
+                    android:layout_height="73dp"/>
+
+                <brandapp.isport.com.basicres.commonview.RoundImageView
+                    android:id="@+id/f18SelectStyle4"
+                    android:layout_width="@dimen/dp70"
+                    android:layout_height="@dimen/dp70"
+                    android:background="@null"
+                    android:layout_gravity="center"
+                    android:src="@drawable/icon_f18_diai_add" />
+
+                <ImageView
+                    android:id="@+id/f18SelectStyle4Small"
+                    android:layout_marginBottom="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|bottom"
+                    android:src="@drawable/style_small" />
+
+            </FrameLayout>
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

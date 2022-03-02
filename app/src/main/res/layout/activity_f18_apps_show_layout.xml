@@ -23,6 +23,39 @@
         android:textColor="@color/common_text_color"
         android:textSize="@dimen/sp16" />
 
+
+    <bike.gymproject.viewlibray.ItemDeviceSettingView
+        android:id="@+id/f18AppsOpenNotiItem"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp60"
+        android:layout_marginBottom="@dimen/dp15"
+        android:background="@drawable/item_comm_main_layout"
+        app:contentSize="@dimen/sp14"
+        app:contentTextColor="@color/common_gray_color"
+        app:itemText="@string/string_open_notication"
+        app:itemviewTitleSize="@dimen/sp15"
+        app:showArrow="true"
+        app:showBottomLine="true"
+        app:showCheckModel="false"
+        app:showRemind="false" />
+
+    <bike.gymproject.viewlibray.ItemDeviceSettingView
+        android:id="@+id/f18AppsPermissItem"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp60"
+        android:layout_marginBottom="@dimen/dp15"
+        android:background="@drawable/item_comm_main_layout"
+        app:contentSize="@dimen/sp14"
+        app:contentTextColor="@color/common_gray_color"
+        app:itemText="@string/string_set_permission"
+        app:itemviewTitleSize="@dimen/sp15"
+        app:showArrow="true"
+        app:showBottomLine="true"
+        app:showCheckModel="false"
+        app:showRemind="false" />
+
+
+
     <bike.gymproject.viewlibray.ItemDeviceSettingView
         android:id="@+id/f18AppsAllStatusItem"
         android:layout_width="match_parent"
@@ -31,7 +64,7 @@
         android:background="@drawable/item_comm_main_layout"
         app:contentSize="@dimen/sp14"
         app:contentTextColor="@color/common_gray_color"
-        app:itemText="消息提醒"
+        app:itemText="@string/string_apps_notice"
         app:itemviewTitleSize="@dimen/sp15"
         app:showArrow="false"
         app:showBottomLine="true"

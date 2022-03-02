@@ -3,8 +3,11 @@ package com.isport.blelibrary.utils;
 import org.apache.commons.lang.StringUtils;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class CommonDateUtil {
     public static String formatOnePoint(double value) {
@@ -19,6 +22,38 @@ public class CommonDateUtil {
         calendar.setTime(new Date(time));
         return calendar.get(Calendar.MINUTE);
     }
+
+
+    public static int getTimeFromLong(String timeStr){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
+        try {
+            Date date = sdf.parse(timeStr);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+
+            return hour+minute;
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+
+    public static int getTimeFromLong(long timeStr){
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date(timeStr));
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        return (hour*60)+minute;
+
+    }
+
+
 
 
     //将HH：mm格式的时间格式化成小时，分钟

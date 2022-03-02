@@ -27,6 +27,8 @@ import com.isport.brandapp.home.presenter.FragmentMinePresenter;
 import com.isport.brandapp.home.view.FragmentMineView;
 import com.isport.brandapp.message.MessageActivity;
 import com.isport.brandapp.util.ActivitySwitcher;
+import com.isport.brandapp.util.AppSP;
+import com.isport.brandapp.util.DeviceTypeUtil;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import org.greenrobot.eventbus.EventBus;
@@ -549,6 +551,9 @@ public class NewMineFragment extends BaseMVPFragment<FragmentMineView, FragmentM
             @Override
             public void determine() {
                 Constants.CAN_RECONNECT = false;
+                if(DeviceTypeUtil.isContainF18()){
+                    AppSP.putString(getActivity(),AppSP.F18_SAVE_MAC,null);
+                }
                 ISportAgent.getInstance().disConDevice(false);
                 ActivitySwitcher.goScanActivty(getActivity(), JkConfiguration.DeviceType.DFU);
             }

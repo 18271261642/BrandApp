@@ -7,13 +7,13 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.isport.brandapp.R;
 
 import androidx.annotation.NonNull;
+import brandapp.isport.com.basicres.commonview.RoundImageView;
 
 /**
  * Created by Admin
@@ -24,7 +24,7 @@ public class DialBottomDialogView extends AlertDialog implements View.OnClickLis
 
     private TextView dialDialogCancelTv,dialDialogSureTv;
     private TextView dialViewBtnTv;
-    private ImageView previewImgView;
+    private RoundImageView previewImgView;
 
 
     private OnF18DialViewClickListener onF18DialViewClickListener;

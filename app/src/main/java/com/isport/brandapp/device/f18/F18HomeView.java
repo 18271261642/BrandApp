@@ -32,4 +32,6 @@ public interface F18HomeView extends BaseView {
     void successGetMainLastTempValue(TempInfo info);
     //睡眠
     void successGetMainLastSleepValue(WatchSleepDayData watchSleepDayData);
+    //锻炼数据
+    void successGetMainTotalAllTime(Integer time);
 }

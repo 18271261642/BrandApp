@@ -39,7 +39,7 @@
 
 
     <FrameLayout
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
@@ -48,7 +48,7 @@
 
         <LinearLayout
             android:id="@+id/view_car_remind_right_layout"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center_vertical|right"
@@ -68,17 +68,19 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:text=""
+                    android:layout_gravity="right"
                     android:textSize="14sp"
                     android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/view_car_remind_content_text"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:text=""
+                    android:layout_gravity="right"
+                    android:gravity="center"
+                    android:singleLine="true"
                     android:textSize="14sp"
-                    android:visibility="gone" />
+                    android:visibility="visible" />
 
             </LinearLayout>
 
@@ -94,6 +96,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:button="@drawable/checkbox_style"
+            android:layout_gravity="right"
             android:gravity="center"
             android:padding="5dp"
             android:text=""

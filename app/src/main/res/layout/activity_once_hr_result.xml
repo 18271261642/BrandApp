@@ -13,7 +13,7 @@
 
     <include
         android:id="@+id/head"
-        layout="@layout/include_result_title"/>
+        layout="@layout/include_result_title" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -55,15 +55,15 @@
 
                     <TextView
                         android:id="@+id/tv_time"
+                        android:visibility="gone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
                         android:layout_gravity="center_horizontal"
-                        android:textStyle="bold"
                         android:textColor="@color/common_tips_color"
                         android:textSize="@dimen/sp14"
-                        tools:text="2019-11-06 18:52:22" />
+                        android:textStyle="bold" />
 
 
                 </RelativeLayout>
@@ -149,11 +149,11 @@
                     android:padding="@dimen/dp15">
 
                     <TextView
+                        android:id="@+id/onceHeartGuidTv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textStyle="bold"
                         android:gravity="center"
-                        android:text="@string/oncehrresult_once_measure_trend"
                         android:textColor="@color/common_white"
                         android:textSize="@dimen/dp12" />
 
@@ -161,7 +161,30 @@
                         android:id="@+id/trendview_oxy"
                         android:layout_width="match_parent"
                         android:layout_height="140dp"
+                        android:visibility="gone"
                         android:background="@color/white" />
+
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/signalRecyclerView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/sp140"/>
+
+
+                        <ImageView
+                            android:id="@+id/htGuidImg"
+                            android:layout_width="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_height="150dp"/>
+
+                    </FrameLayout>
+
+
+
                 </LinearLayout>
 
             </LinearLayout>
@@ -196,6 +219,16 @@
                     android:layout_height="wrap_content"
                     android:text="@string/oncehrresult_oncehr_des"
                     android:textColor="@color/common_name_color"
+                    android:textSize="@dimen/sp14" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_text_light_green_bg"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:text="@string/string_no_duty"
+                    android:textColor="@color/common_white"
                     android:textSize="@dimen/sp14" />
             </LinearLayout>
         </LinearLayout>

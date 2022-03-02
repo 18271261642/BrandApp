@@ -41,7 +41,7 @@
             android:textColor="#6E6E77"
             android:textSize="20sp"
             android:layout_height="wrap_content"
-            android:text="表盘中心"/>
+            android:text="@string/string_dial_center"/>
 
         <TextView
             app:layout_constraintTop_toTopOf="parent"
@@ -55,7 +55,7 @@
             android:padding="10dp"
             android:textSize="20sp"
             android:layout_height="wrap_content"
-            android:text="自定义表盘"/>
+            android:text="@string/string_cus_dial"/>
 
 
 

@@ -2,6 +2,7 @@ package com.isport.brandapp.home.presenter;
 
 import android.text.TextUtils;
 
+import com.isport.blelibrary.db.action.W81Device.W81DeviceDataAction;
 import com.isport.blelibrary.db.action.s002.S002_DetailDataModelAction;
 import com.isport.blelibrary.utils.Constants;
 import com.isport.blelibrary.utils.Logger;
@@ -337,6 +338,11 @@ public class W81DataPresenter {
                     }
                     //String deviceId, String userId, String wristbandSportDetailId, String dateStr, long timestamp, int step, int dis, int cal
                     iw81DeviceDataModel.saveStepData(bean.getDeviceId(), bean.getUserId(), bean.getWristbandSportDetailId(), bean.getDateStr(), System.currentTimeMillis(), bean.getTotalSteps(), (int) Float.parseFloat(bean.getTotalDistance()), (int) Float.parseFloat(bean.getTotalCalories()), true);
+
+
+                    new W81DeviceDataAction().saveDeviceStepArrayData(bean.getDeviceId(), bean.getUserId(),bean.getWristbandSportDetailId(), bean.getDateStr(),bean.getStepDetailArray());
+
+
                 }
                 if (!isMonth) {
                     Logger.myLog("MessageEvent.update_step-------");
@@ -345,7 +351,7 @@ public class W81DataPresenter {
             }
 
         } catch (Exception e) {
-
+            e.printStackTrace();
             Logger.myLog(e.toString());
         }
     }
@@ -509,7 +515,6 @@ public class W81DataPresenter {
 
             @Override
             public void onNext(List<OnceHrInfo> infos) {
-
                 if (infos != null && infos.size() > 0) {
                     for (int i = 0; i < infos.size(); i++) {
                         saveOnceHr(infos.get(i));

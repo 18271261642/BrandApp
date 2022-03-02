@@ -5,10 +5,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
-import com.google.gson.Gson;
 import com.gyf.immersionbar.ImmersionBar;
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
@@ -19,6 +22,8 @@ import com.isport.blelibrary.result.IResult;
 import com.isport.blelibrary.utils.Constants;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.SyncCacheUtils;
+import com.isport.blelibrary.utils.TimeUtils;
+import com.isport.brandapp.App;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 import com.isport.brandapp.banner.recycleView.RefrushRecycleView;
@@ -27,7 +32,6 @@ import com.isport.brandapp.banner.recycleView.holder.CustomHolder;
 import com.isport.brandapp.banner.recycleView.inter.DefaultAdapterViewLisenter;
 import com.isport.brandapp.bean.DeviceBean;
 import com.isport.brandapp.device.bracelet.ReportActivity;
-import com.isport.brandapp.device.watch.ActivityWatchSleep;
 import com.isport.brandapp.home.bean.db.WatchSportMainData;
 import com.isport.brandapp.home.bean.http.WatchSleepDayData;
 import com.isport.brandapp.home.customview.MainHeadLayout;
@@ -36,10 +40,13 @@ import com.isport.brandapp.home.view.DataHeaderHolder;
 import com.isport.brandapp.home.view.DataHeartRateHolder;
 import com.isport.brandapp.home.view.DataScaleHolder;
 import com.isport.brandapp.home.view.DataSleepHolder;
+import com.isport.brandapp.util.ActivitySwitcher;
 import com.isport.brandapp.util.AppSP;
+import com.isport.brandapp.util.ClickUtils;
 import com.isport.brandapp.wu.activity.BPResultActivity;
 import com.isport.brandapp.wu.activity.OnceHrDataResultActivity;
 import com.isport.brandapp.wu.activity.OxyResultActivity;
+import com.isport.brandapp.wu.activity.PractiseRecordActivity;
 import com.isport.brandapp.wu.activity.TempResultActivity;
 import com.isport.brandapp.wu.bean.BPInfo;
 import com.isport.brandapp.wu.bean.OnceHrInfo;
@@ -49,6 +56,7 @@ import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -106,6 +114,23 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
     DataHeartRateHolder dataTempHolder;//单次体温
 
 
+    private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
+
+
+
+    private final Handler handler = new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            if(msg.what == 0x00){
+                handler.removeMessages(0x00);
+                Intent intent = new Intent();
+                intent.setAction(Watch7018Manager.SYNC_DATA_COMPLETE);
+                context.sendBroadcast(intent);
+            }
+        }
+    };
+
 
     @Override
     protected int getLayoutId() {
@@ -120,6 +145,10 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
         ISportAgent.getInstance().registerListener(bleReciveListener);
         IntentFilter intentFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         intentFilter.addAction(Watch7018Manager.SYNC_DATA_COMPLETE);
+        intentFilter.addAction(Watch7018Manager.F18_EXERCISE_SYNC_COMPLETE);
+        intentFilter.addAction(Watch7018Manager.F18_CONNECT_STATUS);
+        intentFilter.addAction(Watch7018Manager.F18_DIS_CONNECTED_STATUS);
+        intentFilter.addAction(Watch7018Manager.F18_CONNECT_ING);
         Objects.requireNonNull(getActivity()).registerReceiver(broadcastReceiver,intentFilter);
 
         initHomeMenu();
@@ -143,10 +172,11 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
                   home_refresh.finishRefresh();
                   return;
               }
-
+              handler.sendEmptyMessageDelayed(0x00,30 * 1000);
                 SyncCacheUtils.saveStartSync(BaseApp.getApp());
                 Watch7018Manager.getWatch7018Manager().syncDeviceData();
                 startSyncDevice();
+
             }
         });
 
@@ -197,22 +227,35 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
 
     //展示头部的状态
     private void showMainHeadLayoutStatus(){
-
-        //判断是否是已连接
-        if(AppConfiguration.isConnected){
-            mainHeadLayout.showProgressBar(false);
-            mainHeadLayout.showOptionButton(false, UIUtils.getString(R.string.connected));
-            return;
-        }
-
+        mCurrentDevice = ISportAgent.getInstance().getCurrnetDevice();
         //判断蓝牙是否开启
         boolean isOpenBle =  AppUtil.isOpenBle();
         mainHeadLayout.setIconDeviceAlp(0.5f);
         if (!isOpenBle) {
             mainHeadLayout.showOptionButton(true, UIUtils.getString(R.string.app_enable), MainHeadLayout.TAG_OPENBLE, UIUtils.getString(R.string.fragment_main_no_connect_open_ble));
+            return;
         } else {
             mainHeadLayout.showOptionButton(true, UIUtils.getString(R.string.fragment_main_click_connect), MainHeadLayout.TAG_CONNECT, UIUtils.getString(R.string.disConnect));
         }
+
+        //判断是否是已连接
+        if(AppConfiguration.isConnected && Watch7018Manager.getWatch7018Manager().isConnected()){
+            mainHeadLayout.showProgressBar(false);
+            mainHeadLayout.showOptionButton(false, UIUtils.getString(R.string.connected));
+            mainHeadLayout.setIconDeviceAlp(5f);
+        }else{
+            mainHeadLayout.setIconDeviceAlp(0.5f);
+            if(Watch7018Manager.getWatch7018Manager().getConnStatus() == 0x02){  //正在连接
+                mainHeadLayout.showProgressBar(true);
+                mainHeadLayout.showOptionButton(false, UIUtils.getString(R.string.app_isconnecting));
+                return;
+            }
+
+
+            mainHeadLayout.showProgressBar(false);
+            mainHeadLayout.showOptionButton(true, UIUtils.getString(R.string.fragment_main_click_connect), MainHeadLayout.TAG_CONNECT, UIUtils.getString(R.string.disConnect));
+        }
+
     }
 
 
@@ -237,11 +280,30 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
     private final MainHeadLayout.ViewMainHeadClickLister viewMainHeadClickLister = new MainHeadLayout.ViewMainHeadClickLister() {
         @Override
         public void onViewOptionClikelister(String type) {
+            if (type.equals(MainHeadLayout.TAG_ADD)) {
+                //跳转到添加设备
+                ActivitySwitcher.goBindAct(context);
+                return;
+            }
+
+            if (type.equals(MainHeadLayout.TAG_CONNECT)){
+                mainHeadLayout.showProgressBar(true);
+                mainHeadLayout.showOptionButton(false, UIUtils.getString(R.string.app_isconnecting));
+                autoConnDevice();
+                return;
+            }
+            if (type.equals(MainHeadLayout.TAG_OPENBLE)){
+                //弹出蓝牙对话框
+                openBlueDialog();
+
+            }
 
         }
 
         @Override
         public void onMainBack() {
+            if(getActivity() == null)
+                return;
             getActivity().finish();
         }
     };
@@ -250,31 +312,83 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
     @Override
     public void onResume() {
         super.onResume();
-
+        autoConnDevice();
         getHomeData();
         showMainHeadLayoutStatus();
     }
 
 
 
+    private void autoConnDevice(){
+        try {
+            //未连接
+            if(!AppConfiguration.isConnected){
+                String f18SaveMac = AppSP.getString(getActivity(),AppSP.F18_SAVE_MAC,"");
+                if(!TextUtils.isEmpty(f18SaveMac)){
+                    F18ConnectStatusService fs = App.getInstance().getF18ConnStatusService();
+                    if(fs != null)
+                        fs.autoScann(f18SaveMac);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+
     private void getHomeData(){
+
+        Log.e(TAG,"------deviceId="+AppConfiguration.braceletID+" "+AppConfiguration.deviceMainBeanList.get(JkConfiguration.DeviceType.Watch_F18));
+        mFragPresenter.getDeviceStepLastTwoData(IDeviceType.TYPE_WATCH_7018);
         mFragPresenter.getDeviceBloodPressure();
-        mFragPresenter.getDevcieOxygenData();
         mFragPresenter.getDevcieOnceHrData();
+        //mFragPresenter.getDeviceLastNetHeart();
+        mFragPresenter.getDevcieOxygenData();
+
         mFragPresenter.getTempData();
         mFragPresenter.getWatchSleepLastData();
+        mFragPresenter.getExerciseTodaySum(IDeviceType.TYPE_WATCH_7018);
+
+        BaseDevice baseDevice = ISportAgent.getInstance().getCurrnetDevice();
+
+        String deviceId = AppConfiguration.braceletID;
+        String userId = TokenUtil.getInstance().getPeopleIdInt(getActivity());
+        if(deviceId == null)
+            return;
+
+        mFragPresenter.getBloodPressure();
+        mFragPresenter.getNumOxyGen();
+        mFragPresenter.getNetTempData();
+        mFragPresenter.getNumNetOnceHr();
+
+        mFragPresenter.getAllDeviceDetailData();
+
+        mFragPresenter.uploadOxyData(deviceId,userId);
+        mFragPresenter.uploadF18BloodData(deviceId,userId);
+        mFragPresenter.upgradeOnceHrData(deviceId,userId);
+        mFragPresenter.updateTempData(deviceId,userId);
     }
 
     @Override
     protected void initData() {
         String deviceId = AppConfiguration.braceletID;
         String userId = TokenUtil.getInstance().getPeopleIdInt(getActivity());
-
-        mCurrentDevice = ISportAgent.getInstance().getCurrnetDevice();
-
-        mFragPresenter.uploadOxyData(deviceId,userId);
-        mFragPresenter.uploadF18BloodData(deviceId,userId);
-
+        if(deviceId == null)
+            return;
+//        mCurrentDevice = ISportAgent.getInstance().getCurrnetDevice();
+//        //从网络获取血压
+//        mFragPresenter.getBloodPressure();
+//        mFragPresenter.getNumOxyGen();
+//        mFragPresenter.getNetTempData();
+//        mFragPresenter.getNumNetOnceHr();
+//
+//        mFragPresenter.getAllDeviceDetailData();
+//
+//        mFragPresenter.uploadOxyData(deviceId,userId);
+//        mFragPresenter.uploadF18BloodData(deviceId,userId);
+//        mFragPresenter.upgradeOnceHrData(deviceId,userId);
+//        mFragPresenter.updateTempData(deviceId,userId);
 
     }
 
@@ -320,7 +434,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
         public CustomHolder getHeader(Context context, List lists, int itemID) {
             dataHeaderHolder = new DataHeaderHolder(context, lists, R.layout.app_fragment_data_head);
             dataHeaderHolder.setOnCourseOnclickLister(F18HomeFragment.this);
-            mFragPresenter.getDeviceStepLastTwoData(7018);
+            //mFragPresenter.getDeviceStepLastTwoData(IDeviceType.TYPE_WATCH_7018);
             return dataHeaderHolder;
         }
 
@@ -330,7 +444,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
             dataOxygenDataHolder = new DataHeartRateHolder(context, lists, R.layout
                     .app_fragment_data_device_item, JkConfiguration.BODY_OXYGEN);
             dataOxygenDataHolder.setHeartRateItemClickListener(F18HomeFragment.this, F18HomeFragment.this);
-            mFragPresenter.getDevcieOxygenData();
+          //  mFragPresenter.getDevcieOxygenData();
             return dataOxygenDataHolder;
         }
 
@@ -340,7 +454,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
             dataTempHolder = new DataHeartRateHolder(context, lists, R.layout
                     .app_fragment_data_device_item, JkConfiguration.BODY_TEMP);
             dataTempHolder.setHeartRateItemClickListener(F18HomeFragment.this, F18HomeFragment.this);
-            mFragPresenter.getTempData();
+          //  mFragPresenter.getTempData();
             return dataTempHolder;
         }
 
@@ -350,7 +464,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
             dataOnceHrHolder = new DataHeartRateHolder(context, lists, R.layout
                     .app_fragment_data_device_item, JkConfiguration.BODY_ONCE_HR);
             dataOnceHrHolder.setHeartRateItemClickListener(F18HomeFragment.this, F18HomeFragment.this);
-            mFragPresenter.getDevcieOnceHrData();
+          //  mFragPresenter.getDevcieOnceHrData();
             return dataOnceHrHolder;
         }
 
@@ -361,14 +475,13 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
             dataBloodPresureDataHolder = new DataHeartRateHolder(context, lists, R.layout
                     .app_fragment_data_device_item, JkConfiguration.BODY_BLOODPRESSURE);
             dataBloodPresureDataHolder.setHeartRateItemClickListener(F18HomeFragment.this, F18HomeFragment.this);
-            mFragPresenter.getDeviceBloodPressure();
+           // mFragPresenter.getDeviceBloodPressure();
             return dataBloodPresureDataHolder;
         }
 
         //锻炼
         @Override
         public CustomHolder getExecericeItem(Context context, List lists, int itemID) {
-            Logger.myLog(TAG,"-----getExecericeItem="+new Gson().toJson(lists)+" "+itemID);
             dataExerciseDataHolder = new DataHeartRateHolder(context, lists, R.layout
                     .app_fragment_data_device_item, JkConfiguration.BODY_EXCERICE);
             dataExerciseDataHolder.setHeartRateItemClickListener(F18HomeFragment.this, F18HomeFragment.this);
@@ -382,7 +495,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
             dataSleepHolder = new DataSleepHolder(context, lists, R.layout
                     .app_fragment_data_device_item);
             dataSleepHolder.setSleepItemClickListener(F18HomeFragment.this, F18HomeFragment.this);
-            mFragPresenter.getWatchSleepLastData();
+            //mFragPresenter.getWatchSleepLastData();
             return dataSleepHolder;
         }
     };
@@ -405,7 +518,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
     //进度条点击监听回调
     @Override
     public void onHeadOnclick() {
-
+        onHeartRateItemClick(JkConfiguration.BODY_HEADER);
     }
 
     @Override
@@ -423,7 +536,8 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
     @Override
     public void onHeartRateItemClick(int viewType) {
         AppConfiguration.isConnected = true;
-
+        if(ClickUtils.isFastDoubleClick())
+            return;
         switch (viewType){
             case JkConfiguration.BODY_TEMP: {   //体温
                 startActivity(new Intent(getActivity(), TempResultActivity.class));
@@ -446,12 +560,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
             break;
             //锻炼
             case JkConfiguration.BODY_EXCERICE: {
-//
-//                if (currentType == JkConfiguration.DeviceType.Brand_W520) {
-//                    startActivity(new Intent(getActivity(), PractiseW520RecordActivity.class));
-//                } else {
-//                    startActivity(new Intent(getActivity(), PractiseRecordActivity.class));
-//                }
+                startActivity(new Intent(getActivity(), PractiseRecordActivity.class));
 
             }
             break;
@@ -495,7 +604,9 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
     //睡眠点击回调
     @Override
     public void onSleepItemClick() {
-        Intent intent = new Intent(context, ActivityWatchSleep.class);
+        if(ClickUtils.isFastDoubleClick())
+            return;
+        Intent intent = new Intent(context, F18SleepActivity.class);
         intent.putExtra(JkConfiguration.CURRENTDEVICETPE, JkConfiguration.DeviceType.Watch_F18);
         intent.putExtra(JkConfiguration.DEVICE, AppConfiguration.deviceBeanList.get(IDeviceType.TYPE_WATCH_7018));
         startActivity(intent);
@@ -546,8 +657,28 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
                 showMainHeadLayoutStatus();
             }
 
+            if(action.equals(Watch7018Manager.F18_CONNECT_STATUS)){
+                showMainHeadLayoutStatus();
+            }
+            if(action.equals(Watch7018Manager.F18_DIS_CONNECTED_STATUS)){
+                showMainHeadLayoutStatus();
+            }
+
             if(action.equals(Watch7018Manager.SYNC_DATA_COMPLETE)){ //同步完成
+                handler.removeMessages(0x00);
                 endSyncDevice();
+                mFragPresenter.getDeviceStepLastTwoData(IDeviceType.TYPE_WATCH_7018);
+
+                mFragPresenter.dealWithYesDayStep(TokenUtil.getInstance().getPeopleIdStr(getContext()),AppConfiguration.braceletID);
+
+                if (!Constants.isSyncData) {
+                    mFragPresenter.getNoUpgradeW81DevcieDetailData(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), AppConfiguration.braceletID, "0", false);
+                }
+            }
+
+            if(action.equals(Watch7018Manager.F18_EXERCISE_SYNC_COMPLETE)){
+                //上传锻炼数据
+                mFragPresenter.upgradeExeciseData(IDeviceType.TYPE_WATCH_7018,AppConfiguration.braceletID,TokenUtil.getInstance().getPeopleIdStr(getActivity()));
             }
         }
     };
@@ -567,46 +698,73 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
     public void successGetMainLastStepDataForDB(WatchSportMainData watchSportMainData) {
 
         Log.e(TAG,"-------详细计步数据="+watchSportMainData.toString()+(dataHeaderHolder == null));
-        if(dataHeaderHolder != null){
-            dataHeaderHolder.updateUI(watchSportMainData);
-        }
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(dataHeaderHolder != null){
+                    String kcalStr = watchSportMainData.getCal();
+                    if(kcalStr != null){
+                        int integerK = Integer.parseInt(kcalStr);
+                        watchSportMainData.setCal(kcalStr);
+                    }
+                    dataHeaderHolder.updateUI(watchSportMainData);
+                }
+            }
+        }, 500);
 
     }
 
     @Override
     public void successGetMainLastOxgenData(OxyInfo info) {
-        if(dataOxygenDataHolder != null){
-            String strDate = info.getStrDate();
-            String value = info.getBoValue() + "%";
-            String unit = "95%～98%";
-            dataOxygenDataHolder.updateUI(strDate, value, unit);
-        }
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(dataOxygenDataHolder != null){
+                    String strDate = info.getStrDate();
+                    String value = info.getBoValue() + "%";
+                    String unit = "95%～98%";
+                    dataOxygenDataHolder.updateUI(strDate, value, unit);
+                }
+            }
+        }, 500);
     }
 
     //单次心率返回
     @Override
     public void successGetMainLastOnceHrData(OnceHrInfo info) {
-        if(dataOnceHrHolder != null){
-            String value = String.valueOf(info.getHeartValue());
-            String unit = UIUtils.getString(R.string.BPM);
-            dataOnceHrHolder.updateUI(info.getStrDate(),value,unit);
-        }
+        Log.e(TAG,"-------心率item="+info.toString());
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
 
+                if(dataOnceHrHolder != null){
+                    String value = String.valueOf(info.getHeartValue());
+                    String unit = UIUtils.getString(R.string.BPM);
+                    dataOnceHrHolder.updateUI(info.getStrDate(),value,unit);
+                }
+            }
+        }, 500);
     }
 
     //单次血压
     @Override
     public void successGetMainLastBloodPresuure(BPInfo info) {
-        if(dataBloodPresureDataHolder != null){
-            String strDate = info.getStrDate();
-            String value = "";
-            if (info.getSpValue() == 0 || info.getDpValue() == 0) {
-            } else {
-                value = info.getSpValue() + "/" + info.getDpValue();
+
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(dataBloodPresureDataHolder != null){
+                    String strDate = info.getStrDate();
+                    String value = "";
+                    if (info.getSpValue() == 0 || info.getDpValue() == 0) {
+                    } else {
+                        value = info.getSpValue() + "/" + info.getDpValue();
+                    }
+                    String unit = UIUtils.getString(R.string.mmhg);
+                    dataBloodPresureDataHolder.updateUI(strDate, value, unit);
+                }
             }
-            String unit = UIUtils.getString(R.string.mmhg);
-            dataBloodPresureDataHolder.updateUI(strDate, value, unit);
-        }
+        }, 500);
 
     }
 
@@ -629,9 +787,25 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
     @Override
     public void successGetMainLastSleepValue(WatchSleepDayData watchSleepDayData) {
         if(dataSleepHolder != null ){
-            dataSleepHolder.updateUI(watchSleepDayData.getDateStr(), watchSleepDayData.getTotalSleepTime());
+            dataSleepHolder.updateUI(watchSleepDayData.getTotalSleepTime() == 0 ? null :  watchSleepDayData.getDateStr(), watchSleepDayData.getTotalSleepTime());
         }
 
+    }
+
+    //锻炼数据
+    @Override
+    public void successGetMainTotalAllTime(Integer time) {
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (dataExerciseDataHolder != null) {
+                    String strDate = TimeUtils.getTimeByyyyyMMdd(System.currentTimeMillis());
+                    String value = time + "";
+                    String unit = UIUtils.getString(R.string.minute);
+                    dataExerciseDataHolder.updateUI(strDate, value, unit);
+                }
+            }
+        }, 500);
     }
 
 

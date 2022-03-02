@@ -1,8 +1,6 @@
 package com.isport.brandapp.wu.adapter;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +14,8 @@ import com.isport.brandapp.wu.bean.OnceHrInfo;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import brandapp.isport.com.basicres.commonutil.UIUtils;
 
 public class OnceHrAdapter extends RecyclerView.Adapter<OnceHrAdapter.MyViewHolder> {

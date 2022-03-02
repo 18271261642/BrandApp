@@ -4,9 +4,11 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.isport.brandapp.R;
 import com.isport.brandapp.device.f18.OnF18ItemClickListener;
 
@@ -14,6 +16,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import brandapp.isport.com.basicres.commonview.RoundImageView;
 
 /**
  * Created by Admin
@@ -49,8 +52,15 @@ public class DialCenterAdapter extends RecyclerView.Adapter<DialCenterAdapter.F1
     @Override
     public void onBindViewHolder(@NonNull F18DialViewHolder f18DialViewHolder, int i) {
         String url = list.get(i).getPreviewImgUrl();
+        if(list.get(i).getStatus()==-1){    //drawable下的图片，添加图片按钮
+            f18DialViewHolder.imgView.setImageResource(Integer.parseInt(url));
+        }else {
+            RequestOptions requestOptions = new RequestOptions().transforms(new CenterCrop(), new RoundedCorners(110));
+            Glide.with(mContext).load(url).apply(requestOptions).into(f18DialViewHolder.imgView);
+          //  LoadImageUtil.getInstance().loadCirc(mContext, url, f18DialViewHolder.imgView);
+         //   Glide.with(mContext).load(url).into(f18DialViewHolder.imgView);
+        }
 
-        Glide.with(mContext).load(url).into(f18DialViewHolder.imgView);
 
         f18DialViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,7 +79,7 @@ public class DialCenterAdapter extends RecyclerView.Adapter<DialCenterAdapter.F1
 
     class F18DialViewHolder extends RecyclerView.ViewHolder{
 
-        private ImageView imgView;
+        private RoundImageView imgView;
 
         public F18DialViewHolder(@NonNull View itemView) {
             super(itemView);

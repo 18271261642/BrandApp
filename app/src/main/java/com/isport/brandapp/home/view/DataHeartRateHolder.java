@@ -134,7 +134,7 @@ public class DataHeartRateHolder extends CustomHolder<String> {
                 break;
             case JkConfiguration.BODY_EXCERICE:
                 tvOption.setVisibility(View.GONE);
-                tv_current_type_name.setText(UIUtils.getString(R.string.practise_today));
+                tv_current_type_name.setText(context.getString(R.string.string_f18_device_per));
                 updateUI(TimeUtils.getTimeByyyyyMMdd(System.currentTimeMillis()), "0", UIUtils.getString(R.string.unit_minute));
                 iv_current_type.setImageResource(R.drawable.icon_main_execise);
                 break;

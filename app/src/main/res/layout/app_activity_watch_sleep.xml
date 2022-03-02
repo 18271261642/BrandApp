@@ -113,7 +113,6 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dp9"
                             android:layout_marginBottom="@dimen/dp26"
-                            android:text="浅睡5:30～6:45"
                             android:textColor="#6E6E77"
                             android:textSize="16sp"/>
 
@@ -282,17 +281,35 @@
                     android:src="@drawable/icon_arrow_left" />
             </RelativeLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/shape_text_light_green_bg"
-                android:paddingLeft="@dimen/dp15"
-                android:paddingTop="@dimen/dp10"
-                android:paddingRight="@dimen/dp15"
-                android:paddingBottom="@dimen/dp10"
-                android:text="@string/activity_sleep_history_exp"
-                android:textColor="@color/common_white"
-                android:textSize="@dimen/sp14" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:gravity="left"
+                    android:text="@string/activity_sleep_history_exp"
+                    android:textColor="@color/common_white"
+                    android:textSize="@dimen/sp14" />
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:padding="5dp"
+                    android:gravity="left"
+                    android:text="@string/string_no_duty"
+                    android:textColor="@color/common_white"
+                    android:textSize="@dimen/sp14" />
+
+            </LinearLayout>
+
+
 
 
             <RelativeLayout

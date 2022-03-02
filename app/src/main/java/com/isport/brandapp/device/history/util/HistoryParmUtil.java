@@ -9,7 +9,6 @@ import com.isport.brandapp.bind.bean.BindInsertOrUpdateBean;
 import com.isport.brandapp.parm.db.DeviceDbParms;
 import com.isport.brandapp.parm.db.DeviceHistoryParms;
 import com.isport.brandapp.parm.db.DeviceTypeParms;
-import brandapp.isport.com.basicres.entry.bean.BaseParms;
 import com.isport.brandapp.parm.http.HistoryParm;
 import com.isport.brandapp.parm.http.ScaleParms;
 import com.isport.brandapp.parm.http.SleepHistoryParms;
@@ -18,12 +17,13 @@ import com.isport.brandapp.util.InitCommonParms;
 import com.isport.brandapp.util.RequestCode;
 
 import brandapp.isport.com.basicres.BaseApp;
-import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 import brandapp.isport.com.basicres.commonbean.BaseDbPar;
 import brandapp.isport.com.basicres.commonbean.BaseUrl;
 import brandapp.isport.com.basicres.commonnet.net.PostBody;
 import brandapp.isport.com.basicres.commonutil.NetUtils;
 import brandapp.isport.com.basicres.commonutil.TokenUtil;
+import brandapp.isport.com.basicres.entry.bean.BaseParms;
+import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 
 public class HistoryParmUtil {
 
@@ -294,7 +294,7 @@ public class HistoryParmUtil {
         bindInsertOrUpdateBean.setCreateTime(System.currentTimeMillis());
         String deviceId = null;
 
-        Logger.myLog("deviceBean.deviceType:" + deviceBean.deviceType + "deviceBean.deviceID:" + deviceBean.deviceID + "deviceBean.mac," + deviceBean.mac);
+        //Logger.myLog("deviceBean.deviceType:" + deviceBean.deviceType + "deviceBean.deviceID:" + deviceBean.deviceID + "deviceBean.mac," + deviceBean.mac);
         deviceId = setDeviceId(deviceBean.deviceType, deviceBean.deviceID, deviceBean.mac);
 
         /*switch (deviceBean.deviceType) {

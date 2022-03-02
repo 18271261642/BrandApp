@@ -1,5 +1,7 @@
 package com.isport.brandapp.home.presenter;
 
+import android.util.Log;
+
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.db.action.DeviceTypeTableAction;
 import com.isport.blelibrary.db.action.scale.Scale_FourElectrode_DataModelAction;
@@ -112,6 +114,8 @@ public class DeviceListPresenter extends BasePresenter<DeviceListView> {
      * @param show
      */
     public void getDeviceList(boolean isFirstDisplayDB, boolean show, boolean setWatchDefault, boolean isConnect) {
+
+
 
         MainResposition<BindDeviceList, BaseParms, BaseUrl, ProgressShowParms> mainResposition = new MainResposition<>();
         InitCommonParms<BaseParms, BaseUrl, ProgressShowParms> commonParms = new InitCommonParms<>();
@@ -548,6 +552,8 @@ public class DeviceListPresenter extends BasePresenter<DeviceListView> {
 
 
     public void connectDevice(String currentName, String watchMac, int deviceType, boolean show, boolean isConnectByUser) {
+        Log.e(TAG,"--------DeviceMan连接="+currentName +" "+watchMac + " "+deviceType + " "+show +" "+isConnectByUser);
+
         BaseDevice device = null;
         switch (deviceType) {
             case JkConfiguration.DeviceType.Watch_F18:

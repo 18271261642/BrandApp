@@ -26,7 +26,7 @@ public class OnceHrHistoryPresenter extends BasePresenter<OnceHrHistoryView> imp
     @Override
     public void getOnceHrNumData() {
 
-        OnceHrRepository.requstOnceHrData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), 7).as(mActView.get().bindAutoDispose()).subscribe(new BaseObserver<List<OnceHrInfo>>(BaseApp.getApp(), false) {
+        OnceHrRepository.requstOnceHrData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), 100).as(mActView.get().bindAutoDispose()).subscribe(new BaseObserver<List<OnceHrInfo>>(BaseApp.getApp(), false) {
 
             @Override
             public void onNext(List<OnceHrInfo> infos) {

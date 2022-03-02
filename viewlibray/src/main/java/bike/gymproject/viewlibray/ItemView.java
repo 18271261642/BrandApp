@@ -277,6 +277,14 @@ public class ItemView extends LinearLayout {
     }
 
 
+    public void setContentEm(){
+        if(contentTextView == null)
+            return;
+        contentTextView.setMaxLines(15);
+        contentTextView.setEllipsize(TextUtils.TruncateAt.MIDDLE);
+    }
+
+
     /**
      * 根据资源ID获取Drawable/设置边框
      *

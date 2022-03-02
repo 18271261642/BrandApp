@@ -4,6 +4,59 @@
     <string name="app_name">奔啦啦</string>//iSport健康管家
 
 
+    <string name="string_f18_device_per">设备锻炼</string>
+    <string name="string_f18_walking">健走</string>
+    <string name="string_f18_Swim">游泳</string>
+    <string name="string_f18_tennis">网球</string>
+    <string name="string_f18_baseball">棒球</string>
+    <string name="string_f18_rugby">橄榄球</string>
+    <string name="string_f18_hula_hoop">呼啦圈</string>
+    <string name="string_f18_golf">高尔夫</string>
+    <string name="string_f18_jump">跳远</string>
+    <string name="string_f18_sit_up">仰卧起坐</string>
+    <string name="string_f18_volley_ball">排球</string>
+
+
+
+    
+    <string name="string_dial_center">表盘中心</string>
+    <string name="string_set_dial">设为表盘</string>
+    <string name="string_cus_dial">自定义表盘</string>
+    <string name="string_cus_txt_style">自定义字体颜色</string>
+    <string name="string_style_1">样式1</string>
+    <string name="string_style_2">样式2</string>
+    <string name="string_style_3">样式3</string>
+    <string name="string_style_4">样式4</string>
+    <string name="string_choose_pick">选择图片</string>
+    <string name="string_alert_delete">是否删除?</string>
+    <string name="string_upgrad_so_on">升级中..</string>
+    <string name="string_curr_no_file">当前文件不存在!</string>
+    <string name="string_no_read_permission">没有授权读取存储权限!</string>
+    <string name="string_open_number">已开启%1$s个</string>
+    <string name="string_drink_alert">喝水提醒</string>
+    <string name="string_dnt_midday">午休免打扰</string>
+    <string name="string_period_open">时间段开启</string>
+    <string name="string_open_notication">打开通知</string>
+    <string name="string_set_permission">权限设置</string>
+    <string name="string_apps_notice">消息提醒</string>
+    <string name="string_phone_alert">电话</string>
+    <string name="string_sms_alert">短信</string>
+    <string name="string_mail">邮件</string>
+    <string name="string_calendar">日历</string>
+    <string name="string_other_txt">其它</string>
+    <string name="string_often_contact">常用联系人</string>
+    <string name="string_contact_desc">可从手机通讯录中添加最多10个常用联系人同步到设备，以便通过设备快速发起通话</string>
+    <string name="string_strength_txt">加强测量</string>
+    <string name="string_timing_detect">定时检测</string>
+    <string name="string_timing_open">定时检测开启</string>
+    <string name="string_timing_desc">手表将在持续的时间间隔内检测健康数据</string>
+    <string name="string_wrist_desc">在设定时间内，抬起手腕将手表屏幕朝向自己即可点亮屏幕</string>
+    <string name="string_audio_guid">音频模式指引</string>
+
+
+    
+    
+    <string name="string_no_duty">*所提供的数据及建议仅供参考，不可作为临床诊断和治疗依据</string>
     <string name="string_permiss_title">奔啦啦权限使用说明</string>
     <string name="string_permiss_desc">为保证APP的正常使用,请开启以下权限</string>
     <string name="string_permiss_ble">使用蓝牙功能</string>
@@ -171,7 +224,7 @@
     <string name="sat">周六</string>
     <string name="once">只提醒一次</string>
     <string name="every_day">每天</string>
-    <string name="work_day">周一至周五</string>
+    <string name="work_day">工作日</string>
     <string name="wenkend_day">周末</string>
     <string name="frequently_tip">请勿频繁操作</string>
 
@@ -367,7 +420,7 @@
     <string name="mythrid">第三方接入</string>//第三方接入
     //Google Fit
     <string name="add_device">添加</string>//添加
-    <string name="disConnect"> 未连接</string>//未连接
+    <string name="disConnect">未连接</string>//未连接
     <string name="connected">已连接</string>//已连接
     <string name="user_watch">手表:%1$s</string>//手表:%1$s
     <string name="user_brand">手环:%1$s</string>//手环:%1$s

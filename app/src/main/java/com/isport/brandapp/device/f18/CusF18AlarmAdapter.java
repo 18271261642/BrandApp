@@ -4,7 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.htsmart.wristband2.bean.WristbandAlarm;
@@ -59,7 +60,7 @@ public class CusF18AlarmAdapter extends RecyclerView.Adapter<CusF18AlarmAdapter.
         WristbandAlarm wristbandAlarm = list.get(i);
         f18ViewHolder.alarmName.setText(DateTimeUtils.getHouAdMinute(wristbandAlarm.getHour(),wristbandAlarm.getMinute()));
         f18ViewHolder.weekTv.setText(repeatToSimpleStr(wristbandAlarm.getRepeat()));
-        f18ViewHolder.switchImg.setImageResource(wristbandAlarm.isEnable() ? R.drawable.icon_open : R.drawable.icon_close);
+        f18ViewHolder.switchImg.setChecked(wristbandAlarm.isEnable());
 
         f18ViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,16 +72,25 @@ public class CusF18AlarmAdapter extends RecyclerView.Adapter<CusF18AlarmAdapter.
             }
         });
 
-        f18ViewHolder.switchImg.setOnClickListener(new View.OnClickListener() {
+        f18ViewHolder.switchImg.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(onF18ItemClickListener != null){
                     int position = f18ViewHolder.getLayoutPosition();
-                    onF18ItemClickListener.onChildClick(position);
+                    onF18ItemClickListener.onChildClick(position,isChecked);
                 }
             }
         });
 
+        f18ViewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                int position = f18ViewHolder.getLayoutPosition();
+                if(onF18ItemClickListener != null)
+                    onF18ItemClickListener.onLongClick(position);
+                return true;
+            }
+        });
 
 
     }
@@ -107,7 +117,7 @@ public class CusF18AlarmAdapter extends RecyclerView.Adapter<CusF18AlarmAdapter.
 
         private TextView alarmName;
         private TextView weekTv;
-        private ImageView switchImg;
+        private CheckBox switchImg;
 
 
         public F18ViewHolder(@NonNull View itemView) {
@@ -132,7 +142,7 @@ public class CusF18AlarmAdapter extends RecyclerView.Adapter<CusF18AlarmAdapter.
         if (sumDays == 7) {
             text = mContext.getString(R.string.every_day);
         } else if (sumDays == 0) {
-            text = "永不";
+            text = mContext.getString(R.string.once);
         } else if (sumDays == 5) {
             boolean sat = !WristbandAlarm.isRepeatEnableIndex(repeat, 5);
             boolean sun = !WristbandAlarm.isRepeatEnableIndex(repeat, 6);

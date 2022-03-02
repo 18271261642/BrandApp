@@ -4,6 +4,7 @@ import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.entry.WristbandData;
 import com.isport.blelibrary.entry.WristbandForecast;
 import com.isport.blelibrary.entry.WristbandWeather;
+import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.utils.BleRequest;
 import com.isport.blelibrary.utils.Constants;
 import com.isport.blelibrary.utils.Logger;
@@ -17,6 +18,7 @@ import brandapp.isport.com.basicres.commonnet.interceptor.BaseObserver;
 import brandapp.isport.com.basicres.commonnet.interceptor.ExceptionHandle;
 import brandapp.isport.com.basicres.mvp.BasePresenter;
 import brandapp.isport.com.basicres.mvp.BaseView;
+import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 
 public class WeatherPresenter extends BasePresenter<BaseView> {
     BaseView baseView;
@@ -99,14 +101,25 @@ public class WeatherPresenter extends BasePresenter<BaseView> {
             public void onNext(WristbandWeather wristbandData) {
                 Constants.wristbandWeather = wristbandData;
                 Logger.myLog("wristbandData:" + wristbandData.toString() +AppConfiguration.isConnected);
+
+                if(deviceType == JkConfiguration.DeviceType.Watch_F18){
+                    setF18Weather(city,wristbandData);
+                    return;
+                }
+
                 if (AppConfiguration.isConnected) {
                     WristbandData wristbandData1 = wristbandData.getCondition();
                     List<WristbandForecast> list = wristbandData.getForecast15Days();
+
                     ISportAgent.getInstance().requestBle(BleRequest.SET_WHEATHER, wristbandData1, list, city);
                 }
             }
         });
     }
 
+
+    private void setF18Weather(String city,WristbandWeather wristbandData){
+        Watch7018Manager.getWatch7018Manager().setWeatherData(city,wristbandData);
+    }
 
 }

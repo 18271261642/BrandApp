@@ -18,7 +18,8 @@
     </queries>
 
 
-
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
+        tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -75,7 +76,6 @@
         tools:ignore="ProtectedPermissions" />
 
 
-
     <application
         android:name=".App"
         android:allowBackup="false"
@@ -88,6 +88,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
+
+
+        <!-- 表示当前项目已经适配了分区存储特性 -->
+        <meta-data
+            android:name="ScopedStorage"
+            android:value="true" />
+
 
         <!--个人测试页面-->
         <activity android:name="test.Test2Activity"/>
@@ -236,7 +243,8 @@
         <activity android:name=".sport.SportSettingActivity" />
         <activity android:name=".sport.SportReportActivity" />
         <activity android:name=".sport.EndSportActivity" />
-        <activity android:name=".upgrade.DFUActivity" />
+        <activity android:name=".upgrade.DFUActivity"
+            android:launchMode="singleTask"/>
         <activity android:name=".upgrade.DfuNotiActvity" />
         <activity android:name=".upgrade.DFUDeviceSelectActivity" />
         <activity android:name=".GoogleMap" />
@@ -318,6 +326,12 @@
         <activity android:name=".device.f18.F18ContactActivity"/>
         <activity android:name=".device.f18.F18DeviceMainActivity"/>
         <activity android:name=".device.f18.dial.F18DialActivity"
+            android:screenOrientation="portrait"/>
+        <!--F18睡眠-->
+        <activity android:name=".device.f18.F18SleepActivity"/>
+        <!--F18固件升级-->
+        <activity android:name=".device.f18.F18DufActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"/>
 
         <!-- 表示当前项目已经适配了分区存储特性 -->

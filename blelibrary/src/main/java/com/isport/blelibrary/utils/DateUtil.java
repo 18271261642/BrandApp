@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 @SuppressLint("SimpleDateFormat")
@@ -28,6 +29,50 @@ public class DateUtil {
 
         return dateFormatyyMM.format(new Date(times));
     }
+
+
+    public static String getFormatTime(long time){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH", Locale.CHINA);
+        return sdf.format(new Date(time));
+    }
+
+    public static String getFormatTime(long time,String format){
+        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.CHINA);
+        return sdf.format(new Date(time));
+    }
+
+    public static String getCurrDay(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd",Locale.CHINA);
+        return sdf.format(new Date());
+    }
+
+    //获取昨天的日期yyyy-MM-dd格式
+    public static String getYestDay(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd",Locale.CHINA);
+        long currDayLong = new Date().getTime();
+        //一天的long
+        long yesLong = currDayLong - 86400000L;
+        return sdf.format(new Date(yesLong));
+    }
+
+
+
+    //yyyy-MM-dd HH:mm格式，获取HH
+    public static String getDateHourStr(String timeStr){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH",Locale.CHINA);
+        try {
+            long timeLong = sdf.parse(timeStr).getTime();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(timeLong);
+
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            return String.format("%02d",hour);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return "0";
+        }
+    }
+
 
     public static String strFormatHHmm(String date) {
 

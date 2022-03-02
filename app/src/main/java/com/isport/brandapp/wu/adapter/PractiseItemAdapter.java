@@ -9,11 +9,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.htsmart.wristband2.bean.data.SportData;
 import com.isport.blelibrary.utils.CommonDateUtil;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.TimeUtils;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
+import com.isport.brandapp.util.DeviceTypeUtil;
 import com.isport.brandapp.wu.Constant;
 import com.isport.brandapp.wu.bean.ExerciseInfo;
 
@@ -32,6 +34,8 @@ public class PractiseItemAdapter extends RecyclerView.Adapter<PractiseItemAdapte
     private Context mContext;
     private boolean isDetail;
 
+    private boolean isF18Device;
+
     public PractiseItemAdapter(Context context, List<ExerciseInfo> data, boolean isDetail) {
         this.mDatas = data;
         mContext = context;
@@ -40,6 +44,7 @@ public class PractiseItemAdapter extends RecyclerView.Adapter<PractiseItemAdapte
             mDatas = new ArrayList<>();
         }
 
+        isF18Device = DeviceTypeUtil.isContainF18();
     }
 
     public PractiseItemAdapter(Context context, List<ExerciseInfo> data) {
@@ -82,46 +87,50 @@ public class PractiseItemAdapter extends RecyclerView.Adapter<PractiseItemAdapte
 
     @Override
     public void onBindViewHolder(PractiseItemAdapter.MyViewHolder holder, int position) {
-//        holder.iv_run.setImageResource();
         ExerciseInfo info = mDatas.get(position);
-        if (info == null) {
-            return;
-        }
-        if (isDetail) {
-            holder.tv_run_time.setText(TimeUtils.getTimeByyyyyMMdd(info.getStartTimestamp()) + " " + TimeUtils.getTimeByHHmmssWithOutSpace(info.getStartTimestamp()) + "~" + (TimeUtils.getTimeByHHmmssWithOutSpace(info.getEndTimestamp())));
-        } else {
-            holder.tv_run_time.setText(TimeUtils.getTimeByHHmmssWithOutSpace(info.getStartTimestamp()) + "~" + (TimeUtils.getTimeByHHmmssWithOutSpace(info.getEndTimestamp())));
-        }
-        holder.tv_sport_time.setText(TimeUtils.getFormatTimeHHMMSS(Long.valueOf(info.getVaildTimeLength())));
-        String aveRate = "0";
-        if (!TextUtils.isEmpty(info.getAveRate().trim())) {
-            aveRate = info.getAveRate().trim();
-        }
-
-        if (StringUtils.isNumeric(aveRate) && Integer.valueOf(aveRate) != 0) {
-            holder.tv_average_heart.setText(mContext.getString(R.string.average_heart_value, aveRate));
-        } else {
-            holder.tv_average_heart.setText("--BPM");
-        }
-
-        holder.tv_consume.setText(mContext.getString(R.string.consume_value, info.getTotalCalories()));
-        holder.tv_step.setText(mContext.getString(R.string.step_value, "" + info.getTotalSteps()));
-        float distance = 0f;
-        String hour_speed = "0";
-        String average_speed = "0";
-        if (!TextUtils.isEmpty(info.getTotalDistance()) && !TextUtils.isEmpty(info.getVaildTimeLength())) {
-            int tempDistance = (Integer.valueOf(info.getTotalDistance()) / 10);
-            distance = (float) (tempDistance) / 100;
-            if (distance > 0) {
-                hour_speed = String.format("%.2f", distance * 60 * 60 / Float.valueOf(info.getVaildTimeLength()));
-                int average_speed_second = (int) (Float.valueOf(info.getVaildTimeLength()) / distance);
-                average_speed = average_speed_second / 60 + "'" + CommonDateUtil.formatTwoStr(average_speed_second % 60) + "''";
+        try {
+            if (info == null) {
+                return;
             }
-        }
-        holder.tv_distance.setText(mContext.getString(R.string.distance_value, String.format("%.2f", distance)));
+            if (isDetail) {
+                holder.tv_run_time.setText(TimeUtils.getTimeByyyyyMMdd(info.getStartTimestamp()) + " " + TimeUtils.getTimeByHHmmssWithOutSpace(info.getStartTimestamp()) + "~" + (TimeUtils.getTimeByHHmmssWithOutSpace(info.getEndTimestamp())));
+            } else {
+                holder.tv_run_time.setText(TimeUtils.getTimeByHHmmssWithOutSpace(info.getStartTimestamp()) + "~" + (TimeUtils.getTimeByHHmmssWithOutSpace(info.getEndTimestamp())));
+            }
+            holder.tv_sport_time.setText(TimeUtils.getFormatTimeHHMMSS(Long.valueOf(info.getVaildTimeLength())));
+            String aveRate = "0";
+            if (!TextUtils.isEmpty(info.getAveRate())) {
+                aveRate = info.getAveRate().trim();
+            }
 
-        holder.tv_hour_speed.setText(mContext.getString(R.string.hour_speed_value, hour_speed));
-        holder.tv_average_speed.setText(average_speed);
+            if (StringUtils.isNumeric(aveRate) && Integer.valueOf(aveRate) != 0) {
+                holder.tv_average_heart.setText(mContext.getString(R.string.average_heart_value, aveRate));
+            } else {
+                holder.tv_average_heart.setText("--BPM");
+            }
+
+            holder.tv_consume.setText(mContext.getString(R.string.consume_value,  info.getTotalCalories()));
+            holder.tv_step.setText(mContext.getString(R.string.step_value, "" + info.getTotalSteps()));
+            float distance = 0f;
+            String hour_speed = "0";
+            String average_speed = "0";
+            if (!TextUtils.isEmpty(info.getTotalDistance()) && !TextUtils.isEmpty(info.getVaildTimeLength())) {
+                float tempDistance = (Float.valueOf(info.getTotalDistance()) / 10);
+                distance = (float) (tempDistance) / 100;
+                if (distance > 0) {
+                    hour_speed = String.format("%.2f", distance * 60 * 60 / Float.valueOf(info.getVaildTimeLength()));
+                    int average_speed_second = (int) (Float.valueOf(info.getVaildTimeLength()) / distance);
+                    average_speed = average_speed_second / 60 + "'" + CommonDateUtil.formatTwoStr(average_speed_second % 60) + "''";
+                }
+            }
+            holder.tv_distance.setText(mContext.getString(R.string.distance_value, String.format("%.2f", distance)));
+
+            holder.tv_hour_speed.setText(mContext.getString(R.string.hour_speed_value, hour_speed));
+            holder.tv_average_speed.setText(average_speed);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,8 +154,115 @@ public class PractiseItemAdapter extends RecyclerView.Adapter<PractiseItemAdapte
 
         int type = Integer.parseInt(info.getExerciseType());
 
+        boolean isF18 = AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_F18);
+        if(isF18){
+            switch (type){
+                case SportData.SPORT_WALK:  //走路
+                    holder.tv_run.setText(mContext.getString(R.string.string_f18_walking));
+                    holder.iv_type.setImageResource(R.drawable.icon_w560_outdoor_walk);
+                    showSet(holder, 0);
+                    break;
+                case SportData.SPORT_OD:    //跑步
+                    holder.tv_run.setText(mContext.getString(R.string.run));
+                    holder.iv_type.setImageResource(R.drawable.icon_w560_outdoor_run);
+                    showSet(holder, 0);
+                    break;
+                case SportData.SPORT_CLIMB: //登山
+                    holder.tv_run.setText(mContext.getString(R.string.climbing));
+                    holder.iv_type.setImageResource(R.drawable.icon_climbing);
+                    showSet(holder, 1);
+                    break;
+                case SportData.SPORT_RIDE:  //骑行
+                    holder.tv_run.setText(mContext.getString(R.string.ride));
+                    holder.iv_type.setImageResource(R.drawable.icon_w560_outdoor_cycle);
+                    showSet(holder, 2);
+                    break;
+                case SportData.SPORT_BB:    //篮球
+                    holder.tv_run.setText(mContext.getString(R.string.basketball));
+                    holder.iv_type.setImageResource(R.drawable.icon_basketball);
+                    showSet(holder, 2);
+                    break;
+                case SportData.SPORT_SWIM:  //游泳
+                    holder.tv_run.setText(mContext.getString(R.string.string_f18_Swim));
+                    holder.iv_type.setImageResource(R.drawable.icon_swim);
+                    showSet(holder, 2);
+                    break;
+                case SportData.SPORT_BADMINTON: //羽毛球
+                    holder.tv_run.setText(mContext.getString(R.string.badminton));
+                    holder.iv_type.setImageResource(R.drawable.icon_badminton);
+                    showSet(holder, 2);
+                    break;
+                case SportData.SPORT_FOOTBALL:  //足球
+                    holder.tv_run.setText(mContext.getString(R.string.football));
+                    holder.iv_type.setImageResource(R.drawable.icon_football);
+                    showSet(holder, 2);
+                    break;
+                case SportData.SPORT_ELLIPTICAL_TRAINER:    //椭圆机
+                    holder.tv_run.setText(mContext.getString(R.string.string_w560_practise_eliptical));
+                    holder.iv_type.setImageResource(R.drawable.icon_w560_elliption);
+                    showSet(holder, 2);
+                    break;
+                case SportData.SPORT_YOGA:  //瑜伽
+                    holder.tv_run.setText(mContext.getString(R.string.string_practise_yoga));
+                    holder.iv_type.setImageResource(R.drawable.icon_w560_yoga);
+                    showSet(holder, 2);
+                    break;
+                case SportData.SPORT_PING_PONG:   //乒乓球
+                    holder.tv_run.setText(mContext.getString(R.string.pingpang));
+                    holder.iv_type.setImageResource(R.drawable.icon_pingpang);
+                    showSet(holder, 2);
+                    break;
+                case SportData.SPORT_ROPE_SKIPPING:     //跳绳
+                    holder.tv_run.setText(mContext.getString(R.string.rope_skip));
+                    holder.iv_type.setImageResource(R.drawable.icon_skip);
+                    showSet(holder, 2);
+                    break;
+                case SportData.SPORT_TENNIS:    //网球
+                    holder.tv_run.setText(mContext.getString(R.string.string_f18_tennis));
+                    holder.iv_type.setImageResource(R.drawable.icon_f18_tennis);
+                    showSet(holder, 2);
+                    break;
+                case SportData.SPORT_BASEBALL:  //棒球
+                    holder.tv_run.setText(mContext.getString(R.string.string_f18_baseball));
+                    holder.iv_type.setImageResource(R.drawable.iocn_f18_baseball);
+                    showSet(holder, 2);
+                    break;
+                case SportData.SPORT_RUGBY:     //橄榄球
+                    holder.tv_run.setText(mContext.getResources().getString(R.string.string_f18_rugby));
+                    holder.iv_type.setImageResource(R.drawable.icon_f18_foot_ball);
+                    showSet(holder, 2);
+                    break;
+                case SportData.SPORT_HULA_HOOP:   //呼啦圈
+                    holder.tv_run.setText(mContext.getResources().getString(R.string.string_f18_hula_hoop));
+                    holder.iv_type.setImageResource(R.drawable.icon_f18_hula_hoop);
+                    showSet(holder, 2);
+                    break;
+                case SportData.SPORT_GOLF: //高尔夫
+                    holder.tv_run.setText(mContext.getResources().getString(R.string.string_f18_golf));
+                    holder.iv_type.setImageResource(R.drawable.icon_f18_golf);
+                    showSet(holder, 2);
+                    break;
+                case SportData.SPORT_LONG_JUMP: //跳远
+                    holder.tv_run.setText(mContext.getResources().getString(R.string.string_f18_jump));
+                    holder.iv_type.setImageResource(R.drawable.icon_f18_jump);
+                    showSet(holder, 2);
+                    break;
+                case SportData.SPORT_SIT_UPS:    //仰卧起坐
+                    holder.tv_run.setText(mContext.getResources().getString(R.string.string_f18_sit_up));
+                    holder.iv_type.setImageResource(R.drawable.icon_f18_sit_up);
+                    showSet(holder, 2);
+                    break;
+                case SportData.SPORT_VOLLEYBALL:    //排球
+                    holder.tv_run.setText(mContext.getResources().getString(R.string.string_f18_volley_ball));
+                    holder.iv_type.setImageResource(R.drawable.icon_f18_volleybar);
+                    showSet(holder, 2);
+                    break;
+            }
+            return;
+        }
+
         boolean isW560 = AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_W560) ;
-        Logger.myLog("ADAPTER","------isW560="+isW560);
+        //Logger.myLog("ADAPTER","------isW560="+isW560);
 
         if(isW560){
 
@@ -344,7 +460,6 @@ public class PractiseItemAdapter extends RecyclerView.Adapter<PractiseItemAdapte
                 holder.ll_bottom.setVisibility(View.GONE);
                 break;
                 case 3:  //保利心率、卡路里、步数
-
 
                 break;
         }

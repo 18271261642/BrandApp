@@ -52,22 +52,6 @@ public class LoadImageUtil {
             RequestOptions options = new RequestOptions();
             options.centerCrop().placeholder(R.drawable.icon_def).error(R.drawable.icon_def).dontAnimate();
             Glide.with(ctx).load(url).apply(options).into(iv);
-           /* Glide.with(ctx).load(url)
-                    .centerCrop()
-                    .placeholder(R.drawable.icon_defs)
-                    .error(R.drawable.icon_defs)
-                    .dontAnimate()
-                    *//*   .skipMemoryCache(false)
-                       .priority(Priority.LOW)
-                       .diskCacheStrategy(DiskCacheStrategy.ALL)*//*
-                    .into(iv);
-               *//* .into(new SimpleTarget<GlideDrawable>() { // 加上这段代码 可以解决
-                    @Override
-                    public void onResourceReady(GlideDrawable resource,
-                                                GlideAnimation<? super GlideDrawable> glideAnimation) {
-                        iv.setImageDrawable(resource); //显示图片
-                    }
-                });*/
         } catch (Exception e) {
             e.printStackTrace();
         }

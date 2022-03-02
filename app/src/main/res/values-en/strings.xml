@@ -3,7 +3,58 @@
     /**app**/
     <string name="app_name">Bonlala</string>//iSport健康管家
 
+    <string name="string_f18_device_per">equipment exercise</string>
+    <string name="string_f18_walking">Walking</string>
+    <string name="string_f18_Swim">Swim</string>
+    <string name="string_f18_tennis">Tennis</string>
+    <string name="string_f18_baseball">Baseball</string>
+    <string name="string_f18_rugby">Football</string>
+    <string name="string_f18_hula_hoop">Hula Hoop</string>
+    <string name="string_f18_golf">Golf</string>
+    <string name="string_f18_jump">Long jump</string>
+    <string name="string_f18_sit_up">Sit-ups</string>
+    <string name="string_f18_volley_ball">Volleyball</string>
 
+    <string name="string_dial_center">dial center</string>
+    <string name="string_set_dial">set as dial</string>
+    <string name="string_cus_dial">custom dial</string>
+    <string name="string_cus_txt_style">custom font color</string>
+    <string name="string_style_1">style 1</string>
+    <string name="string_style_2">style 2</string>
+    <string name="string_style_3">style 3</string>
+    <string name="string_style_4">style 4</string>
+    <string name="string_choose_pick">Select Image</string>
+    <string name="string_alert_delete">delete or not?</string>
+    <string name="string_upgrad_so_on">upgrade..</string>
+    <string name="string_curr_no_file">The current file does not exist!</string>
+    <string name="string_no_read_permission">Not authorized to read storage permission!</string>
+    <string name="string_open_number">opened %1$s</string>
+    <string name="string_drink_alert">Drink water reminder</string>
+    <string name="string_dnt_midday">Do Not Disturb at Lunch Break</string>
+    <string name="string_period_open">time period open</string>
+    <string name="string_open_notication">Turn on notifications</string>
+    <string name="string_set_permission">Permission settings</string>
+    <string name="string_apps_notice">message notification</string>
+    <string name="string_phone_alert">telephone</string>
+    <string name="string_sms_alert">Short message</string>
+    <string name="string_mail">mail</string>
+    <string name="string_calendar">calendar</string>
+    <string name="string_other_txt">other</string>
+    <string name="string_often_contact">Frequent contacts</string>
+    <string name="string_contact_desc">You can add up to 10 frequently used contacts from the phone address book to sync to the device, so that you can quickly initiate calls through the device</string>
+    <string name="string_strength_txt">strengthen measurement</string>
+    <string name="string_timing_detect">Timing detection</string>
+    <string name="string_timing_open">Timed detection on</string>
+    <string name="string_timing_desc">The watch will detect health data at continuous intervals</string>
+    <string name="string_wrist_desc">During the set time, raise your wrist and point the watch screen towards you to light up the screen</string>
+    <string name="string_audio_guid">Audio Mode Guidelines</string>
+
+
+
+
+
+
+    <string name="string_no_duty">*The data and suggestions provided are for reference only and cannot be used as a basis for clinical diagnosis and treatment</string>
     <string name="string_permiss_title">Bonlala permissions instructions</string>
     <string name="string_permiss_desc">To ensure the normal use of the APP, please enable the following permissions</string>
     <string name="string_permiss_ble">Use the Bluetooth function</string>

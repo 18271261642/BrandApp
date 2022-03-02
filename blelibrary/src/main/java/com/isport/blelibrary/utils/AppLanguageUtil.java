@@ -1,5 +1,7 @@
 package com.isport.blelibrary.utils;
 
+import android.content.Context;
+
 import com.crrepa.ble.conn.type.CRPDeviceLanguageType;
 
 import java.util.Locale;
@@ -31,5 +33,14 @@ public class AppLanguageUtil {
             return "zh";
         else
             return "en";
+    }
+
+    public static boolean isZh(Context context) {
+        Locale locale = context.getResources().getConfiguration().locale;
+        String language = locale.getLanguage();
+        if (language.contains("zh"))
+            return true;
+        else
+            return false;
     }
 }

@@ -9,14 +9,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.gyf.immersionbar.ImmersionBar;
 import com.isport.blelibrary.utils.CommonDateUtil;
 import com.isport.blelibrary.utils.StepArithmeticUtil;
 import com.isport.brandapp.App;
-import com.isport.brandapp.home.bean.http.Wristbandstep;
 import com.isport.brandapp.R;
 import com.isport.brandapp.bean.DeviceBean;
 import com.isport.brandapp.device.bracelet.braceletPresenter.BraceletStepPresenter;
@@ -26,6 +22,7 @@ import com.isport.brandapp.device.share.NewShareActivity;
 import com.isport.brandapp.device.share.ShareBean;
 import com.isport.brandapp.device.watch.bean.WatchHistoryNBean;
 import com.isport.brandapp.device.watch.bean.WatchHistoryNList;
+import com.isport.brandapp.home.bean.http.Wristbandstep;
 import com.isport.brandapp.parm.http.WatchHistoryParms;
 import com.isport.brandapp.repository.CustomRepository;
 import com.isport.brandapp.util.DeviceDataUtil;
@@ -42,6 +39,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import bike.gymproject.viewlibray.RopeBarChartView;
 import bike.gymproject.viewlibray.SporttemView;
 import bike.gymproject.viewlibray.chart.BarChartEntity;
@@ -287,7 +286,7 @@ public class MonthReportFragment extends BaseMVPFragment<BraceletStepView, Brace
             avgStep = sumStep.getAvgStep();
             itemStep.setTitleText(sumStep.getAvgStep());
             itemDis.setTitleText(sumStep.getAvgDis());
-            itemCal.setTitleText(sumStep.getAvgCal());
+            itemCal.setTitleText( sumStep.getAvgCal());
 
 
             tvCal.setText(todayCal);

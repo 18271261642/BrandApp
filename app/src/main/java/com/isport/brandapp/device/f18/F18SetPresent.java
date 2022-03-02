@@ -14,17 +14,26 @@ import com.isport.blelibrary.db.action.f18.F18DeviceSetAction;
 import com.isport.blelibrary.db.table.f18.F18CommonDbBean;
 import com.isport.blelibrary.db.table.f18.F18DbType;
 import com.isport.blelibrary.db.table.f18.F18DeviceSetData;
+import com.isport.blelibrary.utils.Constants;
+import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.SyncCacheUtils;
 import com.isport.brandapp.R;
 import com.isport.brandapp.bean.DeviceBean;
 import com.isport.brandapp.bind.bean.BindInsertOrUpdateBean;
+import com.isport.brandapp.device.UpdateSuccessBean;
+import com.isport.brandapp.device.W81Device.IW81DeviceDataModel;
+import com.isport.brandapp.device.W81Device.W81DeviceDataModelImp;
 import com.isport.brandapp.device.dialog.BaseDialog;
 import com.isport.brandapp.device.history.util.HistoryParmUtil;
+import com.isport.brandapp.device.watch.bean.WatchInsertBean;
+import com.isport.brandapp.home.presenter.W81DataPresenter;
 import com.isport.brandapp.parm.db.DeviceTypeParms;
 import com.isport.brandapp.repository.UpdateResposition;
+import com.isport.brandapp.repository.W81DeviceDataRepository;
 import com.isport.brandapp.util.AppSP;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import bike.gymproject.viewlibray.ItemView;
@@ -56,9 +65,14 @@ public class F18SetPresent extends BasePresenter<F18SetView> {
     F18SetView view;
 
     private F18AlarmRepeatView f18AlarmRepeatView;
+    private W81DataPresenter w81DataPresenter;
+
+    private IW81DeviceDataModel iw81DeviceDataModel;
 
     public F18SetPresent(F18SetView f18SetView) {
         this.view = f18SetView;
+        w81DataPresenter = new W81DataPresenter(f18SetView);
+        iw81DeviceDataModel = new W81DeviceDataModelImp();
     }
 
 
@@ -77,8 +91,6 @@ public class F18SetPresent extends BasePresenter<F18SetView> {
                     observableEmitter.onNext(f18DeviceSetData);
                     observableEmitter.onComplete();
                 }
-
-
 
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new BaseObserver<F18DeviceSetData>(BaseApp.getApp(),false) {
@@ -142,6 +154,7 @@ public class F18SetPresent extends BasePresenter<F18SetView> {
                     return;
                 }
                 if (isViewAttached()) {
+                    Log.e(TAG,"----默认选择="+datePicker.getTime());
                     mActView.get().backSelectDateStr(selectType, type, datePicker.getTime());
                 }
                 if (mMenuViewBirth.isShowing()) {
@@ -157,7 +170,7 @@ public class F18SetPresent extends BasePresenter<F18SetView> {
     private String tmpSelectStr = null;
     public void setSignalValue(Context context, int selectType, int type, int defaultIndex){
         tmpSelectStr = null;
-        String[] strArray = new String[]{"15","30","45","60"};
+        String[] strArray = new String[]{"30","60","90","120","150","180"};
 
         BaseDialog mMenuViewBirth = new BaseDialog.Builder(context)
                 .setContentView(R.layout.app_pop_bottom_setting)
@@ -175,7 +188,7 @@ public class F18SetPresent extends BasePresenter<F18SetView> {
                     public void onClick(DialogInterface dialogInterface, int i) {
 
                         if (isViewAttached()) {
-                            mActView.get().backSelectDateStr(selectType,type,tmpSelectStr == null ? strArray[0] : tmpSelectStr);
+                            mActView.get().backSelectDateStr(selectType,type,tmpSelectStr == null ? strArray[defaultIndex] : tmpSelectStr);
                         }
                         dialogInterface.cancel();
                     }
@@ -223,7 +236,7 @@ public class F18SetPresent extends BasePresenter<F18SetView> {
                     public void onClick(DialogInterface dialogInterface, int i) {
 
                         if (isViewAttached()) {
-                            mActView.get().backSelectDateStr(selectType,0,tmpSelectStr == null ? sourceList.get(0) : tmpSelectStr);
+                            mActView.get().backSelectDateStr(selectType,0,tmpSelectStr == null ? sourceList.get(defaultIndex) : tmpSelectStr);
                         }
                         dialogInterface.cancel();
                     }
@@ -247,8 +260,7 @@ public class F18SetPresent extends BasePresenter<F18SetView> {
 
 
     int repeat;
-    public void setAlarmOrUpdateAlarm(Context context,int selectType,int alarmRepeat){
-
+    public void setAlarmOrUpdateAlarm(Context context,int selectType,int alarmRepeat,String timeStr){
 
         BaseDialog dialog = new BaseDialog.Builder(context)
                 .setContentView(R.layout.app_activity_bracelet_alarm_setting)
@@ -276,6 +288,9 @@ public class F18SetPresent extends BasePresenter<F18SetView> {
         DatePickerView datePicker = dialog.findViewById(R.id.datePicker);
 
         ItemView settingRepeat = dialog.findViewById(R.id.iv_watch_alarm_setting_repeat);
+        assert settingRepeat != null;
+        settingRepeat.setContentEm();
+        settingRepeat.setContentText(CusF18AlarmAdapter.repeatToSimpleStr(alarmRepeat));
         settingRepeat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -286,11 +301,16 @@ public class F18SetPresent extends BasePresenter<F18SetView> {
                     @Override
                     public void onItemClick(int position) {
                         repeat = position;
-                        settingRepeat.setTitleText(CusF18AlarmAdapter.repeatToSimpleStr(repeat));
+                        settingRepeat.setContentText(CusF18AlarmAdapter.repeatToSimpleStr(repeat));
                     }
 
                     @Override
-                    public void onChildClick(int position) {
+                    public void onChildClick(int position,boolean isCheck) {
+
+                    }
+
+                    @Override
+                    public void onLongClick(int position) {
 
                     }
                 });
@@ -305,12 +325,15 @@ public class F18SetPresent extends BasePresenter<F18SetView> {
                 }
                 Log.e("tvSave", "datePicker.getTime() = " + datePicker.getTime());
                 dialog.dismiss();
-                mActView.get().backSelectDateStr(selectType,repeat,datePicker.getTime());
+                mActView.get().backSelectDateStr(selectType,repeat, datePicker.getTime());
 
             }
 
         });
         datePicker.setType(3);
+        if(timeStr != null){
+            datePicker.setDefaultItemAdapter(timeStr);
+        }
         // if (isEdit) {
       //  datePicker.setDefaultItemAdapter(itemTimeString);
         datePicker.setCyclic(false);
@@ -354,18 +377,64 @@ public class F18SetPresent extends BasePresenter<F18SetView> {
 
             @Override
             public void onNext(Integer s) {
-                SyncCacheUtils.setUnBindState(false);
-                NetProgressObservable.getInstance().hide();
-                com.isport.blelibrary.utils.Logger.myLog("解绑成功");
-                AppSP.putString(context, AppSP.FORM_DFU, "false");
-                ISportAgent.getInstance().deleteDeviceType(deviceBean.currentType, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
-                BleAction.deletAll();
-                BaseAction.dropDatas();
+                try {
+                    SyncCacheUtils.setUnBindState(false);
+                    NetProgressObservable.getInstance().hide();
+                    com.isport.blelibrary.utils.Logger.myLog("解绑成功");
+                    AppSP.putString(context, AppSP.FORM_DFU, "false");
+                    ISportAgent.getInstance().deleteDeviceType(deviceBean.currentType, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
+                    BleAction.deletAll();
+                    BaseAction.dropDatas();
 
-              //  mActView.get().onUnBindSuccess();
-                mActView.get().backSelectDateStr(-1,-1,"");
+                    //  mActView.get().onUnBindSuccess();
+                    if(mActView != null)
+                        mActView.get().backSelectDateStr(-1,-1,"");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
             }
         });
+    }
+
+
+
+
+    //上传数据
+    public synchronized void getNoUpgradeW81DevcieDetailData(String userId, String deviceId, String defWriId, boolean isToday) {
+        List<WatchInsertBean> upgradeList = iw81DeviceDataModel.getAllNoUpgradeW81DeviceDetailData(deviceId, userId, defWriId, isToday);
+        Logger.myLog("getNoUpgradeW81DevcieDetailData:" + userId + ",deviceId:" + deviceId + ",defWriId:" + defWriId + upgradeList);
+        WatchInsertBean watchInsertBean;
+        for (int i = 0; i < upgradeList.size(); i++) {
+            Constants.isSyncData = true;
+            watchInsertBean = upgradeList.get(i);
+            WatchInsertBean finalWatchInsertBean = watchInsertBean;
+            W81DeviceDataRepository.requstUpgradeW81Data(watchInsertBean).as(view.bindAutoDispose()).subscribe(new BaseObserver<UpdateSuccessBean>(BaseApp.getApp(), false) {
+                @Override
+                protected void hideDialog() {
+
+                }
+
+                @Override
+                protected void showDialog() {
+
+                }
+
+                @Override
+                public void onError(ExceptionHandle.ResponeThrowable e) {
+                    Constants.isSyncData = false;
+                }
+
+                @Override
+                public void onNext(UpdateSuccessBean updateSuccessBean) {
+                    //需要去更新 id;
+                    Constants.isSyncData = false;
+                    Logger.myLog("UpdateSuccessBean:" + userId + ",deviceId:" + deviceId + ",updateSuccessBean.getPublicId():" + updateSuccessBean.getPublicId() + "finalWatchInsertBean.getDateStr()" + finalWatchInsertBean.getDateStr());
+                    iw81DeviceDataModel.updateWriId(finalWatchInsertBean.getDeviceId(), finalWatchInsertBean.getUserId(), finalWatchInsertBean.getDateStr(), String.valueOf(updateSuccessBean.getPublicId()));
+                }
+            });
+        }
+
     }
 
 }

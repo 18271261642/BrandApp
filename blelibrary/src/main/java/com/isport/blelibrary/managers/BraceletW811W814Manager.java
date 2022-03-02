@@ -17,8 +17,13 @@ import com.crrepa.ble.CRPBleClient;
 import com.crrepa.ble.conn.CRPBleConnection;
 import com.crrepa.ble.conn.CRPBleDevice;
 import com.crrepa.ble.conn.bean.CRPAlarmClockInfo;
+import com.crrepa.ble.conn.bean.CRPBloodOxygenInfo;
+import com.crrepa.ble.conn.bean.CRPBloodPressureInfo;
 import com.crrepa.ble.conn.bean.CRPFutureWeatherInfo;
 import com.crrepa.ble.conn.bean.CRPHeartRateInfo;
+import com.crrepa.ble.conn.bean.CRPHistoryBloodOxygenInfo;
+import com.crrepa.ble.conn.bean.CRPHistoryBloodPressureInfo;
+import com.crrepa.ble.conn.bean.CRPHistoryHeartRateInfo;
 import com.crrepa.ble.conn.bean.CRPMessageInfo;
 import com.crrepa.ble.conn.bean.CRPMovementHeartRateInfo;
 import com.crrepa.ble.conn.bean.CRPPeriodTimeInfo;
@@ -57,6 +62,7 @@ import com.crrepa.ble.conn.listener.CRPWeatherChangeListener;
 import com.crrepa.ble.conn.type.CRPDeviceLanguageType;
 import com.crrepa.ble.conn.type.CRPDeviceVersionType;
 import com.crrepa.ble.conn.type.CRPHeartRateType;
+import com.crrepa.ble.conn.type.CRPHistoryDynamicRateType;
 import com.crrepa.ble.conn.type.CRPPastTimeType;
 import com.crrepa.ble.conn.type.CRPPhoneOperationType;
 import com.google.gson.Gson;
@@ -552,12 +558,12 @@ public class BraceletW811W814Manager extends BaseManager {
 
             //查询是否开启定时检测
             if (mCurrentDevice.deviceType == IDeviceType.TYPE_BRAND_W812) {
+
                 mBleConnection.queryTimingMeasureHeartRate(new CRPDeviceTimingMeasureHeartRateCallback() {
                     @Override
-                    public void onTimingMeasure(final boolean b) {
-
+                    public void onTimingMeasure(int i) {
                         //24小时心率
-                        BleSPUtils.putBoolean(mContext,BleSPUtils.KEY_HEART_STATUS,b);
+                        BleSPUtils.putBoolean(mContext,BleSPUtils.KEY_HEART_STATUS,i==1);
 
                         Long currentTime = isSameOption(onTimingMeasure);
                         if (currentTime == onTimingMeasure) {
@@ -570,16 +576,46 @@ public class BraceletW811W814Manager extends BaseManager {
                             @Override
                             public void run() {
                                 Bracelet_W311_24H_hr_SettingModel model = new Bracelet_W311_24H_hr_SettingModel();
-                                model.setHeartRateSwitch(b);
+                                model.setHeartRateSwitch(i==1);
                                 model.setDeviceId(mCurrentDevice.deviceName);
                                 model.setUserId(BaseManager.mUserId);
                                 Bracelet_W311_SettingModelAction.saveOrUpateBracelet24HHrSetting(model);
                             }
                         });
                         //
-                        Logger.myLog(TAG + "queryTimingMeasureHeartRate：state" + b);
+                        Logger.myLog(TAG + "queryTimingMeasureHeartRate：state" + i);
                     }
+
                 });
+
+//                mBleConnection.queryTimingMeasureHeartRate(new CRPDeviceTimingMeasureHeartRateCallback() {
+//                    @Override
+//                    public void onTimingMeasure(final boolean b) {
+//
+//                        //24小时心率
+//                        BleSPUtils.putBoolean(mContext,BleSPUtils.KEY_HEART_STATUS,b);
+//
+//                        Long currentTime = isSameOption(onTimingMeasure);
+//                        if (currentTime == onTimingMeasure) {
+//                            return;
+//                        } else {
+//                            onTimingMeasure = currentTime;
+//                        }
+//
+//                        ThreadPoolUtils.getInstance().addTask(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                Bracelet_W311_24H_hr_SettingModel model = new Bracelet_W311_24H_hr_SettingModel();
+//                                model.setHeartRateSwitch(b);
+//                                model.setDeviceId(mCurrentDevice.deviceName);
+//                                model.setUserId(BaseManager.mUserId);
+//                                Bracelet_W311_SettingModelAction.saveOrUpateBracelet24HHrSetting(model);
+//                            }
+//                        });
+//                        //
+//                        Logger.myLog(TAG + "queryTimingMeasureHeartRate：state" + b);
+//                    }
+//                });
             }
             mBleConnection.queryOtherMessageState(new CRPDeviceOtherMessageCallback() {
                 @Override
@@ -1253,6 +1289,11 @@ public class BraceletW811W814Manager extends BaseManager {
 
             mHandler.sendEmptyMessageDelayed(HandlerContans.mHandlerDeviceUpdateWeather, times);
         }
+
+        @Override
+        public void onTempUnitChange(int i) {
+
+        }
     };
 
     //手机相关操作
@@ -1374,6 +1415,11 @@ public class BraceletW811W814Manager extends BaseManager {
 
     //查询电量的回调
     CRPDeviceBatteryListener crpDeviceBatteryCallback = new CRPDeviceBatteryListener() {
+        @Override
+        public void onSubscribe(boolean b) {
+
+        }
+
         @Override
         public void onDeviceBattery(int i) {
             //0版本号，1是电量
@@ -1576,7 +1622,7 @@ public class BraceletW811W814Manager extends BaseManager {
             public void run() {
                 Gson gson = new Gson();
                 W81DeviceDataAction w81DeviceDataAction = new W81DeviceDataAction();
-                w81DeviceDataAction.saveW81DeviceSleepData(mCurrentDevice.deviceName, String.valueOf(BaseManager.mUserId), "0", TimeUtils.getTimeByyyyyMMdd(currentTime), currentTime, info.getTotalTime(), info.getRestfulTime(), info.getLightTime(), info.getSoberTime(), gson.toJson(sleepDetail));
+                w81DeviceDataAction.saveW81DeviceSleepData(mCurrentDevice.deviceName, String.valueOf(BaseManager.mUserId), "0", TimeUtils.getTimeByyyyyMMdd(currentTime), currentTime, info.getTotalTime(), info.getRestfulTime(), info.getLightTime(), info.getAwakeTime(), gson.toJson(sleepDetail));
             }
         });
     }
@@ -1626,10 +1672,14 @@ public class BraceletW811W814Manager extends BaseManager {
         }
 
         @Override
-        public void onMeasureComplete(final CRPHeartRateInfo info) {
+        public void onHistoryHeartRate(List<CRPHistoryHeartRateInfo> list) {
 
+        }
+
+        @Override
+        public void onMeasureComplete(CRPHistoryDynamicRateType crpHistoryDynamicRateType, CRPHeartRateInfo crpHeartRateInfo) {
             //连接情况下返回的锻炼运动心率数据
-            if (info.getHeartRateType() == CRPHeartRateInfo.HeartRateType.PART_HEART_RATE) {
+            if (crpHeartRateInfo.getHeartRateType() == CRPHeartRateInfo.HeartRateType.PART_HEART_RATE) {
 
                 //需要去保存心率的锻炼数据
                 //然后取拉一次锻炼数据
@@ -1639,32 +1689,66 @@ public class BraceletW811W814Manager extends BaseManager {
                 } else {
                     syncPractiseHr = currentTime;
                 }
-                Logger.myLog(TAG + "onMeasureComplete PART_HEART_RATE" + info.getMeasureData() + "info.getTimeInterval():" + info.getTimeInterval());
+                Logger.myLog(TAG + "onMeasureComplete PART_HEART_RATE" + crpHeartRateInfo.getHeartRateList() + "info.getTimeInterval():" + crpHeartRateInfo.getTimeInterval());
                 ThreadPoolUtils.getInstance().addTask(new Runnable() {
                     @Override
                     public void run() {
                         W81DeviceEexerciseAction w81DeviceEexerciseAction = new W81DeviceEexerciseAction();
-                        w81DeviceEexerciseAction.saveExerciseHrData(String.valueOf(BaseManager.mUserId), mCurrentDevice.getDeviceName(), info.getMeasureData(), info.getTimeInterval(), info.getStartMeasureTime());
+                        w81DeviceEexerciseAction.saveExerciseHrData(String.valueOf(BaseManager.mUserId), mCurrentDevice.getDeviceName(), crpHeartRateInfo.getHeartRateList(), crpHeartRateInfo.getTimeInterval(), crpHeartRateInfo.getStartTime());
                     }
                 });
 
                 mBleConnection.queryMovementHeartRate();
             }
 
-            Log.d(TAG, "onOnceMeasureComplete: " + info.getHeartRateType() + "getStartMeasureTime:" + info.getStartMeasureTime());
-            if (info != null && info.getMeasureData() != null) {
-                for (Integer integer : info.getMeasureData()) {
+            Log.d(TAG, "onOnceMeasureComplete: " + crpHeartRateInfo.getHeartRateType() + "getStartMeasureTime:" + crpHeartRateInfo.getStartTime());
+            if (crpHeartRateInfo != null && crpHeartRateInfo.getHeartRateList() != null) {
+                for (Integer integer : crpHeartRateInfo.getHeartRateList()) {
                     Log.d(TAG, "onMeasureComplete: " + integer);
                 }
             }
         }
 
+//        @Override
+//        public void onMeasureComplete(final CRPHeartRateInfo info) {
+//
+//            //连接情况下返回的锻炼运动心率数据
+//            if (info.getHeartRateType() == CRPHeartRateInfo.HeartRateType.PART_HEART_RATE) {
+//
+//                //需要去保存心率的锻炼数据
+//                //然后取拉一次锻炼数据
+//                Long currentTime = isSameOption(syncPractiseHr);
+//                if (currentTime == syncPractiseHr) {
+//                    return;
+//                } else {
+//                    syncPractiseHr = currentTime;
+//                }
+//                Logger.myLog(TAG + "onMeasureComplete PART_HEART_RATE" + info.getMeasureData() + "info.getTimeInterval():" + info.getTimeInterval());
+//                ThreadPoolUtils.getInstance().addTask(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        W81DeviceEexerciseAction w81DeviceEexerciseAction = new W81DeviceEexerciseAction();
+//                        w81DeviceEexerciseAction.saveExerciseHrData(String.valueOf(BaseManager.mUserId), mCurrentDevice.getDeviceName(), info.getMeasureData(), info.getTimeInterval(), info.getStartMeasureTime());
+//                    }
+//                });
+//
+//                mBleConnection.queryMovementHeartRate();
+//            }
+//
+//            Log.d(TAG, "onOnceMeasureComplete: " + info.getHeartRateType() + "getStartMeasureTime:" + info.getStartMeasureTime());
+//            if (info != null && info.getMeasureData() != null) {
+//                for (Integer integer : info.getMeasureData()) {
+//                    Log.d(TAG, "onMeasureComplete: " + integer);
+//                }
+//            }
+//        }
+
         @Override
         public void on24HourMeasureResult(final CRPHeartRateInfo info) {
 
-            List<Integer> data = info.getMeasureData();
+            List<Integer> data = info.getHeartRateList();
             //拉的历史的锻炼心率数据
-            Logger.myLog(TAG + "on24HourMeasureResult" + info.getHeartRateType() + " info.getMeasureData():" + info.getMeasureData());
+            Logger.myLog(TAG + "on24HourMeasureResult" + info.getHeartRateType() + " info.getMeasureData():" + info.getHeartRateList());
             if (info.getHeartRateType() == CRPHeartRateInfo.HeartRateType.PART_HEART_RATE) {
                 Long currentTime = isSameOption(syncHrHistory);
                 if (currentTime == syncHrHistory) {
@@ -1677,7 +1761,7 @@ public class BraceletW811W814Manager extends BaseManager {
                         @Override
                         public void run() {
                             W81DeviceEexerciseAction w81DeviceEexerciseAction = new W81DeviceEexerciseAction();
-                            w81DeviceEexerciseAction.saveExerciseHrData(String.valueOf(BaseManager.mUserId), mCurrentDevice.getDeviceName(), info.getMeasureData(), info.getTimeInterval(), info.getStartMeasureTime());
+                            w81DeviceEexerciseAction.saveExerciseHrData(String.valueOf(BaseManager.mUserId), mCurrentDevice.getDeviceName(), info.getHeartRateList(), info.getTimeInterval(), info.getStartTime());
                         }
                     });
                 }
@@ -1782,6 +1866,11 @@ public class BraceletW811W814Manager extends BaseManager {
 
     CRPBloodPressureChangeListener mBloodPressureChangeListener = new CRPBloodPressureChangeListener() {
         @Override
+        public void onContinueState(boolean b) {
+
+        }
+
+        @Override
         public void onBloodPressureChange(int sbp, int dbp) {
             //收缩压 Systolic blood pressure
             //舒张压 diastolic blood pressure
@@ -1803,6 +1892,16 @@ public class BraceletW811W814Manager extends BaseManager {
             //     String.format(getString(R.string.blood_pressure), sbp, dbp));
         }
 
+        @Override
+        public void onHistoryBloodPressure(List<CRPHistoryBloodPressureInfo> list) {
+
+        }
+
+        @Override
+        public void onContinueBloodPressure(CRPBloodPressureInfo crpBloodPressureInfo) {
+
+        }
+
     };
 
 
@@ -1821,7 +1920,17 @@ public class BraceletW811W814Manager extends BaseManager {
 
     private final CRPBloodOxygenChangeListener mBloodOxygenChangeListener = new CRPBloodOxygenChangeListener() {
         @Override
-        public void onBloodOxygenChange(int bloodOxygen) {
+        public void onContinueState(boolean b) {
+
+        }
+
+        @Override
+        public void onTimingMeasure(int i) {
+
+        }
+
+        @Override
+        public void onBloodOxygen(int i) {
 
             Long currentTime = isSameOption(bloodOxygenChange);
             if (currentTime == bloodOxygenChange) {
@@ -1831,15 +1940,44 @@ public class BraceletW811W814Manager extends BaseManager {
             }
 
             if (mCurrentDevice != null) {
-                if (bloodOxygen <= 100) {
-                    DeviceDataSave.saveOxyenModelData(mCurrentDevice.deviceName, String.valueOf(BaseManager.mUserId), bloodOxygen, System.currentTimeMillis(), String.valueOf(0));
+                if (i <= 100) {
+                    DeviceDataSave.saveOxyenModelData(mCurrentDevice.deviceName, String.valueOf(BaseManager.mUserId), i, System.currentTimeMillis(), String.valueOf(0));
                 }
                 mHandler.sendEmptyMessageDelayed(HandlerContans.mDevcieMeasureOxyenSuccess, 500);
             }
 
-            //updateTextView(tvBloodOxygen,
-            //    String.format(getString(R.string.blood_oxygen), bloodOxygen));
         }
+
+        @Override
+        public void onHistoryBloodOxygen(List<CRPHistoryBloodOxygenInfo> list) {
+
+        }
+
+        @Override
+        public void onContinueBloodOxygen(CRPBloodOxygenInfo crpBloodOxygenInfo) {
+
+        }
+
+//        @Override
+//        public void onBloodOxygenChange(int bloodOxygen) {
+//
+//            Long currentTime = isSameOption(bloodOxygenChange);
+//            if (currentTime == bloodOxygenChange) {
+//                return;
+//            } else {
+//                bloodOxygenChange = currentTime;
+//            }
+//
+//            if (mCurrentDevice != null) {
+//                if (bloodOxygen <= 100) {
+//                    DeviceDataSave.saveOxyenModelData(mCurrentDevice.deviceName, String.valueOf(BaseManager.mUserId), bloodOxygen, System.currentTimeMillis(), String.valueOf(0));
+//                }
+//                mHandler.sendEmptyMessageDelayed(HandlerContans.mDevcieMeasureOxyenSuccess, 500);
+//            }
+//
+//            //updateTextView(tvBloodOxygen,
+//            //    String.format(getString(R.string.blood_oxygen), bloodOxygen));
+//        }
     };
 
     CRPBleECGChangeListener mECGChangeListener = new CRPBleECGChangeListener() {
@@ -2104,7 +2242,7 @@ public class BraceletW811W814Manager extends BaseManager {
     public void sendSwitchCameraView() {
         if (mBleDevice != null && mBleDevice.isConnected() && mBleConnection != null) {
             //mBleConnection.showCameraView();
-            mBleConnection.switchCameraView();
+            mBleConnection.enterCameraView();
             //mBleConnection.set
         }
 
@@ -2269,7 +2407,7 @@ public class BraceletW811W814Manager extends BaseManager {
             //获取当天的心率数据
             mBleConnection.queryTodayHeartRate(CRPHeartRateType.TIMING_MEASURE_HEART_RATE);
             //未连接的情况下可以获取锻炼数据的最后一次数据
-            mBleConnection.queryLastDynamicRate();
+            mBleConnection.queryLastDynamicRate(CRPHistoryDynamicRateType.THIRD_HEART_RATE);
             //查询最后三次
             mBleConnection.queryMovementHeartRate();
 

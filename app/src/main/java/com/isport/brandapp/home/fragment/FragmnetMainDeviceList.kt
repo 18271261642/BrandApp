@@ -33,7 +33,9 @@ import com.isport.blelibrary.db.action.bracelet_w311.Bracelet_W311_DeviceInfoMod
 import com.isport.blelibrary.db.action.s002.S002_DetailDataModelAction
 import com.isport.blelibrary.db.table.scale.Scale_FourElectrode_DataModel
 import com.isport.blelibrary.deviceEntry.impl.BaseDevice
+import com.isport.blelibrary.deviceEntry.interfaces.IDeviceType
 import com.isport.blelibrary.interfaces.BleReciveListener
+import com.isport.blelibrary.managers.Watch7018Manager
 import com.isport.blelibrary.observe.BatteryChangeObservable
 import com.isport.blelibrary.observe.RopeSyncDataObservable
 import com.isport.blelibrary.observe.bean.BatteryChangeBean
@@ -42,6 +44,7 @@ import com.isport.blelibrary.result.impl.watch.DeviceMessureDataResult
 import com.isport.blelibrary.utils.BleRequest
 import com.isport.blelibrary.utils.Constants
 import com.isport.blelibrary.utils.Logger
+import com.isport.brandapp.App
 import com.isport.brandapp.AppConfiguration
 import com.isport.brandapp.home.DeviceMainActivity
 import com.isport.brandapp.home.adpter.AdapterMainDeviceList
@@ -361,9 +364,9 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
                             return
 
 
-                        val intent = Intent(context, F18WatchManagerActivity::class.java)
-                        intent.putExtra(JkConfiguration.DEVICE, AppConfiguration.deviceMainBeanList.get(deviceType))
-                        startActivity(intent)
+//                        val intent = Intent(context, F18WatchManagerActivity::class.java)
+//                        intent.putExtra(JkConfiguration.DEVICE, AppConfiguration.deviceMainBeanList.get(deviceType))
+//                        startActivity(intent)
 
                         if (!mCurrentMessage!!.isConn) {
                             if (mCurrentMessage!!.deviceType == JkConfiguration.DeviceType.BODYFAT) {   //体脂称
@@ -380,6 +383,19 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
                             }
                             return
                         }
+
+                        if(DeviceTypeUtil.isConnectF18(deviceType)){
+                            var db = AppConfiguration.deviceMainBeanList[deviceType];
+                            if (db != null) {
+                                AppConfiguration.braceletID = db.getDeviceID()
+                            }
+                        val intent = Intent(context, F18WatchManagerActivity::class.java)
+                        intent.putExtra(JkConfiguration.DEVICE, AppConfiguration.deviceMainBeanList.get(deviceType))
+                        startActivity(intent)
+
+                            return
+                        }
+
                         if (DeviceTypeUtil.isContainWatch(deviceType)) {   //手表设置页面
                             //if (AppConfiguration.hasSynced) {
                             val intent2 = Intent(context, ActivityWatchMain::class.java)
@@ -422,6 +438,10 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
                             }
 
                             JkConfiguration.DeviceType.Watch_F18->{
+                                var db = AppConfiguration.deviceMainBeanList[deviceType];
+                                if (db != null) {
+                                    AppConfiguration.braceletID = db.getDeviceID()
+                                }
                                 startActivity(Intent(context, F18DeviceMainActivity::class.java))
                             }
 
@@ -552,6 +572,27 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
         }
     }
 
+    //连接F18手表
+    private fun connF18Device(isConnectByUser: Boolean, deviceType: Int,deviceBean: DeviceBean){
+        val f18Mac = DeviceTypeUtil.getW81Mac(deviceBean.deviceID)
+        Logger.myLog(tg,"--------获取的Mac地址="+f18Mac)
+        autoConnDevice(f18Mac)
+    }
+
+
+    private fun autoConnDevice(f18Mac : String) {
+        try {
+            //未连接
+            if ( !Watch7018Manager.getWatch7018Manager().isConnected) {
+                val fs = App.getInstance().f18ConnStatusService
+                // fs?.scanningDevice(f18Mac)
+                fs?.autoScann(f18Mac)
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
+
 
     @Synchronized
     private fun connectWatchOrBracelet(isConnectByUser: Boolean, deviceType: Int) {
@@ -576,6 +617,14 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
          }*/
         if (AppConfiguration.deviceMainBeanList.containsKey(deviceType)) {
             deviceBean = AppConfiguration.deviceMainBeanList[deviceType]
+        }
+
+
+        if(deviceType == IDeviceType.TYPE_WATCH_7018){
+            if (deviceBean != null) {
+                connF18Device(isConnectByUser,deviceType,deviceBean)
+            }
+            return
         }
 
         Logger.myLog(tg,"---deviceBean="+(deviceBean.toString()))
@@ -660,8 +709,7 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
             override fun determine() {
 //                    Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 //                    startActivity(intent);
-                val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-                bluetoothAdapter?.enable()
+                BluetoothAdapter.getDefaultAdapter()?.enable()
             }
 
             override fun cancel() {}
@@ -1070,7 +1118,9 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
 
     private fun getVersionOrBattery(deviceType: Int, deviceName: String): Int {
         //是W516的设备信息 w81的版本信息存在一起
-        if (DeviceTypeUtil.isContainWatch(deviceType) || DeviceTypeUtil.isContaintW81(deviceType) || deviceType == JkConfiguration.DeviceType.ROPE_SKIPPING) {
+        if (DeviceTypeUtil.isContainF18(deviceName) || DeviceTypeUtil.isContainWatch(deviceType)
+                || DeviceTypeUtil.isContaintW81(deviceType) || deviceType == JkConfiguration.DeviceType.ROPE_SKIPPING
+                || deviceType == IDeviceType.TYPE_WATCH_7018) {
             val deviceInfoByDeviceId = DeviceInformationTableAction.findDeviceInfoByDeviceId(deviceName)
             if (deviceInfoByDeviceId != null) {
                 Logger.myLog(tg,"---111-getVersionOrBattery:$deviceInfoByDeviceId")

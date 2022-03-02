@@ -1,9 +1,22 @@
 package com.isport.blelibrary.utils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 
 public class StepArithmeticUtil {
+
+
+
+
+
+    public static float addNumber(float f1,float f2){
+        BigDecimal bigDecimal = new BigDecimal(f1);
+        BigDecimal bigDecimal2 = new BigDecimal(f2);
+        BigDecimal bg =  bigDecimal.add(bigDecimal2);
+        return bg.floatValue();
+    }
+
 
 
     public static String stepsConversionCalories(float weight, long steps) {

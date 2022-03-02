@@ -23,6 +23,7 @@ import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.htsmart.wristband2.bean.data.SportData;
 import com.isport.blelibrary.utils.DateUtil;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.TimeUtils;
@@ -160,6 +161,77 @@ public class PractiseDetailActivity extends BaseActivity implements View.OnClick
 
         Logger.myLog(TAG,"-----exInfo="+info.toString());
         int type = Integer.parseInt(info.getExerciseType());
+
+
+        boolean isF18 = AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_F18);
+        if(isF18){
+            switch (type){
+                case SportData.SPORT_WALK:  //走路
+                    titleName = getResources().getString(R.string.string_f18_walking);
+                    break;
+                case SportData.SPORT_OD:    //跑步
+                    titleName = UIUtils.getString(R.string.run);
+                    break;
+                case SportData.SPORT_CLIMB: //登山
+                    titleName = UIUtils.getString(R.string.climbing);
+                    break;
+                case SportData.SPORT_RIDE:  //骑行
+                    titleName = UIUtils.getString(R.string.ride);
+                    break;
+                case SportData.SPORT_BB:    //篮球
+                    titleName = UIUtils.getString(R.string.basketball);
+                    break;
+                case SportData.SPORT_SWIM:  //游泳
+                    titleName = getResources().getString(R.string.string_f18_Swim);
+                    break;
+                case SportData.SPORT_BADMINTON: //羽毛球
+                    titleName = UIUtils.getString(R.string.badminton);
+                    break;
+                case SportData.SPORT_FOOTBALL:  //足球
+                    titleName = UIUtils.getString(R.string.football);
+                    break;
+                case SportData.SPORT_ELLIPTICAL_TRAINER:    //椭圆机
+                    titleName = UIUtils.getString(R.string.string_w560_practise_eliptical);
+                    break;
+                case SportData.SPORT_YOGA:  //瑜伽
+                    titleName = UIUtils.getString(R.string.string_practise_yoga);
+                    break;
+                case SportData.SPORT_PING_PONG:   //乒乓球
+                    titleName = UIUtils.getString(R.string.pingpang);
+                    break;
+                case SportData.SPORT_ROPE_SKIPPING:     //跳绳
+                    titleName = UIUtils.getString(R.string.rope_skip);
+                    break;
+                case SportData.SPORT_TENNIS:    //网球
+                    titleName = getResources().getString(R.string.string_f18_tennis);
+                    break;
+                case SportData.SPORT_BASEBALL:  //棒球
+                    titleName = getResources().getString(R.string.string_f18_baseball);
+                    break;
+                case SportData.SPORT_RUGBY:     //橄榄球
+                    titleName = getResources().getString(R.string.string_f18_rugby);
+                    break;
+                case SportData.SPORT_HULA_HOOP:   //呼啦圈
+                    titleName = getResources().getString(R.string.string_f18_hula_hoop);
+                    break;
+                case SportData.SPORT_GOLF: //高尔夫
+                    titleName = getResources().getString(R.string.string_f18_golf);
+                    break;
+                case SportData.SPORT_LONG_JUMP: //跳远
+                    titleName = getResources().getString(R.string.string_f18_jump);
+                    break;
+                case SportData.SPORT_SIT_UPS:    //仰卧起坐
+                    titleName = getResources().getString(R.string.string_f18_sit_up);
+                    break;
+                case SportData.SPORT_VOLLEYBALL:    //排球
+                    titleName = getResources().getString(R.string.string_f18_volley_ball);
+                    break;
+            }
+            return;
+        }
+
+
+
 
         boolean isW560 = AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_W560) ;
         if(isW560){

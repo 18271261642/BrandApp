@@ -50,7 +50,7 @@ public class BpHistoryPresenter extends BasePresenter<BpHistoryView> implements 
     @Override
     public void getBpNumData() {
 
-        BPRepository.requstNumBPData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), 7).as(mActView.get().bindAutoDispose()).subscribe(new BaseObserver<List<BPInfo>>(BaseApp.getApp(), false) {
+        BPRepository.requstNumBPData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), 50).as(mActView.get().bindAutoDispose()).subscribe(new BaseObserver<List<BPInfo>>(BaseApp.getApp(), false) {
 
             @Override
             public void onNext(List<BPInfo> infos) {

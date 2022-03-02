@@ -9,9 +9,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.gyf.immersionbar.ImmersionBar;
 import com.isport.blelibrary.utils.CommonDateUtil;
 import com.isport.blelibrary.utils.DateUtil;
@@ -19,9 +16,6 @@ import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.StepArithmeticUtil;
 import com.isport.blelibrary.utils.TimeUtils;
 import com.isport.brandapp.App;
-import com.isport.brandapp.home.bean.http.Wristbandstep;
-import com.isport.brandapp.home.presenter.DeviceHistotyDataPresenter;
-import com.isport.brandapp.home.presenter.W81DataPresenter;
 import com.isport.brandapp.R;
 import com.isport.brandapp.bean.DeviceBean;
 import com.isport.brandapp.device.bracelet.braceletPresenter.BraceletStepPresenter;
@@ -32,6 +26,9 @@ import com.isport.brandapp.device.share.ShareBean;
 import com.isport.brandapp.device.sleep.TimeUtil;
 import com.isport.brandapp.device.sleep.calendar.Cell;
 import com.isport.brandapp.device.sleep.calendar.WatchPopCalendarView;
+import com.isport.brandapp.home.bean.http.Wristbandstep;
+import com.isport.brandapp.home.presenter.DeviceHistotyDataPresenter;
+import com.isport.brandapp.home.presenter.W81DataPresenter;
 import com.isport.brandapp.util.DeviceTypeUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -45,6 +42,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import bike.gymproject.viewlibray.RopeBarChartView;
 import bike.gymproject.viewlibray.SporttemView;
 import bike.gymproject.viewlibray.chart.BarChartEntity;
@@ -506,7 +505,7 @@ public class DayReportFragment extends BaseMVPFragment<BraceletStepView, Bracele
             getMonthData(instance);
 
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -529,7 +528,7 @@ public class DayReportFragment extends BaseMVPFragment<BraceletStepView, Bracele
             return;
         }
         Logger.myLog("getMonthData year:" + instance.get(Calendar.YEAR) + "month:" + instance.get(Calendar.MONTH) + "day:" + instance.get(Calendar.DAY_OF_MONTH) + "currentType:" + currentType);
-        if (DeviceTypeUtil.isContaintW81(currentType)) {
+        if (DeviceTypeUtil.isContaintW81(currentType) || DeviceTypeUtil.isContainF18(currentType)) {
             w81DataPresenter.getW81MonthStep(deviceBean.deviceID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), String.valueOf(JkConfiguration.WatchDataType.STEP), instance.getTimeInMillis());
         } else {
             DeviceHistotyDataPresenter.getMonthData(instance, JkConfiguration.WatchDataType.STEP, currentType, BaseApp.getApp());

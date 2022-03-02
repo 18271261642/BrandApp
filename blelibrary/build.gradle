@@ -36,10 +36,16 @@ android {
             java.srcDirs = ['src/main/java', 'src/main/java-gen']
         }
     }*/
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+            java.srcDirs = ['src/main/java', 'src/main/java-gen']
+        }
+    }
 }
 
 greendao {
-    schemaVersion 32
+    schemaVersion 33
     daoPackage 'com.isport.blelibrary.gen'
     targetGenDir 'src/main/java'
 }
@@ -48,7 +54,10 @@ repositories {
         // dirs 'libs'
         dirs '../basiclib/libs','libs'
     }
+
+
 }
+
 
 dependencies {
     implementation project(':basiclib')
@@ -60,6 +69,12 @@ dependencies {
             implementation files('libs/restonsdk_3.4.1.jar')
             implementation files('libs/sdkalgorithm_3.4.0.jar')
             implementation files('libs/sdkcore_3.4.1.jar')*/
+
+   // api(name: 'libraryDfu_v1.0.4', ext: 'aar')
+    //F18拓步SDK
+  //  implementation(name:'libraryCore_v1.1.7', ext: 'aar')
+   // api(name: 'libraryCore_v1.1.7', ext: 'aar')
+
     /** W
      *     数据库存储
      */

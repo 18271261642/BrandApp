@@ -136,7 +136,11 @@ public class ExerciseRepository {
                  ]
                  */
                 List<W81DeviceExerciseData> list = deviceMeasureData.uploadingExerciseData(deviceId, userId, "0");
-                   Logger.myLog("---requstUpgradeExerciseData--list:" + list.size());
+                  if(list != null && !list.isEmpty()){
+
+                  }
+
+                   //Logger.myLog("---requstUpgradeExerciseData--list:" + list.size());
                 W81DeviceExerciseData exerciseData;
                 ExerciseInfo info;
                 List<ExerciseInfo> upgradeList = new ArrayList<>();

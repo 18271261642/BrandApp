@@ -73,7 +73,7 @@ public class OnceHrRepository {
                         // info
                     }
                 } catch (Exception e) {
-
+                    e.printStackTrace();
                 } finally {
 
                     if (upgradeList.size() == 0) {

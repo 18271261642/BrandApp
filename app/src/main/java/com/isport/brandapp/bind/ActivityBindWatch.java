@@ -1,13 +1,21 @@
 package com.isport.brandapp.bind;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.view.View;
 import android.widget.AdapterView;
 
 import com.google.gson.Gson;
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
+import com.isport.blelibrary.deviceEntry.interfaces.IDeviceType;
 import com.isport.blelibrary.interfaces.BleReciveListener;
+import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.observe.SyncProgressObservable;
 import com.isport.blelibrary.result.IResult;
 import com.isport.blelibrary.result.impl.sleep.SleepHistoryDataResult;
@@ -17,6 +25,7 @@ import com.isport.blelibrary.result.impl.watch_w516.WatchW516SyncResult;
 import com.isport.blelibrary.utils.BleRequest;
 import com.isport.blelibrary.utils.BleSPUtils;
 import com.isport.blelibrary.utils.Constants;
+import com.isport.blelibrary.utils.DeviceTimesUtil;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.SyncCacheUtils;
 import com.isport.blelibrary.utils.TimeUtils;
@@ -32,6 +41,7 @@ import com.isport.brandapp.device.publicpage.GoActivityUtil;
 import com.isport.brandapp.dialog.UnBindDeviceDialog;
 import com.isport.brandapp.dialog.UnbindStateCallBack;
 import com.isport.brandapp.util.ActivitySwitcher;
+import com.isport.brandapp.util.AppSP;
 import com.isport.brandapp.util.DeviceTypeUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -40,6 +50,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonrecyclerview.FullyLinearLayoutManager;
@@ -75,6 +86,20 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
     private DeviceBean mDeviceBean;
     private boolean canUnBind;
 
+    private final Handler handler = new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            if(msg.what == 0x00){
+                handler.removeMessages(0x00);
+                Intent intent = new Intent();
+                intent.setAction(Watch7018Manager.SYNC_UNBIND_DATA_COMPLETE);
+                sendBroadcast(intent);
+
+            }
+        }
+    };
+
 
     @Override
     protected BindPresenter createPresenter() {
@@ -92,6 +117,9 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
         mActivityBind = this;
         if (!EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().register(this);
+
+        registerReceiver(broadcastReceiver,new IntentFilter(Watch7018Manager.SYNC_UNBIND_DATA_COMPLETE));
+
         refreshRecyclerView = (RefreshRecyclerView) view.findViewById(R.id.recycler_device);
         adapterBindPageDeviceList = new AdapterBindPageDeviceList(this);
         //TODO 俱乐部名称 recycler_club_content
@@ -316,8 +344,8 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
         Logger.myLog(TAG,"mDeviceBean=" + mDeviceBean.toString() + "position=" + position+"\n"+"map保存="+new Gson().toJson(AppConfiguration.deviceBeanList));
         if (AppConfiguration.deviceMainBeanList != null && AppConfiguration.deviceMainBeanList.size() > 0) {
             //已经有绑定的设备列表
-            if (Utils.isEmpty(mDeviceBean.deviceName)) {
-                if (DeviceTypeUtil.isContainBrand() || DeviceTypeUtil.isContainW81() || DeviceTypeUtil.isContainWatch()) {
+            if (Utils.isEmpty(mDeviceBean.getDeviceName())) {
+                if (DeviceTypeUtil.isContainF18() || DeviceTypeUtil.isContainBrand() || DeviceTypeUtil.isContainW81() || DeviceTypeUtil.isContainWatch()) {
                     showUnbindDialog();
                     //弹出解绑对话框
                 } else {
@@ -337,7 +365,7 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
             Logger.myLog("去断开连接00000000000");
             ISportAgent.getInstance().disConDevice(false);
             // }
-            ActivitySwitcher.goScanActivty(ActivityBindWatch.this, mDeviceBean.currentType);
+            ActivitySwitcher.goScanActivty(ActivityBindWatch.this, mDeviceBean.getCurrentType());
 
         }
 
@@ -347,6 +375,14 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
         isDerictUnBind = true;
         currentType = deviceBean.deviceType;
         Logger.myLog("点击去解绑 == " + currentType+"\n"+deviceBean.toString());
+        if(deviceBean.getDeviceType() == JkConfiguration.DeviceType.Watch_F18){
+            SyncProgressObservable.getInstance().hide();
+            canUnBind = true;
+            AppSP.putString(ActivityBindWatch.this,AppSP.F18_SAVE_MAC,null);
+            Watch7018Manager.getWatch7018Manager().disConnectDevice();
+            ISportAgent.getInstance().stopLeScan(0);
+            ISportAgent.getInstance().disConDevice(false);
+        }
         mActPresenter.unBind(deviceBean, isDe);
     }
 
@@ -498,6 +534,15 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
                         deviceType = device.deviceType ;
 
                     }
+
+                    if(deviceType == JkConfiguration.DeviceType.Watch_F18){
+                        handler.sendEmptyMessageDelayed(0x00,80 * 1000);
+                        Watch7018Manager.getWatch7018Manager().syncDeviceData();
+                        SyncProgressObservable.getInstance().sync(DeviceTimesUtil.getTime(1, 1), false);
+                        return;
+                    }
+
+
                     if (deviceType == JkConfiguration.DeviceType.ROPE_SKIPPING) {
                         ToastUtils.showToast(context, UIUtils.getString(R.string.app_disconnect_device));
                         return;
@@ -516,7 +561,7 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
                     }
 
                 } else {
-                    ToastUtils.showToast(context, UIUtils.getString(R.string.app_disconnect_device));
+                    ToastUtils.showToast(context, UIUtils.getString(R.string.main_device_no_conn_title));
                 }
             }
 
@@ -535,4 +580,27 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
             }
         }, mDeviceBean.currentType);
     }
+
+
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action == null)
+                return;
+            if(action.equals(Watch7018Manager.SYNC_UNBIND_DATA_COMPLETE)){
+                if(ActivitySwitcher.isForeground(ActivityBindWatch.this)){
+
+                    AppConfiguration.deviceBeanList.remove(JkConfiguration.DeviceType.Watch_F18);
+                    DeviceBean device = AppConfiguration.deviceMainBeanList.get(IDeviceType.TYPE_WATCH_7018);
+
+                    mActPresenter.updateBraceletW311HistoryData(mDeviceBean, true);
+
+//                    assert device != null;
+//                    unBindDevice(device, true);
+                }
+
+            }
+        }
+    };
 }

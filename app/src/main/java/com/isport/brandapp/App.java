@@ -18,10 +18,10 @@ import com.isport.blelibrary.BleConstance;
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.SyncCacheUtils;
-import com.isport.brandapp.blue.AlertService;
 import com.isport.brandapp.blue.CallListener;
 import com.isport.brandapp.blue.NotificationService;
 import com.isport.brandapp.device.UpdateSuccessBean;
+import com.isport.brandapp.device.f18.F18ConnectStatusService;
 import com.isport.brandapp.net.APIService;
 import com.isport.brandapp.net.RetrofitClient;
 import com.isport.brandapp.sport.bean.SportDetailData;
@@ -72,10 +72,14 @@ public class App extends BaseApp {
 
     private SMSBroadCastReceiver smsBroadcastReceiver;
 
+    private static F18ConnectStatusService f18ConnectStatusService;
+
+    private static App instanceApp;
+
     @Override
     public void onCreate() {
         super.onCreate();
-
+        instanceApp = this;
         init();
     }
 
@@ -132,13 +136,48 @@ public class App extends BaseApp {
 
         initUmenData();
 
+        bindF18ConnStatusService();
+
 //        //绑定通知服务
 //        Intent intent = new Intent(this, AlertService.class);
 //        bindService(intent,serviceConnection,Context.BIND_AUTO_CREATE);
     }
 
 
+    public static App getInstance(){
+        return instanceApp;
+    }
 
+
+    public  F18ConnectStatusService getF18ConnStatusService(){
+        if(f18ConnectStatusService == null){
+            bindF18ConnStatusService();
+        }
+        return f18ConnectStatusService;
+    }
+
+    private  void bindF18ConnStatusService(){
+        Intent intent = new Intent(instanceApp, F18ConnectStatusService.class);
+        instanceApp.bindService(intent,serviceConnection,Context.BIND_AUTO_CREATE);
+    }
+
+
+    private  final ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            try {
+                f18ConnectStatusService = ((F18ConnectStatusService.F18StatusBinder)service).getService();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            f18ConnectStatusService = null;
+        }
+    };
 
 
     public static void initAppState() {
@@ -548,17 +587,6 @@ public class App extends BaseApp {
     };
 
 
-    private final ServiceConnection serviceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
-        }
-    };
 
 
 }

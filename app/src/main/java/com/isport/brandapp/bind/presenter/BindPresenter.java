@@ -389,7 +389,7 @@ public class BindPresenter extends BasePresenter<BindBaseView> {
         } else {
 
 
-            if (DeviceTypeUtil.isContainW81(deviceBean.currentType)) {
+            if (DeviceTypeUtil.isContainW81(deviceBean.currentType) || DeviceTypeUtil.isContainF18(deviceBean.getCurrentType())) {
                 getNoUpgradeW81DevcieDetailData(deviceBean, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), deviceBean.deviceID, "0");
                 return;
             }

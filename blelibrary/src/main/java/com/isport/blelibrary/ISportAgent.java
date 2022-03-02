@@ -9,13 +9,13 @@ import com.isport.blelibrary.entry.NotificationMsg;
 import com.isport.blelibrary.entry.SedentaryRemind;
 import com.isport.blelibrary.entry.WristbandData;
 import com.isport.blelibrary.entry.WristbandForecast;
+import com.isport.blelibrary.interfaces.CusScannResultListener;
 import com.isport.blelibrary.interfaces.ScanBackListener;
 import com.isport.blelibrary.observe.SyncProgressObservable;
 import com.isport.blelibrary.utils.BleRequest;
 import com.isport.blelibrary.utils.DeviceTimesUtil;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.TimeUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,10 +76,15 @@ public class ISportAgent extends BaseAgent {
         super.scanDevice(scanBackListener, deviceType, isScaleWithTimeOut);
     }
 
+    public void scanDevice(CusScannResultListener scannResultListener,long timeOut){
+        super.scanDevice(scannResultListener,timeOut);
+    }
+
     @Override
     protected boolean scanW910(ScanBackListener scanBackListener) {
         return super.scanW910(scanBackListener);
     }
+
 
     /**
      * 停止搜索

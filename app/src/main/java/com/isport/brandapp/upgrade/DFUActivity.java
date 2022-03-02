@@ -715,7 +715,8 @@ public class DFUActivity extends BaseMVPTitleActivity<DeviceUpgradeView, DevcieU
             Logger.myLog("DFUActivity" + "path:" + pathVersion + "/" + fileName + "currentVersion:" + currentVersion + ",name:" + name + ",upgradeName:" + upgradeName);
             File file = new File(pathVersion + "/" + fileName);
             if (mBleDevice != null && mBleDevice.isConnected() && mBleConnection != null) {
-                mBleConnection.startFirmwareUpgrade(crpBleFirmwareUpgradeListener, file, currentVersion);
+               // mBleConnection.startFirmwareUpgrade(crpBleFirmwareUpgradeListener, file, currentVersion);
+                mBleConnection.startFirmwareUpgrade(false,file,currentVersion,crpBleFirmwareUpgradeListener);
             }
             return true;
 
@@ -731,7 +732,8 @@ public class DFUActivity extends BaseMVPTitleActivity<DeviceUpgradeView, DevcieU
 
             File file = new File(pathVersion + "/" + fileName);
             if (mBleDevice != null && mBleDevice.isConnected() && mBleConnection != null) {
-                mBleConnection.startFirmwareUpgrade(crpBleFirmwareUpgradeListener, file, currentVersion);
+               // mBleConnection.startFirmwareUpgrade(crpBleFirmwareUpgradeListener, file, currentVersion);
+                mBleConnection.startFirmwareUpgrade(false,file,currentVersion,crpBleFirmwareUpgradeListener);
             }
             return true;
 
@@ -748,7 +750,9 @@ public class DFUActivity extends BaseMVPTitleActivity<DeviceUpgradeView, DevcieU
                 }*/
             Logger.myLog("DFUActivity" + "BraceletW811W814Manager.mBleDevice.isConnected()" + mBleDevice.isConnected());
             if (mBleDevice != null && mBleDevice.isConnected() && mBleConnection != null) {
-                mBleConnection.startFirmwareUpgrade(crpBleFirmwareUpgradeListener, file, currentVersion);
+              //  mBleConnection.startFirmwareUpgrade(crpBleFirmwareUpgradeListener, file, currentVersion);
+
+                mBleConnection.startFirmwareUpgrade(false, file, currentVersion,crpBleFirmwareUpgradeListener);
             }
             return true;
 

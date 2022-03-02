@@ -68,7 +68,7 @@ public class PlayW311Fragment extends BaseFragment {
                     LoadImageUtil.getInstance().loadGif(getActivity(), strUrl, ivPic);
                 }
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
 
             //  GifDrawable gifDrawable = (GifDrawable) gifImageView.getDrawable();

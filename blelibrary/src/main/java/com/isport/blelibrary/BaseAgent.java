@@ -41,6 +41,7 @@ import com.isport.blelibrary.entry.SedentaryRemind;
 import com.isport.blelibrary.entry.WristbandData;
 import com.isport.blelibrary.entry.WristbandForecast;
 import com.isport.blelibrary.interfaces.BleReciveListener;
+import com.isport.blelibrary.interfaces.CusScannResultListener;
 import com.isport.blelibrary.interfaces.ScanBackListener;
 import com.isport.blelibrary.managers.BaseManager;
 import com.isport.blelibrary.managers.BraceletW311BleManager;
@@ -49,6 +50,7 @@ import com.isport.blelibrary.managers.BraceletW811W814Manager;
 import com.isport.blelibrary.managers.ScaleBleManager;
 import com.isport.blelibrary.managers.SleepBleManager;
 import com.isport.blelibrary.managers.Watch516BleManager;
+import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.managers.WatchW557BleManager;
 import com.isport.blelibrary.scanner.BluetoothLeScannerCompat;
 import com.isport.blelibrary.scanner.ScanCallback;
@@ -85,6 +87,9 @@ public class BaseAgent {
     private Handler mHandler;
 
 
+    private CusScannResultListener cusScannResultListener;
+    private List<String> filterList = new ArrayList<>();
+
 //    public BaseDevice createNULLDevice(String name, String mac, int rssi, int type) {
 //        return new WatchDevice(name, mac, rssi, type);
 //    }
@@ -104,6 +109,8 @@ public class BaseAgent {
         BraceletW520BleManager.getInstance().registerListener(bleReciveListener);
         WatchW557BleManager.getInstance().registerListener(bleReciveListener);
         BraceletW811W814Manager.getInstance().registerListener(bleReciveListener);
+
+        Watch7018Manager.getWatch7018Manager().registerListener(bleReciveListener);
     }
 
     /**
@@ -191,7 +198,7 @@ public class BaseAgent {
         if (TextUtils.isEmpty(name)) {
             return null;
         }
-        Logger.myLog(TAG,"handleActionFount deviceName = " + name+" mac="+device.getAddress());
+        //Logger.myLog(TAG,"handleActionFount deviceName = " + name+" mac="+device.getAddress());
         if (name.contains(Constants.SLEEP_FILTER)) {
             String deviceName = Utils.getBleDeviceName(0xff, bytes);
             if (deviceName != null) {
@@ -218,20 +225,12 @@ public class BaseAgent {
            // Logger.myLog(TAG,"scanFilter:" + scanFilter + "name:" + name + "name.contains(scanFilter):" + name.contains(scanFilter));
 
 
-            if ( name.contains(scanFilter) || scanFilter.equals("all") || (scanFilter.equals(Constants.WATCH_560_FILTER) && name.contains("FT_ReflexSW"))) {
+            if ( name.contains(scanFilter) || scanFilter.equals("all") || (scanFilter.equals(Constants.WATCH_560_FILTER) && name.contains("FT_ReflexSW")) || (scanFilter.equals(Constants.WATCH_7018_FILTER) && name.equals("BL"))) {
                 if (createDevice == null) {
                     createDevice = new CreateDevice();
                 }
                 return createDevice.createDevcie(name, address, scanFilter, isDFUMode);
             } else {
-
-//                //560
-//                if(name.contains("FT_ReflexSW") && scanFilter.equals(Constants.WATCH_560_FILTER)){
-//                    if (createDevice == null) {
-//                        createDevice = new CreateDevice();
-//                    }
-//                    return createDevice.createDevcie(name, address, scanFilter, isDFUMode);
-//                }
 
                 if (name.contains(scanFilter) && name.contains(Constants.BRAND_FILTER)) {
                     if (createDevice == null) {
@@ -343,6 +342,10 @@ public class BaseAgent {
         }
     }
 
+
+    protected void scanDevice(CusScannResultListener cusScannResultListener,long timeOut){
+        startScanGoalDevice(cusScannResultListener,timeOut);
+    }
     /**
      * 搜索体脂称
      *
@@ -450,6 +453,7 @@ public class BaseAgent {
         scanFilter = Constants.WATCH_7018_FILTER;
         return startLeScanWithOutTimeOut(scanBackListener);
     }
+
 
     /**
      * 搜索手表
@@ -590,17 +594,31 @@ public class BaseAgent {
 */
 
     private final static long SCAN_DURATION = 20 * 1000;
-    Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handler = new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if(msg.what == 0x00){
+//                BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
+//                scanner.stopScan(cusScanCallback);
+//                isF18Scann = false;
+                if(adapter == null || !adapter.isEnabled())
+                    return;
+                adapter.stopLeScan(leScanCallback);
+
+            }
+        }
+    };
     int connectingPosition = -1;
     boolean scanning = false;
 
-    private Runnable stopScanTask = this::stopLeScan;
+    private final Runnable stopScanTask = this::stopLeScan;
 
     public void stopLeScan() {
-        if (!scanning)
-            return;
+//        if (!scanning)
+//            return;
 
-        final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
+       BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
         scanner.stopScan(scanCallback);
 
         handler.removeCallbacks(stopScanTask);
@@ -629,6 +647,52 @@ public class BaseAgent {
         scanning = true;
     }
 
+
+    private boolean isF18Scann = false;
+
+
+    public void stopLeScan(long scanTime){
+        handler.sendEmptyMessage(0x00);
+    }
+
+
+    public void startLeScan(long scanTime) {
+        // Scanning is disabled when we are connecting or connected.
+        if(adapter == null || !adapter.isEnabled())
+            return;
+        adapter.stopLeScan(leScanCallback);
+
+        adapter.startLeScan(leScanCallback);
+
+//
+//         BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
+//         ScanSettings settings = new ScanSettings.Builder().setReportDelay(1000).setUseHardwareBatchingIfSupported(false).setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build();
+//        scanner.startScan(null,settings,cusScanCallback);
+//        isF18Scann = true;
+        handler.sendEmptyMessageDelayed(0x00,scanTime);
+
+//        // Setup timer that will stop scanning
+//        handler.postDelayed(stopScanTask, scanTime);
+//        scanning = true;
+    }
+
+
+    private final BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback(){
+
+
+        @Override
+        public void onLeScan(BluetoothDevice bluetoothDevice, int rssi, byte[] scanRecord) {
+            if(bluetoothDevice.getName() == null || bluetoothDevice.getAddress() == null)
+                return;
+//            if(filterList.contains(bluetoothDevice.getAddress()))
+//                return;
+//            filterList.add(bluetoothDevice.getAddress());
+            if(cusScannResultListener != null)
+                cusScannResultListener.onCusScanResult(bluetoothDevice,scanRecord,rssi);
+        }
+    };
+
+
     CreateDevice createDevice;
 
     public BaseDevice getBondDevice(String name, String address) {
@@ -648,6 +712,48 @@ public class BaseAgent {
             return null;
         }
 
+    }
+
+    BluetoothAdapter adapter;
+
+    private void startScanGoalDevice(CusScannResultListener cusScannResultListener, long scanTimeOut){
+        filterList.clear();
+        this.cusScannResultListener = cusScannResultListener;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (mContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED ||
+                    mContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED) {
+                Logger.myLog("request permission:" + Manifest.permission_group.LOCATION);
+                Logger.myLog("开始扫描1111");
+                return ;
+            }
+        }
+        if (!mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Logger.myLog("开始扫描2222");
+            return;
+        }
+        adapter = BluetoothAdapter.getDefaultAdapter();
+        if (adapter == null || !adapter.isEnabled()) {
+            Logger.myLog("开始扫描3333");
+            return ;
+        }
+        if (adapter.isDiscovering()) {
+            adapter.cancelDiscovery();
+        }
+
+        Set<BluetoothDevice> devices = adapter.getBondedDevices();
+        for (BluetoothDevice bluetoothDevice : devices) {
+            if(bluetoothDevice.getName() == null || bluetoothDevice.getAddress() == null)
+                return;
+            if(!filterList.contains(bluetoothDevice.getAddress())){
+
+                filterList.add(bluetoothDevice.getAddress());
+                cusScannResultListener.onCusScanResult(bluetoothDevice,new byte[]{},0);
+            }
+
+        }
+        startLeScan(scanTimeOut);
     }
 
 
@@ -689,16 +795,20 @@ public class BaseAgent {
         Set<BluetoothDevice> devices = adapter.getBondedDevices();
         // Logger.myLog("获取已经配对devices" + devices.size());
         for (BluetoothDevice bluetoothDevice : devices) {
-            BaseDevice tpbaseDevice = getBondDevice(bluetoothDevice.getName(), bluetoothDevice.getAddress());
-            if (tpbaseDevice != null && !macListTp.contains(bluetoothDevice.getAddress())) {
-                //Logger.myLog("getBondedDevices:Utils.isContainsDFU(tpbaseDevice.deviceName)" + Utils.isContainsDFU(tpbaseDevice.deviceName));
-                if (Utils.isContainsDFU(tpbaseDevice.deviceName)) {
-                    continue;
+            if(bluetoothDevice.getName() != null && !bluetoothDevice.getName().equals("F18")){
+                BaseDevice tpbaseDevice = getBondDevice(bluetoothDevice.getName(), bluetoothDevice.getAddress());
+                if (tpbaseDevice != null && !macListTp.contains(bluetoothDevice.getAddress())) {
+                    //Logger.myLog("getBondedDevices:Utils.isContainsDFU(tpbaseDevice.deviceName)" + Utils.isContainsDFU(tpbaseDevice.deviceName));
+                    if (Utils.isContainsDFU(tpbaseDevice.deviceName)) {
+                        continue;
+                    }
+                    listDevicesTp.add(tpbaseDevice);
+                    macListTp.add(tpbaseDevice.address);
+                    addtpbaseDevice(tpbaseDevice);
                 }
-                listDevicesTp.add(tpbaseDevice);
-                macListTp.add(tpbaseDevice.address);
-                addtpbaseDevice(tpbaseDevice);
             }
+
+
         }
         Message msg = Message.obtain();
         msg.obj = listDevicesMap;
@@ -723,7 +833,7 @@ public class BaseAgent {
 
     protected volatile int sumSize = 0;
 
-    private ScanCallback scanCallback = new ScanCallback() {
+    private final ScanCallback scanCallback = new ScanCallback() {
         @Override
         public void onScanResult(final int callbackType, @NonNull final ScanResult result) {
             // empty
@@ -1385,6 +1495,10 @@ public class BaseAgent {
             }
             else if(currentDevice instanceof W560BDevice){
                 ((W560BDevice) currentDevice).get_daily_record(day);
+            }
+
+            if(currentDevice instanceof W7018Device){
+                ((W7018Device) currentDevice).sync_data();
             }
         }
     }
@@ -2637,6 +2751,7 @@ public class BaseAgent {
             else if(currentDevice instanceof W560BDevice){
                 ((W560BDevice) currentDevice).setWeather(weather,list);
             }
+
         }
     }
 

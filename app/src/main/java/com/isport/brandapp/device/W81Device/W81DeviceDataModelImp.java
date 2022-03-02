@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.crrepa.ble.conn.bean.CRPSleepInfo;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.isport.blelibrary.db.CommonInterFace.WatchData;
 import com.isport.blelibrary.db.action.W81Device.DeviceMeasuredDActionation;
 import com.isport.blelibrary.db.action.W81Device.W81DeviceDataAction;
@@ -17,22 +18,24 @@ import com.isport.blelibrary.utils.CommonDateUtil;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.ThreadPoolUtils;
 import com.isport.blelibrary.utils.TimeUtils;
+import com.isport.brandapp.R;
+import com.isport.brandapp.device.bracelet.braceletModel.IW311SettingModel;
+import com.isport.brandapp.device.bracelet.braceletModel.W311ModelSettingImpl;
+import com.isport.brandapp.device.watch.bean.WatchInsertBean;
 import com.isport.brandapp.home.bean.db.HeartRateMainData;
 import com.isport.brandapp.home.bean.db.WatchSportMainData;
 import com.isport.brandapp.home.bean.http.SporadicNapData;
 import com.isport.brandapp.home.bean.http.WatchSleepDayData;
 import com.isport.brandapp.home.bean.http.WristbandHrHeart;
 import com.isport.brandapp.home.bean.http.Wristbandstep;
-import com.isport.brandapp.R;
-import com.isport.brandapp.device.bracelet.braceletModel.IW311SettingModel;
-import com.isport.brandapp.device.bracelet.braceletModel.W311ModelSettingImpl;
-import com.isport.brandapp.device.watch.bean.WatchInsertBean;
+import com.isport.brandapp.util.DeviceTypeUtil;
 import com.isport.brandapp.wu.bean.BPInfo;
 import com.isport.brandapp.wu.bean.ExerciseInfo;
 import com.isport.brandapp.wu.bean.OnceHrInfo;
 import com.isport.brandapp.wu.bean.OxyInfo;
 import com.isport.brandapp.wu.bean.TempInfo;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -62,6 +65,7 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
         return parWristBandStep(w81DeviceDetailData);
     }
 
+    private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
     public Wristbandstep parWristBandStep(W81DeviceDetailData model) {
         Wristbandstep wristbandstep = new Wristbandstep();
@@ -75,8 +79,20 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
         wristbandstep.setStepNum(String.valueOf(model.getStep()));
         wristbandstep.setLastServerTime(model.getTimestamp());
         wristbandstep.setStrDate(model.getDateStr());
-
+        String stepArray = model.getStepArray();
         ArrayList<Integer> stepList = new ArrayList<>();
+
+        if(stepArray != null && !stepArray.equals("[]")){
+            List<String[]> stepArrList = new Gson().fromJson(stepArray,new TypeToken<List<String[]>>(){}.getType());
+            if(stepArrList != null){
+
+                for(String[] st : stepArrList){
+                    stepList.add(Integer.valueOf(st[1]));
+                }
+
+            }
+        }
+
         int sumSize = stepList.size();
         if (stepList.size() < 24) {
             for (int i = 0; i < 24 - sumSize; i++) {
@@ -132,22 +148,40 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
     @Override
     public WatchSleepDayData getLastSleepData(String userId, String deviceId, boolean main) {
         W81DeviceDetailData w81DeviceDetailData = w81DeviceDataAction.getW81DeviceSleepLastest(deviceId, userId, "");
-        Logger.myLog("getW81DeviceSleepLastest:deviceId:" + deviceId + ",userId:" + userId + "w81DeviceDetailData:" + w81DeviceDetailData);
+        Logger.myLog("getW81DeviceSleepLastest:deviceId:" + deviceId + ",userId:" + userId + "w81DeviceDetailData:" + new Gson().toJson(w81DeviceDetailData));
         WatchSleepDayData watchSleepDayData = new WatchSleepDayData();
 
 
         if (main) {
             if (w81DeviceDetailData != null) {
-                watchSleepDayData.setTotalSleepTime(w81DeviceDetailData.getTotalTime());
+                watchSleepDayData.setTotalSleepTime(w81DeviceDetailData.getLightTime()+w81DeviceDetailData.getRestfulTime());
+              //  watchSleepDayData.setAwakeSleepTime(w81DeviceDetailData.getSoberTime());
                 watchSleepDayData.setDateStr(w81DeviceDetailData.getDateStr());
             }
         } else {
+            if(DeviceTypeUtil.isContainF18(deviceId)){
+                watchSleepDayData = changeF18SleepData(w81DeviceDetailData);
+            }else{
+                watchSleepDayData = parseSleep(w81DeviceDetailData);
+            }
 
-            watchSleepDayData = parseSleep(w81DeviceDetailData);
 
         }
         return watchSleepDayData;
     }
+
+    private WatchSleepDayData changeF18SleepData(W81DeviceDetailData w81DeviceDetailData){
+        WatchSleepDayData watchSleepDayData = new WatchSleepDayData();
+        watchSleepDayData.setTotalSleepTime(w81DeviceDetailData.getTotalTime());
+        watchSleepDayData.setAwakeSleepTime(w81DeviceDetailData.getSoberTime());
+        watchSleepDayData.setDateStr(w81DeviceDetailData.getDateStr());
+        watchSleepDayData.setDeepSleepTime(w81DeviceDetailData.getRestfulTime());
+        watchSleepDayData.setLightLV1SleepTime(w81DeviceDetailData.getLightTime());
+        watchSleepDayData.setSporadicNapSleepTimeStr(w81DeviceDetailData.getSleepArray());
+        return watchSleepDayData;
+    }
+
+
 
     @Override
     public HeartRateMainData getLastHrData(String userId, String deviceId) {
@@ -172,7 +206,12 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
         W81DeviceDetailData w81DeviceDetailData = w81DeviceDataAction.getW81DeviceSleepLastest(deviceId, userId, strDate);
         WatchSleepDayData watchSleepDayData = null;
         if (w81DeviceDetailData != null) {
-            watchSleepDayData = parseSleep(w81DeviceDetailData);
+            if(DeviceTypeUtil.isContainF18(deviceId)){
+                watchSleepDayData = changeF18SleepData(w81DeviceDetailData);
+            }else{
+                watchSleepDayData = parseSleep(w81DeviceDetailData);
+            }
+
         } else {
             watchSleepDayData = new WatchSleepDayData();
         }
@@ -452,6 +491,7 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
     @Override
     public OxyInfo getOxygenLastData(String deviceId, String userId) {
         OxygenMode oxygenMode = deviceMeasuredDActionation.findOxyenMode(deviceId, userId, 0);
+        if(oxygenMode != null)
         Logger.myLog("----获取单次血氧getOxygenLastData:" + oxygenMode.toString() + "deviceId");
         OxyInfo oxyInfo = new OxyInfo();
         if (oxygenMode != null) {
@@ -466,7 +506,7 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
     public BPInfo getBloodPressureLastData(String deviceId, String userId) {
         BloodPressureMode bloodPressureMode = deviceMeasuredDActionation.findBloodPressureMode(deviceId, userId, 0);
         BPInfo bpInfo = new BPInfo();
-        Logger.myLog("--------getBloodPressureLastData:=" + bloodPressureMode.toString());
+        Logger.myLog("--------getBloodPressureLastData:=" + bloodPressureMode == null ? "" : bloodPressureMode.toString());
         if (bloodPressureMode != null) {
             bpInfo.setSpValue(bloodPressureMode.getSystolicBloodPressure());
             bpInfo.setDpValue(bloodPressureMode.getDiastolicBloodPressure());
@@ -561,6 +601,8 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
 
 
     public WatchSleepDayData parseSleep(W81DeviceDetailData w81DeviceDetailData) {
+
+        boolean isF18 = DeviceTypeUtil.isContainF18(w81DeviceDetailData.getDeviceId());
         WatchSleepDayData watchSleepDayData = new WatchSleepDayData();
 
         Logger.myLog("parseSleep:--------------------------" + w81DeviceDetailData);
@@ -600,11 +642,11 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
                         int dataType = sleepList.get(i).dataType;
 
                         for (int j = startTime; j < startTime + totalTime; j++) {
-                            if (dataType == CRPSleepInfo.SLEEP_STATE_RESTFUL) {
+                            if (dataType == (isF18 ? 1 : CRPSleepInfo.SLEEP_STATE_RESTFUL)) {
                                 deep++;
-                            } else if (dataType == CRPSleepInfo.SLEEP_STATE_LIGHT) {
+                            } else if (dataType == (isF18 ? 2 : CRPSleepInfo.SLEEP_STATE_LIGHT)) {
                                 light++;
-                            } else if (dataType == CRPSleepInfo.SLEEP_STATE_SOBER) {
+                            } else if (dataType == (isF18 ? 3 : CRPSleepInfo.SLEEP_STATE_LIGHT)) {
                                 awakTime++;
                             }
                             //   Logger.myLog("allData[" + j + "-----" + startTime + ",totalTime:" + totalTime + ",dataType:" + dataType + ",allData.lenth" + allData.length);
@@ -655,6 +697,7 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
                     watchSleepDayData.setLightLV1SleepTime(light);
                     watchSleepDayData.setDeepSleepTime(deep);
                     watchSleepDayData.setSleepArry(allData);
+                    w81DeviceDetailData.setLightTime(light);
                     return watchSleepDayData;
                 }
             } else {

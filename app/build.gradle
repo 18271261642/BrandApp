@@ -35,9 +35,10 @@ android {
         }
     }
     defaultConfig {
+        buildToolsVersion              "29.0.2"
         applicationId versions.applicationId
         minSdkVersion 19
-        targetSdkVersion versions.sdkTargetVersion
+        targetSdkVersion 29
         versionCode versions.appVersionCode
         versionName versions.appVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -56,6 +57,12 @@ android {
 
         vectorDrawables.useSupportLibrary = true
     }
+
+
+    dexOptions{
+        javaMaxHeapSize "6g"
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -180,6 +187,10 @@ dependencies {
     //implementation files('libs/open_sdk_r6140_lite.jar')
 
     implementation project(':dfu')
+
+//    implementation project(':alibbLib')
+
+
     api "org.java-websocket:Java-WebSocket:1.4.0"
     annotationProcessor 'com.alibaba:arouter-compiler:1.2.2'
 
@@ -190,5 +201,5 @@ dependencies {
 
    // api 'com.github.chrisbanes:PhotoView:2.3.0'
 
-
+    api 'com.yuyh.imgsel:library:2.1.0'
 }

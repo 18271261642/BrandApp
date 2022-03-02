@@ -101,6 +101,21 @@ public class WatchSleepDayData implements Serializable {
         SporadicNapSleepTimeStr = sporadicNapSleepTimeStr;
     }
 
+
+    public String toString(int a) {
+        return "WatchSleepDayData{" +
+                "totalSleepTime=" + totalSleepTime +
+                ", deepSleepTime=" + deepSleepTime +
+                ", dateStr='" + dateStr + '\'' +
+                ", lightLV1SleepTime=" + lightLV1SleepTime +
+                ", lightLV2SleepTime=" + lightLV2SleepTime +
+                ", awakeSleepTime=" + awakeSleepTime +
+                ", SporadicNapSleepTime=" + SporadicNapSleepTime +
+                ", SporadicNapSleepTimeStr='" + SporadicNapSleepTimeStr + '\'' +
+                ", SporadicNapSleepTimes=" + SporadicNapSleepTimes +
+                '}';
+    }
+
     @Override
     public String toString() {
         return "WatchSleepDayData{" +

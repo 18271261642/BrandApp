@@ -119,9 +119,8 @@ public class DataHeaderHolder extends CustomHolder<String> {
         try {
             int goalType = AppSP.getInt(BaseApp.getApp(),AppSP.DEVICE_GOAL_KEY,0);
             if(goalType == 0){  //步数目标
-                setTarget(JkConfiguration.WATCH_GOAL);
-
                 heardLayout.setSportStep(step);
+                setTarget(JkConfiguration.WATCH_GOAL);
                 //距离 title
                 itemDis.setTitleText(context.getResources().getString(R.string.watch_step_type_distance));
                 //距离value

@@ -79,7 +79,12 @@ public class PlayW311Activity extends BaseTitleActivity implements View.OnClickL
     protected void initData() {
 
         presenter = new PlayerPresenter(this);
-        presenter.getPlayBanImage(currentType);
+      //  presenter.getPlayBanImage(currentType);
+        if(currentType == 70180){  //F18的音频模式指引
+            presenter.getF18AudioGuidData(70180);
+        }else{
+            presenter.getPlayBanImage(currentType);
+        }
 
 
         TodayObservable.getInstance().addObserver(this);
@@ -95,7 +100,8 @@ public class PlayW311Activity extends BaseTitleActivity implements View.OnClickL
 
     @Override
     protected void initEvent() {
-        titleBarView.setTitle(String.format(UIUtils.getString(R.string.bracelet_play)));
+        titleBarView.setTitle(currentType == 70180 ? getResources().getString(R.string.string_audio_guid) : String.format(UIUtils.getString(R.string.bracelet_play)));
+
         titleBarView.setOnTitleBarClickListener(new TitleBarView.OnTitleBarClickListener() {
             @Override
             public void onLeftClicked(View view) {

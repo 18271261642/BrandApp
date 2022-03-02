@@ -207,6 +207,8 @@ public class TempHistoryPresenter extends BasePresenter<TempHistoryView> impleme
             @Override
             public void onNext(TempInfo tempInfo) {
                 if (isViewAttached()) {
+                    if(mActView == null)
+                        return;
                     mActView.get().getLastTempSuccess(tempInfo);
                 }
             }

@@ -37,6 +37,5 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="@dimen/dp15"
-        tools:text="2019-11-06 12:00" />
+        android:layout_marginRight="@dimen/dp15" />
 </RelativeLayout>

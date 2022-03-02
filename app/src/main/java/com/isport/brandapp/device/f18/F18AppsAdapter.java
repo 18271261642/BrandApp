@@ -81,7 +81,7 @@ public class F18AppsAdapter extends RecyclerView.Adapter<F18AppsAdapter.F18AppsV
         int count = 0;
         for(F18AppsItemBean f : list){
             if(f.isChecked()){
-                count +=count;
+                count ++;
             }
         }
         return count;

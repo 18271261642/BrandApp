@@ -97,7 +97,7 @@ public class OnceHrListActivity extends BaseMVPTitleActivity<OnceHrHistoryView, 
     }
 
     protected void initData() {
-        mActPresenter.getOnceHrHistoryData(0);
+        mActPresenter.getOnceHrHistoryData(mCurrentPage);
     }
 
 

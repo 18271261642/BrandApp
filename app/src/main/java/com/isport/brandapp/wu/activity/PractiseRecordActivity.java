@@ -16,6 +16,8 @@ import com.isport.blelibrary.utils.Logger;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 import com.isport.brandapp.device.dialog.BaseDialog;
+import com.isport.brandapp.device.f18.view.F18PractiseTypeView;
+import com.isport.brandapp.device.f18.view.OnF18PractiseDialogClickListener;
 import com.isport.brandapp.util.DeviceTypeUtil;
 import com.isport.brandapp.wu.Constant;
 import com.isport.brandapp.wu.bean.PractiseRecordInfo;
@@ -62,6 +64,8 @@ public class PractiseRecordActivity extends BaseMVPActivity<PractiseRecordView, 
     private List<PractiseRecordInfo> mDatalist = new ArrayList<>();
 
     private int currentType;
+
+    private F18PractiseTypeView f18PractiseTypeView;
 
     @Override
     protected int getLayoutId() {
@@ -246,6 +250,13 @@ public class PractiseRecordActivity extends BaseMVPActivity<PractiseRecordView, 
                 finish();
                 break;
             case R.id.iv_arrow:
+
+                if(DeviceTypeUtil.isContainF18()){
+                    showF18PractiseType();
+                    return;
+                }
+
+
                 if (DeviceTypeUtil.isContainWatch()) {
                     if(AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_W560)){
                         showSelectPopupWindowW560();
@@ -254,6 +265,7 @@ public class PractiseRecordActivity extends BaseMVPActivity<PractiseRecordView, 
                     }
 
                 } else {
+
                     showSelectPopupWindow();
                 }
                 break;
@@ -407,6 +419,29 @@ public class PractiseRecordActivity extends BaseMVPActivity<PractiseRecordView, 
 
         }
     }
+
+
+
+    private void showF18PractiseType(){
+        if(f18PractiseTypeView == null)
+            f18PractiseTypeView = new F18PractiseTypeView(this);
+        f18PractiseTypeView.show();
+       // f18PractiseTypeView.setListData(F18PractiseTypeConstance.getF18PractiseTypeList());
+        f18PractiseTypeView.setF18Listener(new OnF18PractiseDialogClickListener() {
+            @Override
+            public void onItemClick(int position, String desc) {
+                f18PractiseTypeView.dismiss();
+                tv_title.setText(desc);
+                getData(position);
+                f18PractiseTypeView.setListItemChecked(position);
+            }
+        });
+    }
+
+
+
+
+
 
     private boolean isShowPopup = false;
 

@@ -925,6 +925,8 @@ public class ActivityWatchSleep extends BaseMVPActivity<WatchSleepView, WatchSle
 
         Logger.myLog(TAG,"------睡眠查找="+watchSleepDayData.toString());
 
+        Log.e(TAG,"-----深睡="+watchSleepDayData.toString(0));
+
         if (!TextUtils.isEmpty(watchSleepDayData.getDateStr())) {
             mCurrentStr = watchSleepDayData.getDateStr();
             //UI展示
@@ -938,8 +940,9 @@ public class ActivityWatchSleep extends BaseMVPActivity<WatchSleepView, WatchSle
             String sporadicNapSleepTimeStr = watchSleepDayData.getSporadicNapSleepTimeStr();
             int sporadicNapSleepTime = watchSleepDayData.getSporadicNapSleepTime();
             int sporadicNapSleepTimes = watchSleepDayData.getSporadicNapSleepTimes();
+
             //总睡眠时间
-            setHourMinute(0xFF4DDA64, sleepTime/60, sleepTime % 60);
+            setHourMinute(0xFF4DDA64, (sleepTime-awakeTime)/60, (sleepTime-awakeTime) % 60);
             //开始和结束时间
             tv_current_state.setText("");
         //    tv_current_state.setText(value);

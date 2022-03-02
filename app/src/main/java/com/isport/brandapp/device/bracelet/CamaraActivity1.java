@@ -1,7 +1,10 @@
 package com.isport.brandapp.device.bracelet;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -165,8 +168,21 @@ public class CamaraActivity1 extends BaseActivity implements View.OnClickListene
         // verifyPermission(new String[]{Manifest.permission.CAMERA});
         Log.e("mainService", "6666");
         // 预览控件
-
+        registerReceiver(broadcastReceiver,new IntentFilter(Watch7018Manager.F18_TAKE_PICK_ACTION));
     }
+
+
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action == null)
+                return;
+            if(action.equals(Watch7018Manager.F18_TAKE_PICK_ACTION)){
+                capturePicture();
+            }
+        }
+    };
 
 
     @Override
@@ -264,6 +280,7 @@ public class CamaraActivity1 extends BaseActivity implements View.OnClickListene
     protected void onDestroy() {
         Watch7018Manager.getWatch7018Manager().intoTakePhotoStatus(false);
         handler.removeCallbacksAndMessages(null);
+        unregisterReceiver(broadcastReceiver);
         super.onDestroy();
     }
 

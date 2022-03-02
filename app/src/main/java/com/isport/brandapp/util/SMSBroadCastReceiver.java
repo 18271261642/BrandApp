@@ -20,6 +20,7 @@ import com.isport.blelibrary.db.action.watch_w516.Watch_W516_SleepAndNoDisturbMo
 import com.isport.blelibrary.db.table.watch_w516.Watch_W516_NotifyModel;
 import com.isport.blelibrary.db.table.watch_w516.Watch_W516_SleepAndNoDisturbModel;
 import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
+import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.utils.BleRequest;
 import com.tencent.mm.opensdk.utils.Log;
 
@@ -107,9 +108,14 @@ public class SMSBroadCastReceiver extends BroadcastReceiver {
             if (device == null) {
                 return;
             }
-            String deviceName = device.deviceName;
-            int deviceType = device.deviceType;
-            // 同步解绑的逻辑
+            String deviceName = device.getDeviceName();
+            int deviceType = device.getDeviceType();
+
+            if(DeviceTypeUtil.isContainF18(deviceName)){
+                sendF18SmsData(msgStr);
+                return;
+            }
+
             Watch_W516_NotifyModel watch_w516_notifyModelByDeviceId = Watch_W516_NotifyModelAction.findWatch_W516_NotifyModelByDeviceId(deviceName, TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()));
 
             if (watch_w516_notifyModelByDeviceId == null) {
@@ -161,6 +167,15 @@ public class SMSBroadCastReceiver extends BroadcastReceiver {
             e.printStackTrace();
         }
     }
+
+
+    private void sendF18SmsData(String msgStr){
+        Watch7018Manager.getWatch7018Manager().sendNoticeToDevice((byte) 0x04,"",msgStr);
+    }
+
+
+
+
 
     private void getReceiverMsg(Context context) {
         try {

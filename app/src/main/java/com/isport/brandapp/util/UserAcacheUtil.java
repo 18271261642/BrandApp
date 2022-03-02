@@ -47,7 +47,7 @@ public class UserAcacheUtil {
                 aCache.put("devcieplay" + key, mGson.toJson(list));
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 

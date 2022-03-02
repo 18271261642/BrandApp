@@ -1,11 +1,16 @@
 package com.isport.brandapp.device.f18.dial;
 
 
+import android.Manifest;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.TextView;
 
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.XXPermissions;
 import com.isport.brandapp.R;
+
+import java.util.List;
 
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -34,7 +39,7 @@ public class F18DialActivity extends BaseActivity implements View.OnClickListene
     protected void initView(View view) {
         findViews();
 
-        titleLayout.setTitle("表盘设置");
+        titleLayout.setTitle(getResources().getString(R.string.watch_dial_is_set));
         titleLayout.setLeftIcon(R.drawable.icon_back);
         titleLayout.setOnTitleBarClickListener(new TitleBarView.OnTitleBarClickListener() {
             @Override
@@ -81,6 +86,13 @@ public class F18DialActivity extends BaseActivity implements View.OnClickListene
 
         dialCenterTv.setOnClickListener(this);
         dialCusTv.setOnClickListener(this);
+
+        XXPermissions.with(this).permission(Manifest.permission.WRITE_EXTERNAL_STORAGE).request(new OnPermissionCallback() {
+            @Override
+            public void onGranted(List<String> list, boolean b) {
+
+            }
+        });
     }
 
     @Override

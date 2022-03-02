@@ -325,8 +325,6 @@ public class NewShareActivity extends BaseActivity implements View.OnClickListen
     }
 
 
-
-
     private void requestPermiss(){
         ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE},0x00);
     }
@@ -523,7 +521,6 @@ public class NewShareActivity extends BaseActivity implements View.OnClickListen
             case R.id.btn_custom_bg:
                 new RxPermissions(NewShareActivity.this)
                         .request(Manifest.permission.CAMERA,
-                                Manifest.permission.READ_PHONE_STATE,
                                 Manifest.permission.READ_EXTERNAL_STORAGE,
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         .subscribe(granted -> {
@@ -644,14 +641,20 @@ public class NewShareActivity extends BaseActivity implements View.OnClickListen
                     // 得到图片的全路径
                     Uri uri = data.getData();
                     String path = BitmapUtils.getRealFilePath(context, uri);
-                    Logger.myLog(TAG,"----图片选择path="+path+"\n"+uri);
-//                   setCustomBg(path);
-                    if ("Redmi4A".equals(AppUtil.getModel())) {
-                        setCustomBg(path);
-                    } else {
-                        startPhotoZoom(uri);
-//                        startTestPhotoZoom(uri);
-                    }
+                   setCustomBg(path);
+                    String phoneModel = AppUtil.getModel();
+                    Logger.myLog(TAG,"----图片选择path="+path+"\n"+uri+"\n"+phoneModel);
+//                    if(phoneModel.toLowerCase(Locale.ROOT).equals("readmi") || phoneModel.toLowerCase(Locale.ROOT).equals("mi a1")){
+//                        setCustomBg(path);
+//                    }else{
+//                        startPhotoZoom(uri);
+//                    }
+//                    if ("Redmi4A".equals(AppUtil.getModel())) {
+//                        setCustomBg(path);
+//                    } else {
+//                        startPhotoZoom(uri);
+////                        startTestPhotoZoom(uri);
+//                    }
 
 //                    mActPresenter.compressPhoto(new File(path));
                 } else {

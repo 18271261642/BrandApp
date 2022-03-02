@@ -54,9 +54,9 @@ public class DeviceTypeUtil {
 
     public static String getCurrentBindDeviceName() {
         String deviceName = "";
-        if (AppConfiguration.deviceBeanList != null && AppConfiguration.deviceBeanList.size() > 0) {
+        if (AppConfiguration.deviceMainBeanList != null && AppConfiguration.deviceMainBeanList.size() > 0) {
             ArrayList<DeviceBean> list = new ArrayList<>();
-            list.addAll(AppConfiguration.deviceBeanList.values());
+            list.addAll(AppConfiguration.deviceMainBeanList.values());
             for (int i = 0; i < list.size(); i++) {
                 DeviceBean deviceBean = list.get(i);
                 if (deviceBean.deviceType == JkConfiguration.DeviceType.BODYFAT) {
@@ -127,6 +127,11 @@ public class DeviceTypeUtil {
     }
 
     public static String getW81Mac(String name) {
+
+        if(name.contains("BL")){    //名字为BL-F18X-XXX
+            name = name.substring(3);
+        }
+
         String macs[] = name.split("-");
         String mac = "";
         if (macs.length == 2) {
@@ -211,6 +216,7 @@ public class DeviceTypeUtil {
                 || type == JkConfiguration.DeviceType.Watch_W812B
                 || type == JkConfiguration.DeviceType.Watch_W560
                 || type == JkConfiguration.DeviceType.Watch_W560B
+                || type == JkConfiguration.DeviceType.Watch_F18
         ) {
             return true;
         } else {
@@ -233,6 +239,19 @@ public class DeviceTypeUtil {
     public static boolean isContaintW81(int deviceType) {
         return isContainW81(deviceType);
     }
+
+    public static boolean isContainF18(){
+        return null != AppConfiguration.deviceMainBeanList && AppConfiguration.deviceMainBeanList.size() > 0 && AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_F18);
+    }
+
+    public static boolean isConnectF18(int deviceType){
+        return deviceType == JkConfiguration.DeviceType.Watch_F18;
+    }
+
+    public static boolean isContainF18(int deviceType){
+        return null != AppConfiguration.deviceMainBeanList && AppConfiguration.deviceMainBeanList.size() > 0 && AppConfiguration.deviceMainBeanList.containsKey(deviceType);
+    }
+
 
     public static boolean isContainWatch() {
         if (null != AppConfiguration.deviceMainBeanList && AppConfiguration.deviceMainBeanList.size() > 0
@@ -469,6 +488,20 @@ public class DeviceTypeUtil {
             return false;
         }
     }
+
+
+    public static boolean isContainF18(String deviceName) {
+        if (TextUtils.isEmpty(deviceName)) {
+            return false;
+        }
+        if(deviceName.startsWith("BL")){
+            return true;
+        }
+
+        String[] names = deviceName.split("-");
+        return names[0].equals(Constants.WATCH_7018_FILTER);
+    }
+
 
     public static boolean isContainWatch(int current) {
         if (current == JkConfiguration.DeviceType.WATCH_W516

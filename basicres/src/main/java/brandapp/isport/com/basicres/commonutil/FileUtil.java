@@ -4,13 +4,16 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,6 +72,63 @@ public class FileUtil {
             createDir(appPath);
         }
     }
+
+    public static ArrayList<File> refreshFileList(String strPath) {
+
+        Log.e("FILEUTILS","------refreshFileList="+strPath);
+
+        ArrayList<File> localList = new ArrayList<File>();
+        File dir = new File(strPath);
+        File[] files = dir.listFiles();
+
+        if (files == null)
+            return null;
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isDirectory()) {
+                refreshFileList(files[i].getAbsolutePath());
+            } else {
+                if(files[i].getName().toLowerCase().endsWith("jpg"))
+                    localList.add(files[i]);
+            }
+        }
+        return localList;
+
+}
+
+
+    public static LinkedList<File> listLinkedFiles(String strPath) {
+        LinkedList<File> list = new LinkedList<File>();
+        File dir = new File(strPath);
+        File[] file = dir.listFiles();
+        for (int i = 0; i < file.length; i++) {
+            if (file[i].isDirectory())
+                list.add(file[i]);
+            else
+                System.out.println(file[i].getAbsolutePath());
+        }
+        File tmp;
+        while (!list.isEmpty()) {
+            tmp = (File) list.removeFirst();
+            if (tmp.isDirectory()) {
+                file = tmp.listFiles();
+                if (file == null)
+                    continue;
+                for (int i = 0; i < file.length; i++) {
+                    if (file[i].isDirectory())
+                        list.add(file[i]);
+                    else
+                        System.out.println(file[i].getAbsolutePath());
+                }
+            } else {
+                System.out.println(tmp.getAbsolutePath());
+            }
+        }
+        return list;
+    }
+
+
+
+
 
     /**
      * 获取手机根目录存储地址
@@ -529,12 +589,30 @@ public class FileUtil {
         file.delete();
     }
 
+
+
+    public static boolean deleteFileLast(String path) {
+        boolean result = false;
+        File file = new File(path);
+        if (file.isFile() && file.exists()) {
+            int tryCount = 0;
+            while (!result && tryCount++ < 10) {
+                System.gc();
+                result = file.delete();
+            }
+        }
+
+        return result;
+    }
+
     public static void deleteFile(File file) {
         try {
             if (null == file || !file.exists()) {
                 return;
             }
-            file.delete();
+            System.gc();
+            boolean isDelete = file.delete();
+            Log.e("TAG","------删除文件="+isDelete);
         } catch (Exception e) {
             e.printStackTrace();
         }

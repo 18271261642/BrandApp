@@ -7,7 +7,6 @@ import android.os.Build.VERSION;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
-import android.view.Gravity;
 import android.widget.Toast;
 
 /**
@@ -70,7 +69,7 @@ public class ToastUtils {
                         }
                         //  toast = Toast.makeText(context.getApplicationContext(), msg, len);
                         // toast.setDuration(len);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
+                     //   toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
                     }
                 }
@@ -102,5 +101,6 @@ public class ToastUtils {
 
         cancelToast();
     }
+
 
 }

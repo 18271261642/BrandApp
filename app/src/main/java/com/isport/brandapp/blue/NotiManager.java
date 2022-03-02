@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.crrepa.ble.conn.type.CRPBleMessageType;
 import com.crrepa.ble.conn.type.CRPDeviceLanguageType;
+import com.htsmart.wristband2.bean.WristbandNotification;
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.db.action.bracelet_w311.Bracelet_W311_SettingModelAction;
 import com.isport.blelibrary.db.action.watch_w516.Watch_W516_NotifyModelAction;
@@ -23,6 +24,7 @@ import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
 import com.isport.blelibrary.deviceEntry.interfaces.IDeviceType;
 import com.isport.blelibrary.entry.NotificationMsg;
 import com.isport.blelibrary.managers.Constants;
+import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.utils.AppLanguageUtil;
 import com.isport.blelibrary.utils.BleRequest;
 import com.isport.blelibrary.utils.Logger;
@@ -55,6 +57,51 @@ public class NotiManager {
     public static HashMap<String, Integer> mapstrPkNames = new HashMap<>();
     public static HashMap<String, Integer> w556mapstrPkNames = new HashMap<>();
     public static HashMap<String, Integer> w81MapstrPkNames = new HashMap<>();
+
+
+    //F18消息区分
+    public static HashMap<String,Byte> f18AppMaps = new HashMap<>();
+
+    static {
+
+        //短信
+        f18AppMaps.put(Constants.SMS_PACKAGE_NAME, WristbandNotification.TYPE_SMS);
+        f18AppMaps.put(Constants.SAMSUNG_MSG_PACKNAME, WristbandNotification.TYPE_SMS);
+        f18AppMaps.put(Constants.SAMSUNG_MSG_SRVERPCKNAME, WristbandNotification.TYPE_SMS);
+        f18AppMaps.put(Constants.MSG_PACKAGENAME, WristbandNotification.TYPE_SMS);
+        f18AppMaps.put(Constants.XIAOMI_SMS_PACK_NAME, WristbandNotification.TYPE_SMS);
+        f18AppMaps.put(Constants.SMS_ONEPLUS_PACK_NAME, WristbandNotification.TYPE_SMS);
+
+        //日历
+        f18AppMaps.put("com.android.calendar",WristbandNotification.TYPE_CALENDAR);
+        //邮件
+        f18AppMaps.put("com.android.email",WristbandNotification.TYPE_EMAIL);
+        //微信
+        f18AppMaps.put(Constants.WECHAT_APP_NAME,WristbandNotification.TYPE_WECHAT);
+        //QQ
+        f18AppMaps.put(Constants.QQ_APP_NAME,WristbandNotification.TYPE_QQ);
+        //Facebook
+        f18AppMaps.put(Constants.FACEBOOK_APP_PACK_NAME,WristbandNotification.TYPE_FACEBOOK);
+        //linkedin
+        f18AppMaps.put(Constants.LINKED_APP_PACK_NAME,WristbandNotification.TYPE_LINKEDIN);
+        //instagram
+        f18AppMaps.put(Constants.INSTAGRAM_APP_PACK_NAME,WristbandNotification.TYPE_INSTAGRAM);
+        //messenger
+        f18AppMaps.put(Constants.MESSENGER_APP_PACK_NAME,WristbandNotification.TYPE_FACEBOOK_MESSENGER);
+        //snapchat
+        f18AppMaps.put(Constants.SNAPCHAT_APP_PACK_NAME,WristbandNotification.TYPE_SNAPCHAT);
+        //link
+        f18AppMaps.put(Constants.MESSGE_LINE,WristbandNotification.TYPE_LINE);
+        //kakao Talk
+        f18AppMaps.put(Constants.KEY_KAOKAO_TALK,WristbandNotification.TYPE_KAKAO);
+        //viber
+        f18AppMaps.put(Constants.VIBER_PACK,WristbandNotification.TYPE_VIBER);
+        //skype
+        f18AppMaps.put(Constants.KEY_15_PACKAGE_2,WristbandNotification.TYPE_SKYPE);
+
+
+
+    }
 
     static {
         w556mapstrPkNames.put(Constants.KEY_14_PACKAGE, 3);
@@ -211,6 +258,13 @@ public class NotiManager {
                 return;
             }
 
+            //F18
+            if(DeviceTypeUtil.isContainF18(baseDevice.getDeviceName())){
+                sendF18AppsMsg(packagename,title,content,baseDevice.getDeviceName());
+                return;
+            }
+
+
 //            ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, title, content, 2);
 //
 
@@ -300,6 +354,91 @@ public class NotiManager {
         }
 
     }
+
+
+    //F18
+    private void sendF18AppsMsg(String packagename, String tile,String contentStr,String deviceId){
+        try {
+
+            if(f18AppMaps.containsKey(packagename)){
+                if(TextUtils.isEmpty(contentStr))
+                    return;
+                Watch7018Manager.getWatch7018Manager().sendNoticeToDevice(f18AppMaps.get(packagename),tile,contentStr);
+                return;
+            }
+            //其它
+            Watch7018Manager.getWatch7018Manager().sendNoticeToDevice(WristbandNotification.TYPE_OTHERS_APP,tile,contentStr);
+
+
+            //短信
+            if (w81MapstrPkNames.containsKey(packagename)) {
+
+                Watch7018Manager.getWatch7018Manager().sendNoticeToDevice(WristbandNotification.TYPE_SMS,tile,contentStr);
+                return;
+            }
+
+            //微信
+            if (packagename.equals(Constants.WECHAT_APP_NAME) ) {
+                Watch7018Manager.getWatch7018Manager().sendNoticeToDevice(WristbandNotification.TYPE_WECHAT,tile,contentStr);
+                return;
+            }
+
+
+            //QQ
+            if (packagename.equals(Constants.QQ_APP_NAME) ) {
+                Watch7018Manager.getWatch7018Manager().sendNoticeToDevice(WristbandNotification.TYPE_QQ,tile,contentStr);
+                return;
+            }
+
+            //WhatsAPP
+            if (packagename.equals(Constants.WHATS_APP_PACKAGE_NAME)) {
+                Watch7018Manager.getWatch7018Manager().sendNoticeToDevice(WristbandNotification.TYPE_WHATSAPP,tile,contentStr);
+                return;
+            }
+
+            //facebook
+            if (packagename.equals(Constants.FACEBOOK_APP_PACK_NAME) ) {
+                Watch7018Manager.getWatch7018Manager().sendNoticeToDevice(WristbandNotification.TYPE_FACEBOOK,tile,contentStr);
+                return;
+            }
+
+            //twitter
+            if (packagename.equals(Constants.TWITTER_APP_PACK_NAME)) {
+                Watch7018Manager.getWatch7018Manager().sendNoticeToDevice(WristbandNotification.TYPE_TWITTER,tile,contentStr);
+                return;
+            }
+
+
+            //Skype
+            if (packagename.equals(Constants.KEY_15_PACKAGE_1) ) {
+                Watch7018Manager.getWatch7018Manager().sendNoticeToDevice(WristbandNotification.TYPE_SKYPE,tile,contentStr);
+                return;
+            }
+
+            //line
+            if (packagename.equals(Constants.MESSGE_LINE) ) {
+                Watch7018Manager.getWatch7018Manager().sendNoticeToDevice(WristbandNotification.TYPE_LINE,tile,contentStr);
+                return;
+            }
+
+
+            //Instagram
+            if (packagename.equals(Constants.INSORTS_APP_PACK_NAME)) {
+                Watch7018Manager.getWatch7018Manager().sendNoticeToDevice(WristbandNotification.TYPE_INSTAGRAM,tile,contentStr);
+                return;
+            }
+            //其它
+            Watch7018Manager.getWatch7018Manager().sendNoticeToDevice(WristbandNotification.TYPE_OTHERS_APP,tile,contentStr);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+
+
+
 
     //魔样系列
     private void sendMoYMsgTypeMsg(String packagename, String tile,String contentStr,String deviceId) {

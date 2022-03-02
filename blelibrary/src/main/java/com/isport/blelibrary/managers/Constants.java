@@ -45,6 +45,8 @@ public class Constants {
     public final static String KEY_KAOKAO_TALK = "com.kakao.talk";
     public final static String MESSGE_OHTERS = "message_ohters";
     public final static String MESSGE_LINE = "jp.naver.line.android";
+
+    public static final String VIBER_PACK= "com.viber.voip"; //viber
     /**
      * add in fireware that version is 89 or up
      */
@@ -140,7 +142,7 @@ public class Constants {
 
     public static final String YT_MUSIC_APP_NAME = "com.google.ios.youtubemusic";
     public static final String OAL_APP_NAME = "olacabs.olacabs";
-    public static final String QQ_APP_NAME = "com.tencent.mqq";
+    public static final String QQ_APP_NAME = "com.tencent.mobileqq";
     public static final String WECHAT_APP_NAME = "com.tencent.mm";
 
     //Youtubemusic 31

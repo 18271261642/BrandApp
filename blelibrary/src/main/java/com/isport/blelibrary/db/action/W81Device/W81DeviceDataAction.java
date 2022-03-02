@@ -1,14 +1,17 @@
 package com.isport.blelibrary.db.action.W81Device;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.isport.blelibrary.db.CommonInterFace.WatchData;
 import com.isport.blelibrary.db.action.BleAction;
 import com.isport.blelibrary.db.parse.ParseData;
 import com.isport.blelibrary.db.table.w811w814.W81DeviceDetailData;
 import com.isport.blelibrary.gen.W81DeviceDetailDataDao;
 import com.isport.blelibrary.utils.Logger;
+import com.isport.blelibrary.utils.StepArithmeticUtil;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 
@@ -37,6 +40,74 @@ public class W81DeviceDataAction {
         }
 
     }
+
+
+    public synchronized void saveDeviceStepArrayData(String deviceId, String userId,String wrisId, String dateStr,String stepArray){
+        W81DeviceDetailData w81DeviceDetailData = getW81DeviceDetialData(deviceId, userId, dateStr);
+        if(w81DeviceDetailData != null){
+
+            Log.e("bb","----wristId="+w81DeviceDetailData.getWristbandSportDetailId());
+            if(w81DeviceDetailData.getWristbandSportDetailId() != null)
+                return;
+            w81DeviceDetailData.setStepArray(analysisStepArray(stepArray,w81DeviceDetailData.getStepArray()));
+            w81DeviceDetailData.setDateStr(dateStr);
+            Log.e("保存计步",w81DeviceDetailData.toString());
+
+            saveW81DeviceDetailData(w81DeviceDetailData);
+        }else{
+            W81DeviceDetailData wb = new W81DeviceDetailData();
+
+            wb.setUserId(userId);
+            wb.setDeviceId(deviceId);
+            wb.setWristbandSportDetailId(wrisId);
+            wb.setDateStr(dateStr);
+            wb.setStepArray(stepArray);
+
+            saveW81DeviceDetailData(wb)    ;
+
+        }
+    }
+
+
+
+    private String analysisStepArray(String currStepArr,String localStepArr){
+        if(localStepArr == null || localStepArr.equals("[]"))
+            return currStepArr;
+        if(currStepArr == null || currStepArr.equals("[]"))
+            return localStepArr;
+        //当前的计步详情
+        List<String[]> currStepList = new Gson().fromJson(currStepArr,new TypeToken<List<String[]>>(){}.getType());
+        //已经存在的计步详情
+        List<String[]> localStepList = new Gson().fromJson(localStepArr,new TypeToken<List<String[]>>(){}.getType());
+
+
+        //本地数据库有，与原始整理的数据合并
+        if(currStepList.size() == localStepList.size()){
+            List<String[]> yesResultList = new ArrayList<>();
+            for(int i = 0;i<currStepList.size();i++){
+                String[] sourceItem = currStepList.get(i);
+                String[] localItem = localStepList.get(i);
+
+                //合并
+                String[] resultStr = new String[4];
+                //小时
+                resultStr[0] = sourceItem[0];
+                //步数
+                resultStr[1] = (Integer.parseInt(sourceItem[1])+Integer.parseInt(localItem[1]))+"";
+                //距离
+                resultStr[2] = StepArithmeticUtil.addNumber(Float.parseFloat(sourceItem[2]),Float.parseFloat(localItem[2]))+"";
+                //卡路里
+                resultStr[3] = StepArithmeticUtil.addNumber(Float.parseFloat(sourceItem[3]),Float.parseFloat(localItem[3]))+"";
+                yesResultList.add(resultStr);
+            }
+
+            return new Gson().toJson(yesResultList);
+        }
+
+        return null;
+    }
+
+
 
     //保存步数数据
     public synchronized void saveW81DeviceStepData(String deviceId, String userId, String wristbandSportDetailId, String dateStr, long timestamp, int step, int dis, int cal, boolean isNet) {
@@ -135,6 +206,7 @@ public class W81DeviceDataAction {
 
     }
 
+
     public synchronized W81DeviceDetailData getW81DeviceDetialData(String deviceId, String userId, String dateStr) {
         if (TextUtils.isEmpty(deviceId) || TextUtils.isEmpty(userId) || TextUtils.isEmpty(dateStr)) {
             return null;
@@ -220,11 +292,15 @@ public class W81DeviceDataAction {
             return 0l;
         }
         long id = w81DeviceDetailDataDao.insertOrReplace(deviceDetailData);
-        Logger.myLog("saveW81DeviceDetailData：" + deviceDetailData + " save id:" + id);
+        Logger.myLog("saveW81DeviceDetailData：" + deviceDetailData.toString() + " save id:" + id);
         return id;
 
 
     }
+
+
+
+
 
     private synchronized long saveDefW81DeviceDetailData(String userId, String deviceId,
                                                          String wristbandSportDetailId, String dateStr, Long timestamp,

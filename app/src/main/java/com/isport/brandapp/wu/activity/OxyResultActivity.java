@@ -1,6 +1,7 @@
 package com.isport.brandapp.wu.activity;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,6 +20,8 @@ import com.isport.blelibrary.utils.TimeUtils;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 import com.isport.brandapp.device.W81Device.W81DeviceDataModelImp;
+import com.isport.brandapp.device.f18.OnF18ItemClickListener;
+import com.isport.brandapp.device.f18.adapter.SignalHeartAdapter;
 import com.isport.brandapp.util.ActivitySwitcher;
 import com.isport.brandapp.wu.bean.DrawRecDataBean;
 import com.isport.brandapp.wu.bean.OxyInfo;
@@ -32,8 +35,11 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonalertdialog.ProgressOxyView;
+import brandapp.isport.com.basicres.commonutil.LoadImageUtil;
 import brandapp.isport.com.basicres.commonutil.MessageEvent;
 import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.commonutil.UIUtils;
@@ -63,6 +69,15 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
     private boolean isMeasure = false;
     private W81DeviceDataModelImp mW81DeviceDataModelImp;
 
+
+    private RecyclerView signalSpo2RecyclerView;
+    private SignalHeartAdapter signalHeartAdapter;
+    private List<DrawRecDataBean> singleList;
+
+    private TextView onceSpo2ValueTv;
+
+    private ImageView spo2GuidImg;
+
     @Override
     protected int getLayoutId() {
         return R.layout.activity_oxy_result;
@@ -70,9 +85,14 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
 
     @Override
     protected void initView(View view) {
+
+        spo2GuidImg = findViewById(R.id.spo2GuidImg);
+        onceSpo2ValueTv = findViewById(R.id.onceSpo2ValueTv);
+        signalSpo2RecyclerView = findViewById(R.id.signalSpo2RecyclerView);
         progressOxyView = view.findViewById(R.id.progressBar);
         tv_title = view.findViewById(R.id.tv_title);
         iv_history = findViewById(R.id.iv_history);
+        iv_history.setVisibility(View.INVISIBLE);
         iv_back = findViewById(R.id.iv_back);
         trendview_oxy = findViewById(R.id.trendview_oxy);
         tv_oxy_value = findViewById(R.id.tv_oxy_value);
@@ -87,6 +107,15 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
                 } else {
                     finishMeasure();
                 }
+            }
+        });
+
+        LoadImageUtil.getInstance().loadGifHr(this,R.drawable.icon_spide_guid,spo2GuidImg);
+
+        spo2GuidImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                spo2GuidImg.setVisibility(View.GONE);
             }
         });
     }
@@ -122,7 +151,49 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
         mW81DeviceDataModelImp = new W81DeviceDataModelImp();
         mActPresenter.getOxyNumData();
         ISportAgent.getInstance().registerListener(mBleReciveListener);
+
+
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,true);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        signalSpo2RecyclerView.setLayoutManager(linearLayoutManager);
+        singleList = new ArrayList<>();
+        signalHeartAdapter = new SignalHeartAdapter(108,singleList,this);
+        signalSpo2RecyclerView.setAdapter(signalHeartAdapter);
+        signalHeartAdapter.setOnF18ItemClickListener(new OnF18ItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                onceSpo2ValueTv.setText(singleList.get(position).getStrdate());
+                setCurrentData(singleList.get(position));
+            }
+
+            @Override
+            public void onChildClick(int position, boolean isCheck) {
+
+            }
+
+            @Override
+            public void onLongClick(int position) {
+
+            }
+        });
     }
+
+    private void setCurrentData(DrawRecDataBean currentData) {
+        try {
+            tv_percent.setVisibility(View.VISIBLE);
+            if (currentData.getValue() > 80) {
+                progressOxyView.setProgress(currentData.getValue());
+            }
+            tv_oxy_value.setText("" + currentData.getValue());
+            tv_time.setText(currentData.getStrdate());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+
 
     @Override
     protected void onDestroy() {
@@ -176,26 +247,34 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
     }
 
     private void setDataFromLocal() {
-        mCurrentInfo = mW81DeviceDataModelImp.getOxygenLastData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
-        if (lastTimestamp == mCurrentInfo.getTimestamp().longValue()) {
-            return;
-        }
-        lastTimestamp = mCurrentInfo.getTimestamp().longValue();
-        setData();
-        if (mCurrentInfo != null) {
-
-            DrawRecDataBean bean = new DrawRecDataBean();
-            bean.setStrdate(TimeUtils.getTimeByyyyyMMddhhmmss(mCurrentInfo.getTimestamp()));
-            bean.setValue(mCurrentInfo.getBoValue());
-
-            if (mCurrentInfo.getBoValue() > 95) {
-                bean.setColors(UIUtils.getColor(R.color.common_view_color));
-            } else {
-                bean.setColors(UIUtils.getColor(R.color.oxyen_error));
-
+        try {
+            if(!ActivitySwitcher.isForeground(OxyResultActivity.this))
+                return;
+            mCurrentInfo = mW81DeviceDataModelImp.getOxygenLastData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
+            if (lastTimestamp == mCurrentInfo.getTimestamp().longValue()) {
+                return;
             }
-            trendview_oxy.setLocalData(bean);
+            lastTimestamp = mCurrentInfo.getTimestamp().longValue();
+            setData();
+            if (mCurrentInfo != null) {
+                DrawRecDataBean bean = new DrawRecDataBean();
+                bean.setStrdate(TimeUtils.getTimeByyyyyMMddhhmmss(mCurrentInfo.getTimestamp()));
+                bean.setValue(mCurrentInfo.getBoValue());
+
+                if (mCurrentInfo.getBoValue() > 95) {
+                    bean.setColors(UIUtils.getColor(R.color.common_view_color));
+                } else {
+                    bean.setColors(UIUtils.getColor(R.color.oxyen_error));
+
+                }
+                singleList.add(0,bean);
+                signalHeartAdapter.notifyDataSetChanged();
+                trendview_oxy.setLocalData(bean);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
+
     }
 
     @Override
@@ -235,10 +314,16 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
             e.printStackTrace();
         } finally {
             if (list.size() > 0) {
+
+                singleList.clear();
+                singleList.addAll(list);
+                signalHeartAdapter.notifyDataSetChanged();
+                spo2GuidImg.setVisibility(singleList.size()>=7 ? View.VISIBLE : View.GONE);
                 trendview_oxy.setdata(list, JkConfiguration.BODY_OXYGEN);
                 mCurrentInfo = info.get(0);
                 setData();
             } else {
+                spo2GuidImg.setVisibility(View.GONE);
                 trendview_oxy.setDeviceType(JkConfiguration.BODY_OXYGEN);
                 tv_percent.setVisibility(View.GONE);
                 tv_oxy_value.setText("--");
@@ -254,7 +339,7 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
 
         @Override
         public void onConnResult(boolean isConn, boolean isConnectByUser, BaseDevice baseDevice) {
-
+            AppConfiguration.isConnected = isConn;
         }
 
         @Override
@@ -278,7 +363,13 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
                                 case DeviceMessureData.measure_oxygen:
                                     isMeasure = false;
                                     btn_measure.setText(R.string.start_measure);
-                                    setDataFromLocal();
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            setDataFromLocal();
+                                        }
+                                    },1000);
+
                                     Logger.myLog("measure_oxygen success");
                                     break;
                             }

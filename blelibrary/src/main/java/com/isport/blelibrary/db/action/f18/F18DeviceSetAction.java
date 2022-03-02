@@ -6,11 +6,15 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.isport.blelibrary.db.action.BleAction;
 import com.isport.blelibrary.db.table.f18.F18CommonDbBean;
+import com.isport.blelibrary.db.table.f18.F18DetailStepBean;
+import com.isport.blelibrary.db.table.f18.F18StepBean;
 import com.isport.blelibrary.gen.F18CommonDbBeanDao;
+import com.isport.blelibrary.gen.F18DetailStepBeanDao;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Admin
@@ -19,6 +23,54 @@ import java.util.ArrayList;
 public class F18DeviceSetAction {
 
     private static final String TAG = "F18DeviceSetAction";
+
+
+    //保存手表返回的计步数据，手表同步数据后返回数据，返回数据后即情况手表中的数据，再次同步后不再返回
+    public static synchronized void saveF18DeviceDetailStep(String userId, String deviceId,String day,long time, F18StepBean f18StepBean){
+
+        if(TextUtils.isEmpty(userId) || TextUtils.isEmpty(deviceId) || TextUtils.isEmpty(day))
+            return;
+
+        F18DetailStepBeanDao f18DetailStepBeanDao = BleAction.getF18DetailStepBeanDao();
+
+        F18DetailStepBean f18DetailStepBean = new F18DetailStepBean();
+        f18DetailStepBean.setUserId(userId);
+        f18DetailStepBean.setDeviceTypeId(deviceId);
+        f18DetailStepBean.setDayStr(day);
+        f18DetailStepBean.setTimeLong(time);
+        f18DetailStepBean.setStep(f18StepBean.getStep());
+        f18DetailStepBean.setDistance(f18StepBean.getDistance());
+        f18DetailStepBean.setKcal(f18StepBean.getKcal());
+        Log.e(TAG,"-------保存详细计步到数据库="+f18DetailStepBean.toString());
+        f18DetailStepBeanDao.insert(f18DetailStepBean);
+
+    }
+
+
+    //查询数据
+    public static List<F18DetailStepBean> getF18DetailList(String userId,String deviceId,String day){
+        QueryBuilder<F18DetailStepBean> queryBuilder = BleAction.getDaoSession().queryBuilder(F18DetailStepBean.class);
+        queryBuilder.where(F18DetailStepBeanDao.Properties.UserId.eq(userId),F18DetailStepBeanDao.Properties.DeviceTypeId.eq(deviceId),F18DetailStepBeanDao.Properties.DayStr.eq(day));
+        if(queryBuilder.list().size()>0){
+           List<F18DetailStepBean> f18DetailStepBeanList = queryBuilder.list();
+           return f18DetailStepBeanList;
+        }
+        return null;
+    }
+
+
+
+    public static long deleteF18DetailStepBean(String userId,String deviceId,String day){
+        F18DetailStepBeanDao f18DetailStepBeanDao = BleAction.getF18DetailStepBeanDao();
+        List<F18DetailStepBean> delList = getF18DetailList(userId,deviceId,day);
+        if(delList != null){
+            for(F18DetailStepBean fb : delList){
+                f18DetailStepBeanDao.delete(fb);
+            }
+        }
+        return 0;
+    }
+
 
 
     //保存或更新数据，有就更新 无就保存
@@ -56,9 +108,9 @@ public class F18DeviceSetAction {
             Log.e(TAG,"-----F18保存数据="+f18CommonDbBean.toString());
             F18CommonDbBean fb = querySingleBean(userId,deviceMac,type);
             if(fb != null){
-                deleteDbData(fb);
+             deleteDbData(fb);
             }
-            Long saveDb = f18CommonDbBeanDao.insert(f18CommonDbBean);
+            Long saveDb = f18CommonDbBeanDao.insertOrReplace(f18CommonDbBean);
             Log.e(TAG,"---保存数据="+saveDb);
         }catch (Exception e){
             e.printStackTrace();
@@ -69,8 +121,11 @@ public class F18DeviceSetAction {
 
     //查询数据
     public static F18CommonDbBean querySingleBean(String userId,String deviceMac,String type){
+        Log.e(TAG,"------查询是存在="+userId+" "+deviceMac +" "+type);
         QueryBuilder<F18CommonDbBean> f18CommonDbBeanQueryBuilder = BleAction.getDaoSession().queryBuilder(F18CommonDbBean.class);
         f18CommonDbBeanQueryBuilder.where(F18CommonDbBeanDao.Properties.UserId.eq(userId),F18CommonDbBeanDao.Properties.DeviceMac.eq(deviceMac),F18CommonDbBeanDao.Properties.DbType.eq(type));
+        if(f18CommonDbBeanQueryBuilder.list() == null)
+            return null;
         if(f18CommonDbBeanQueryBuilder.list().size()>0){
             ArrayList<F18CommonDbBean> dbList = (ArrayList<F18CommonDbBean>) f18CommonDbBeanQueryBuilder.list();
             Log.e(TAG,"---查询="+new Gson().toJson(dbList));
@@ -96,6 +151,10 @@ public class F18DeviceSetAction {
     private static void deleteDbData(F18CommonDbBean db){
         F18CommonDbBeanDao f18CommonDbBeanDao = BleAction.getF18CommonDbBeanDao();
         f18CommonDbBeanDao.delete(db);
+    }
 
+    private static void updateDbData(F18CommonDbBean f18CommonDbBean){
+        F18CommonDbBeanDao f18CommonDbBeanDao = BleAction.getF18CommonDbBeanDao();
+        f18CommonDbBeanDao.update(f18CommonDbBean);
     }
 }

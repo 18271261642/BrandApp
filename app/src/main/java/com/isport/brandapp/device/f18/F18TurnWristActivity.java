@@ -2,6 +2,7 @@ package com.isport.brandapp.device.f18;
 
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.isport.blelibrary.db.table.f18.F18DbType;
@@ -11,7 +12,10 @@ import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.utils.CommonDateUtil;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
 import bike.gymproject.viewlibray.ItemView;
+import brandapp.isport.com.basicres.commonutil.ToastUtils;
 import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.commonview.TitleBarView;
 import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
@@ -24,10 +28,12 @@ import brandapp.isport.com.basicres.mvp.BaseMVPTitleActivity;
 public class F18TurnWristActivity extends BaseMVPTitleActivity<F18SetView,F18SetPresent> implements F18SetView , View.OnClickListener {
 
     private ItemView f18TurnWristStatusTimeItem;
-    private ItemView f18TurnWristStartTimeItem;
-    private ItemView f18TurnWristEndTimeItem;
+    private TextView f18TurnWristStartTimeItem;
+    private TextView f18TurnWristEndTimeItem;
 
     private F18DeviceSetData turnWristBean;
+
+    private ConstraintLayout f18TurnStartLayout,f18TurnEndLayout;
 
     @Override
     public void backAllSetData(F18DeviceSetData f18DeviceSetData) {
@@ -36,12 +42,45 @@ public class F18TurnWristActivity extends BaseMVPTitleActivity<F18SetView,F18Set
 
     @Override
     public void backSelectDateStr(int selectType,int type, String timeStr) {
-        if(selectType == 0){    //开始时间
-            f18TurnWristStartTimeItem.setContentText(timeStr);
-        }else{  //结束时间
-            f18TurnWristEndTimeItem.setContentText(timeStr);
+        try {
+            if(selectType == 0){    //开始时间
+
+                String startTimeStr = timeStr;
+                String endTimeStr = f18TurnWristEndTimeItem.getText().toString();
+                if(TextUtils.isEmpty(startTimeStr) || TextUtils.isEmpty(endTimeStr))
+                    return;
+                int[] startTimeArray = CommonDateUtil.getHourAdMinute(startTimeStr);
+                int[] endTimeArray = CommonDateUtil.getHourAdMinute(endTimeStr);
+                int endTime = endTimeArray[0] * 60 + endTimeArray[1];
+                int startTime = startTimeArray[0] * 60 + startTimeArray[1];
+
+                if(startTime>=endTime){
+                    ToastUtils.showToast(F18TurnWristActivity.this,"开始时间不能晚于结束时间!");
+                    return;
+                }
+
+                f18TurnWristStartTimeItem.setText(timeStr+"");
+            }else{  //结束时间
+
+                String startTimeStr = f18TurnWristStartTimeItem.getText().toString();
+                String endTimeStr = timeStr;
+                if(TextUtils.isEmpty(startTimeStr) || TextUtils.isEmpty(endTimeStr))
+                    return;
+                int[] startTimeArray = CommonDateUtil.getHourAdMinute(startTimeStr);
+                int[] endTimeArray = CommonDateUtil.getHourAdMinute(endTimeStr);
+                int endTime = endTimeArray[0] * 60 + endTimeArray[1];
+                int startTime = startTimeArray[0] * 60 + startTimeArray[1];
+
+                if(endTime<=startTime){
+                    ToastUtils.showToast(F18TurnWristActivity.this,"结束时间不能小于开始时间!");
+                    return;
+                }
+                f18TurnWristEndTimeItem.setText(timeStr+"");
+            }
+            setDataToDevice();
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        setDataToDevice();
     }
 
     @Override
@@ -72,16 +111,18 @@ public class F18TurnWristActivity extends BaseMVPTitleActivity<F18SetView,F18Set
 
     @Override
     protected void initData() {
-        if(AppConfiguration.braceletID != null){
-            mActPresenter.getAllDeviceSet(TokenUtil.getInstance().getPeopleIdStr(this),AppConfiguration.braceletID);
-        }
+        turnWristBean = (F18DeviceSetData) getIntent().getSerializableExtra("comm_key");
+//        if(AppConfiguration.braceletID != null){
+//            mActPresenter.getAllDeviceSet(TokenUtil.getInstance().getPeopleIdStr(this),AppConfiguration.braceletID);
+//        }
         Watch7018Manager.getWatch7018Manager().getTurnWristLightingConfig(new CommAlertListener() {
             @Override
             public void backCommAlertData(boolean isOpen, int startHour, int startMinute, int endHour, int endMinute, int interval) {
                 f18TurnWristStatusTimeItem.setChecked(isOpen);
-                f18TurnWristStartTimeItem.setContentText(CommonDateUtil.formatHourMinute(startHour,startMinute));
-                f18TurnWristEndTimeItem.setContentText(CommonDateUtil.formatHourMinute(endHour,endMinute));
+                f18TurnWristStartTimeItem.setText(CommonDateUtil.formatHourMinute(startHour,startMinute));
+                f18TurnWristEndTimeItem.setText(CommonDateUtil.formatHourMinute(endHour,endMinute));
 
+                showOrClose(isOpen);
 
                 if(turnWristBean != null){
                     turnWristBean.setTurnWrist(isOpen ? (CommonDateUtil.formatHourMinute(startHour,startMinute)+"-"+CommonDateUtil.formatHourMinute(endHour,endMinute)) : "未开启");
@@ -91,6 +132,12 @@ public class F18TurnWristActivity extends BaseMVPTitleActivity<F18SetView,F18Set
             }
         });
     }
+
+    private void showOrClose(boolean isShow){
+        f18TurnStartLayout.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        f18TurnEndLayout.setVisibility(isShow ? View.VISIBLE : View.GONE);
+    }
+
 
     @Override
     protected void initEvent() {
@@ -108,16 +155,21 @@ public class F18TurnWristActivity extends BaseMVPTitleActivity<F18SetView,F18Set
     }
 
     private void findViews(){
+
+        f18TurnStartLayout = findViewById(R.id.f18TurnStartLayout);
+        f18TurnEndLayout = findViewById(R.id.f18TurnEndLayout);
+
         f18TurnWristStatusTimeItem = findViewById(R.id.f18TurnWristStatusTimeItem);
         f18TurnWristStartTimeItem = findViewById(R.id.f18TurnWristStartTimeItem);
         f18TurnWristEndTimeItem = findViewById(R.id.f18TurnWristEndTimeItem);
-        f18TurnWristStartTimeItem.setOnClickListener(this);
-        f18TurnWristEndTimeItem.setOnClickListener(this);
+        f18TurnStartLayout.setOnClickListener(this);
+        f18TurnEndLayout.setOnClickListener(this);
 
         f18TurnWristStatusTimeItem.setOnCheckedChangeListener(new ItemView.OnItemViewCheckedChangeListener() {
             @Override
             public void onCheckedChanged(int id, boolean isChecked) {
                 f18TurnWristStatusTimeItem.setChecked(isChecked);
+                showOrClose(isChecked);
                 setDataToDevice();
             }
         });
@@ -126,18 +178,20 @@ public class F18TurnWristActivity extends BaseMVPTitleActivity<F18SetView,F18Set
     @Override
     public void onClick(View v) {
         int vId = v.getId();
-        if(vId == R.id.f18TurnWristStartTimeItem){  //开始时间
-            mActPresenter.setDateTimeSelectView(F18TurnWristActivity.this,0,3,"08:00");
+        if(vId == R.id.f18TurnStartLayout){  //开始时间
+            String str = f18TurnWristStartTimeItem.getText().toString();
+            mActPresenter.setDateTimeSelectView(F18TurnWristActivity.this,0,3,TextUtils.isEmpty(str) ? "08:00" : str);
         }
-        if(vId == R.id.f18TurnWristEndTimeItem){    //结束时间
-            mActPresenter.setDateTimeSelectView(F18TurnWristActivity.this,0,3,"08:00");
+        if(vId == R.id.f18TurnEndLayout){    //结束时间
+            String endStr = f18TurnWristEndTimeItem.getText().toString();
+            mActPresenter.setDateTimeSelectView(F18TurnWristActivity.this,1,3,TextUtils.isEmpty(endStr) ? "08:00" : endStr);
         }
 
     }
     private void setDataToDevice(){
         try {
-            String startTimeStr = f18TurnWristStartTimeItem.getContentText();
-            String endTimeStr = f18TurnWristEndTimeItem.getContentText();
+            String startTimeStr = f18TurnWristStartTimeItem.getText().toString();
+            String endTimeStr = f18TurnWristEndTimeItem.getText().toString();
             if(TextUtils.isEmpty(startTimeStr) || TextUtils.isEmpty(endTimeStr))
                 return;
             int[] startTimeArray = CommonDateUtil.getHourAdMinute(startTimeStr);

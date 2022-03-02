@@ -164,11 +164,11 @@ public class ContinousBarChartView extends View {
     private void init(Context context) {
         mContext = context;
         type = new String[5];
-        type[0] = mContext.getString(R.string.sleep_awake);
-        type[1] = mContext.getString(R.string.light_1sleep);
-        type[2] = mContext.getString(R.string.light_2sleep);
-        type[3] = mContext.getString(R.string.sleep_deep);
-        type[4] = mContext.getString(R.string.sleep_awake);
+        type[0] = mContext.getString(R.string.sleep_awake);  //清醒
+        type[1] = mContext.getString(R.string.light_1sleep);  //快速眼动
+        type[2] = mContext.getString(R.string.light_2sleep);  //浅睡
+        type[3] = mContext.getString(R.string.sleep_deep);   //深睡
+        type[4] = mContext.getString(R.string.sleep_awake);   //清醒
 
       /*  type[] = new String[]{mContext.getString(R.string.sleep_awake),
                 mContext.getString(R.string.light_1sleep),
@@ -466,12 +466,16 @@ public class ContinousBarChartView extends View {
         int position = identifyWhichItemClick(e.getX(), e.getY());
         setClicked(position);
         setHourAndMinute();
+        if(mData == null)
+            return;
        // Log.e(TAG,"----drawHint----="+position);
         if (mData != null && mClickPosition >= mData.size()) {
             return;
         }
+        assert mData != null;
+        if(mData.size()==0)
+            return;
         ContinousBarChartEntity barChartEntity = mData.get(mClickPosition);
-
 
         String startTime = SleepFormatUtils.sleepTimeFormatByIndex(startPosition, startCalendar);
         String endTime = "";
@@ -482,9 +486,6 @@ public class ContinousBarChartView extends View {
         }
         //这里画已个点击的矩形区域
         String text = type[barChartEntity.type] + startTime + "～" + endTime;//barChartEntity.getxLabel()+":00  "+barChartEntity.getyValue();
-
-
-        
         if (mOnItemBarClickListener != null) {
             if (isHasSleep) {
                 mOnItemBarClickListener.onSelectSleepState(text);

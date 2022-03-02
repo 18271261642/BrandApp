@@ -1,7 +1,9 @@
 package com.isport.blelibrary.db.action.W81Device;
 
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.google.gson.Gson;
 import com.isport.blelibrary.db.action.BleAction;
 import com.isport.blelibrary.db.table.w526.Device_TempTable;
 import com.isport.blelibrary.db.table.w811w814.BloodPressureMode;
@@ -254,7 +256,10 @@ public class DeviceMeasuredDActionation {
         }
 
         List<OneceHrMode> list = queryBuilder.list();
+        Log.e("DDD","----list="+list.size());
+
         if (list.size() > 0) {
+            Log.e("DDD","-----血氧="+new Gson().toJson(list));
             OneceHrMode oxygenMode = list.get(0);
             return oxygenMode;
         } else {

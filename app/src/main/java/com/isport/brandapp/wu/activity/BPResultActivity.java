@@ -1,6 +1,8 @@
 package com.isport.brandapp.wu.activity;
 
 import android.content.Intent;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,6 +21,8 @@ import com.isport.blelibrary.utils.TimeUtils;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 import com.isport.brandapp.device.W81Device.W81DeviceDataModelImp;
+import com.isport.brandapp.device.f18.OnF18ItemClickListener;
+import com.isport.brandapp.device.f18.adapter.SingnalBpAdapter;
 import com.isport.brandapp.util.ActivitySwitcher;
 import com.isport.brandapp.wu.bean.BPInfo;
 import com.isport.brandapp.wu.mvp.BpHistoryView;
@@ -32,8 +36,11 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import bike.gymproject.viewlibray.AkrobatNumberTextView;
 import brandapp.isport.com.basicres.BaseApp;
+import brandapp.isport.com.basicres.commonutil.LoadImageUtil;
 import brandapp.isport.com.basicres.commonutil.MessageEvent;
 import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.mvp.BaseMVPActivity;
@@ -60,8 +67,18 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
     private ImageView iv_back;
     private ImageView iv_history;
 
+
+
     private boolean isMeasure = false;
     private W81DeviceDataModelImp mW81DeviceDataModelImp;
+
+    private RecyclerView singleBpRecyclerView;
+    private SingnalBpAdapter adapter;
+    private List<BPInfo> bpInfoList;
+
+    private ImageView bpGuidImg;
+
+    private TextView onceBpDescTv;
 
     @Override
     protected int getLayoutId() {
@@ -70,6 +87,11 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
 
     @Override
     protected void initView(View view) {
+
+        onceBpDescTv = findViewById(R.id.onceBpDescTv);
+        singleBpRecyclerView = findViewById(R.id.singleBpRecyclerView);
+        bpGuidImg = findViewById(R.id.bpGuidImg);
+
         // StatusBarCompat.setStatusBarColor(this, getResources().getColor(com.isport.brandapp.basicres.R.color.common_view_color));
 //        setTranslucentStatus(getResources().getColor(R.color.common_view_color));
         trendview_bp = findViewById(R.id.trendview_bp);
@@ -89,6 +111,15 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
             }
         });
         bp_barview = findViewById(R.id.bp_barview);
+
+
+        LoadImageUtil.getInstance().loadGifHr(this,R.drawable.icon_spide_guid,bpGuidImg);
+        bpGuidImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bpGuidImg.setVisibility(View.GONE);
+            }
+        });
     }
 
 
@@ -98,6 +129,7 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
         tv_title.setText(getResources().getString(R.string.bp));
         iv_history = findViewById(R.id.iv_history);
         iv_back = findViewById(R.id.iv_back);
+        iv_history.setVisibility(View.INVISIBLE);
         iv_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -117,7 +149,44 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
         mW81DeviceDataModelImp = new W81DeviceDataModelImp();
         mActPresenter.getBpNumData();
         ISportAgent.getInstance().registerListener(mBleReciveListener);
+
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,true);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        singleBpRecyclerView.setLayoutManager(linearLayoutManager);
+        bpInfoList = new ArrayList<>();
+        adapter = new SingnalBpAdapter(bpInfoList,this);
+        singleBpRecyclerView.setAdapter(adapter);
+        adapter.setOnF18ItemClickListener(new OnF18ItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Log.e("TAG","---desc="+bpInfoList.get(position).getStrDate());
+                onceBpDescTv.setText(bpInfoList.get(position).getStrDate());
+                setCurrentData(bpInfoList.get(position));
+            }
+
+            @Override
+            public void onChildClick(int position, boolean isCheck) {
+
+            }
+
+            @Override
+            public void onLongClick(int position) {
+
+            }
+        });
+
+
     }
+
+
+    private void setCurrentData(BPInfo bpInfo){
+        tv_bp_time.setText(TimeUtils.getTimeByyyyyMMddhhmmss(bpInfo.getTimestamp()));
+        bp_barview.setProgress(bpInfo.getSpValue(), bpInfo.getDpValue());
+        tv_bp_sys.setText("" + bpInfo.getSpValue());
+        tv_bp_dias.setText("" + bpInfo.getDpValue());
+    }
+
 
     @Override
     protected void initEvent() {
@@ -140,14 +209,23 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
 
 
     private void setDataFromLocal() {
-        mCurrentInfo = mW81DeviceDataModelImp.getBloodPressureLastData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
-        if (lastTimestamp == mCurrentInfo.getTimestamp().longValue()) {
-            return;
-        }
-        lastTimestamp = mCurrentInfo.getTimestamp().longValue();
+        try {
+            if(!ActivitySwitcher.isForeground(BPResultActivity.this))
+                return;
+            mCurrentInfo = mW81DeviceDataModelImp.getBloodPressureLastData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
+            if (lastTimestamp == mCurrentInfo.getTimestamp().longValue()) {
+                return;
+            }
+            lastTimestamp = mCurrentInfo.getTimestamp().longValue();
 
-        setData();
-        trendview_bp.setLocalData(mCurrentInfo);
+            setData();
+            trendview_bp.setLocalData(mCurrentInfo);
+
+            bpInfoList.add(0,mCurrentInfo);
+            adapter.notifyDataSetChanged();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void startMeasure() {
@@ -195,19 +273,25 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
             trendview_bp.setData(info);
             mCurrentInfo = info.get(0);
             lastTimestamp = mCurrentInfo.getTimestamp().longValue();
+            bpInfoList.clear();
+            bpInfoList.addAll(info);
+            adapter.notifyDataSetChanged();
+            setCurrentData(bpInfoList.get(bpInfoList.size()-1));
+            bpGuidImg.setVisibility(bpInfoList.size()>=7 ? View.VISIBLE : View.GONE);
             setData();
         } else {
+            bpGuidImg.setVisibility(View.GONE);
             tv_bp_time.setText("--");
             tv_bp_sys.setText("--");
             tv_bp_dias.setText("--");
         }
     }
 
-    private BleReciveListener mBleReciveListener = new BleReciveListener() {
+    private final BleReciveListener mBleReciveListener = new BleReciveListener() {
 
         @Override
         public void onConnResult(boolean isConn, boolean isConnectByUser, BaseDevice baseDevice) {
-
+            AppConfiguration.isConnected = isConn;
         }
 
         @Override
@@ -227,7 +311,13 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
                                 case DeviceMessureData.measure_bloodpre:
                                     isMeasure = false;
                                     btn_measure.setText(R.string.start_measure);
-                                    setDataFromLocal();
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            setDataFromLocal();
+                                        }
+                                    },1000);
+
                                     Logger.myLog("measure_bloodpre success");
                                     break;
                                 case DeviceMessureData.measure_oxygen:

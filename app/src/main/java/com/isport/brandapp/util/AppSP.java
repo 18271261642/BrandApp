@@ -29,10 +29,15 @@ public class AppSP {
     public static String CAN_RECONNECT = "CAN_RECONNECT";
     public static String FORM_DFU = "FORM_DFU";
 
+    //F18保存Mac
+    public static final String F18_SAVE_MAC = "f18_mac";
+
     //目标类型key,0：运动目标；1：距离目标：2：卡路里目标
     public static final String DEVICE_GOAL_KEY = "device_goal_key";
     //目标
 
+    //电话提醒开关 0 关，1 开
+    public static final String F18_PHONE_ALERT = "f18_phone_status";
 
     public static HashMap macMap = new HashMap<String, String>();
 

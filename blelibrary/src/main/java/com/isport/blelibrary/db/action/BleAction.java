@@ -25,6 +25,7 @@ import com.isport.blelibrary.gen.DeviceTypeTableDao;
 import com.isport.blelibrary.gen.Device_BacklightTimeAndScreenLuminanceModelDao;
 import com.isport.blelibrary.gen.Device_TempTableDao;
 import com.isport.blelibrary.gen.F18CommonDbBeanDao;
+import com.isport.blelibrary.gen.F18DetailStepBeanDao;
 import com.isport.blelibrary.gen.FaceWatchModeDao;
 import com.isport.blelibrary.gen.OneceHrModeDao;
 import com.isport.blelibrary.gen.OxygenModeDao;
@@ -121,6 +122,13 @@ public class BleAction {
 
     //F18设置项Dao
     private static F18CommonDbBeanDao f18CommonDbBeanDao;
+
+    //F18保存手表详细计步的Dao
+    private static F18DetailStepBeanDao f18DetailStepBeanDao;
+
+    public static F18DetailStepBeanDao getF18DetailStepBeanDao() {
+        return f18DetailStepBeanDao;
+    }
 
     public static F18CommonDbBeanDao getF18CommonDbBeanDao() {
         return f18CommonDbBeanDao;
@@ -356,6 +364,7 @@ public class BleAction {
         sDailyBriefDao=sDaoSession.getDailyBriefDao();
         summaryDao=sDaoSession.getSummaryDao();
         f18CommonDbBeanDao = sDaoSession.getF18CommonDbBeanDao();
+        f18DetailStepBeanDao = sDaoSession.getF18DetailStepBeanDao();
     }
 
     public static void dropDatas() {
@@ -416,7 +425,7 @@ public class BleAction {
                 sOneceHrModeDao.deleteAll();
                 sDeviceTempTableDao.deleteAll();
 
-
+                f18DetailStepBeanDao.deleteAll();
                 f18CommonDbBeanDao.deleteAll();
                 Logger.myLog("deletAll table");
             }

@@ -29,6 +29,15 @@ public class F18DialBean {
     private String createTime;
     private Object typeName;
 
+    public F18DialBean() {
+    }
+
+    public F18DialBean(String name, String previewImgUrl, Integer status) {
+        this.name = name;
+        this.previewImgUrl = previewImgUrl;
+        this.status = status;
+    }
+
     public Integer getId() {
         return id;
     }

@@ -12,13 +12,16 @@
         android:layout_width="match_parent"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
-        android:padding="8dp"
-        android:gravity="left"
-        android:textSize="20sp"
+        android:paddingLeft="@dimen/dp30"
+        android:paddingTop="@dimen/dp10"
+        android:paddingRight="@dimen/dp30"
+        android:paddingBottom="@dimen/dp10"
+        android:textSize="15sp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         android:layout_height="wrap_content"
-        android:text="在设定时间内，抬起手腕将手表屏幕朝向自己即可点亮屏幕"/>
+        android:text="@string/string_wrist_desc"/>
 
 
 
@@ -58,33 +61,97 @@
                 app:showRemind="false" />
         </phone.gym.jkcq.com.socialmodule.shadow.ShadowLayout>
 
-        <bike.gymproject.viewlibray.ItemView
-            android:id="@+id/f18TurnWristStartTimeItem"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/dp60"
-            android:background="@drawable/common_item_bg_selector"
-            app:contentSize="@dimen/sp16"
-            app:contentTextColor="@color/common_white"
-            app:itemText="@string/watch_disturb_setting_start"
-            app:itemviewTitleSize="@dimen/sp16"
-            app:showArrow="true"
-            app:showBottomLine="true"
-            app:showCheckModel="false"
-            app:showRemind="false" />
 
-        <bike.gymproject.viewlibray.ItemView
-            android:id="@+id/f18TurnWristEndTimeItem"
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/f18TurnStartLayout"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dp60"
             android:background="@drawable/common_item_bg_selector"
-            app:contentSize="@dimen/sp16"
-            app:contentTextColor="@color/common_white"
-            app:itemText="@string/watch_disturb_setting_end"
-            app:itemviewTitleSize="@dimen/sp16"
-            app:showArrow="true"
-            app:showBottomLine="true"
-            app:showCheckModel="false"
-            app:showRemind="false" />
+            android:layout_height="@dimen/dp60">
+
+            <TextView
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="16sp"
+                android:layout_marginStart="15dp"
+                android:textColor="@color/common_text_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/watch_disturb_setting_start"/>
+
+
+            <TextView
+                android:id="@+id/f18TurnWristStartTimeItem"
+                app:layout_constraintRight_toLeftOf="@id/startremind_arrowImg"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="17sp"
+                android:padding="5dp"
+                android:textColor="@color/common_text_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+
+
+            <ImageView
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginEnd="17dp"
+                android:id="@+id/startremind_arrowImg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/icon_arrow_left" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/f18TurnEndLayout"
+            android:layout_width="match_parent"
+            android:background="@drawable/common_item_bg_selector"
+            android:layout_height="@dimen/dp60">
+
+            <TextView
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="16sp"
+                android:layout_marginStart="15dp"
+                android:textColor="@color/common_text_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/watch_disturb_setting_end"/>
+
+
+
+            <TextView
+                android:id="@+id/f18TurnWristEndTimeItem"
+                app:layout_constraintRight_toLeftOf="@id/remind_arrowImg"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="17sp"
+                android:padding="5dp"
+                android:textColor="@color/common_text_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+
+
+            <ImageView
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginEnd="17dp"
+                android:id="@+id/remind_arrowImg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/icon_arrow_left" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     </LinearLayout>

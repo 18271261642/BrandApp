@@ -43,7 +43,7 @@
                         tc:ringColor="@color/common_view_color" />
 
                     <TextView
-                        android:id="@+id/watch_bettery_count"
+                        android:id="@+id/f18Bettery_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=""
@@ -55,7 +55,7 @@
 
 
                 <TextView
-                    android:id="@+id/watch_state"
+                    android:id="@+id/f18Watch_state"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/sp10"
@@ -148,7 +148,7 @@
                 android:onClick="onClick"
                 app:contentSize="@dimen/sp14"
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="表盘设置"
+                app:itemText="@string/watch_dial_is_set"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -165,7 +165,7 @@
                 android:onClick="onClick"
                 app:contentSize="@dimen/sp14"
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="摇一摇拍照"
+                app:itemText="@string/device_setting_photo"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -181,7 +181,7 @@
                 android:background="@drawable/item_comm_main_layout"
                 app:contentSize="@dimen/sp14"
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="计步目标"
+                app:itemText="@string/watch_step_target_str"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -198,7 +198,7 @@
                 android:background="@drawable/item_comm_main_layout"
                 app:contentSize="@dimen/sp14"
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="距离目标"
+                app:itemText="@string/watch_distance_target_str"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -215,7 +215,7 @@
                 android:background="@drawable/item_comm_main_layout"
                 app:contentSize="@dimen/sp14"
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="卡路里目标"
+                app:itemText="@string/watch_calorie_target_str"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -232,7 +232,7 @@
                 android:background="@drawable/item_comm_main_layout"
                 app:contentSize="@dimen/sp14"
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="闹钟设置"
+                app:itemText="@string/watch_alarm_setting_str"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -251,7 +251,7 @@
                 app:contentSize="@dimen/sp14"
                 app:contentText=""
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="喝水提醒"
+                app:itemText="@string/string_drink_alert"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -268,7 +268,7 @@
                 app:contentSize="@dimen/sp14"
                 app:contentText=""
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="久坐提醒"
+                app:itemText="@string/watch_stable_remind_str"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -285,7 +285,7 @@
                 app:contentSize="@dimen/sp14"
                 app:contentText=""
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="勿扰模式"
+                app:itemText="@string/watch_disturb_setting_str"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -303,7 +303,7 @@
                 app:contentSize="@dimen/sp14"
                 app:contentText=""
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="APP消息提醒"
+                app:itemText="@string/watch_third_msg"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -320,7 +320,7 @@
                 app:contentSize="@dimen/sp14"
                 app:contentText=""
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="常用联系人"
+                app:itemText="@string/string_often_contact"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -333,9 +333,6 @@
                 android:layout_height="60dp"/>
 
 
-
-
-
             <!--时间格式-->
             <bike.gymproject.viewlibray.ItemDeviceSettingView
                 android:id="@+id/f18DeviceTimeStyleItem"
@@ -345,7 +342,7 @@
                 android:background="@drawable/item_comm_main_layout"
                 app:contentSize="@dimen/sp14"
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="时间格式"
+                app:itemText="@string/device_setting_time_fomate"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -362,7 +359,7 @@
                 app:contentSize="@dimen/sp14"
                 app:contentText=""
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="温度单位"
+                app:itemText="@string/temperature_setting"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -386,7 +383,7 @@
                 app:contentSize="@dimen/sp14"
                 app:contentText=""
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="加强测量"
+                app:itemText="@string/string_strength_txt"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="false"
                 app:showBottomLine="true"
@@ -404,7 +401,7 @@
                 app:contentSize="@dimen/sp14"
                 app:contentText=""
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="定时监测"
+                app:itemText="@string/string_timing_detect"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -429,7 +426,7 @@
                 app:contentSize="@dimen/sp14"
                 android:onClick="onClick"
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="查找设备"
+                app:itemText="@string/bracelet_find"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -448,7 +445,7 @@
                 android:background="@drawable/item_comm_main_layout"
                 app:contentSize="@dimen/sp14"
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="抬腕亮屏"
+                app:itemText="@string/bracelet_lift_up_screen"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -466,7 +463,7 @@
                 app:contentSize="@dimen/sp14"
                 app:contentText=""
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="天气设置"
+                app:itemText="@string/device_setting_weather"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -484,7 +481,7 @@
                 app:contentSize="@dimen/sp14"
                 app:contentText=""
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="音频模式指引"
+                app:itemText="@string/string_audio_guid"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -500,14 +497,12 @@
                 android:background="@drawable/item_comm_main_layout"
                 app:contentSize="@dimen/sp14"
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="玩转设备"
+                app:itemText="@string/bracelet_play"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
                 app:showCheckModel="false"
                 app:showRemind="false" />
-
-
 
 
 
@@ -541,7 +536,7 @@
                 app:contentSize="@dimen/sp14"
                 app:contentText=""
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="24小时心率"
+                app:itemText="@string/watch_24_heart_rate_str"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -566,7 +561,7 @@
                 app:contentSize="@dimen/sp14"
                 app:contentText=""
                 app:contentTextColor="@color/common_gray_color"
-                app:itemText="固件版本号"
+                app:itemText="@string/watch_stable_version_str"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -585,14 +580,12 @@
                 android:layout_height="@dimen/dp50"
                 android:background="@drawable/common_button_bg_selector"
                 android:gravity="center"
-                android:onClick="onClick"
                 android:text="@string/watch_unbind_str"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
                 android:layout_marginBottom="15dp"
                 android:textColor="@drawable/common_button_text_selector"
-                android:textSize="@dimen/sp18"
-                android:visibility="visible" />
+                android:textSize="@dimen/sp18" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

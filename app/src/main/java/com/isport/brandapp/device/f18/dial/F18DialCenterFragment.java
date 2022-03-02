@@ -5,9 +5,10 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 
-import com.google.gson.Gson;
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.XXPermissions;
+import com.isport.blelibrary.interfaces.OnF18DialStatusListener;
+import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.brandapp.App;
 import com.isport.brandapp.R;
 import com.isport.brandapp.device.f18.OnF18ItemClickListener;
@@ -16,6 +17,7 @@ import com.isport.brandapp.util.DownloadUtils;
 import com.isport.brandapp.util.InitCommonParms;
 import com.isport.brandapp.util.onDownloadListener;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +43,8 @@ public class F18DialCenterFragment extends BaseFragment {
     private static final String TAG = "F18DialCenterFragment";
 
     private static  String DOWN_BIN_FILE_PATH ;
+
+
 
     public static F18DialCenterFragment getInstance(){
 
@@ -76,7 +80,12 @@ public class F18DialCenterFragment extends BaseFragment {
             }
 
             @Override
-            public void onChildClick(int position) {
+            public void onChildClick(int position,boolean isCheck) {
+
+            }
+
+            @Override
+            public void onLongClick(int position) {
 
             }
         });
@@ -92,16 +101,14 @@ public class F18DialCenterFragment extends BaseFragment {
             public void onGranted(List<String> list, boolean b) {
 
             }
+
         });
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            XXPermissions.with(this).permission(Manifest.permission.MANAGE_EXTERNAL_STORAGE).request(new OnPermissionCallback() {
-//                @Override
-//                public void onGranted(List<String> list, boolean b) {
-//
-//                }
-//            });
-//        }
+
+        File dialFile = new File(DOWN_BIN_FILE_PATH+"dial.bin");
+        boolean isSaveDial =  dialFile.isFile();
+        if(!isSaveDial)
+            downLoadDial();
+
     }
 
     @Override
@@ -135,18 +142,18 @@ public class F18DialCenterFragment extends BaseFragment {
 
             @Override
             public void onOperateClick(int position) {
-                downloadBinFile(dialList.get(position).getBinUrl(),dialList.get(position).getDialNum());
+                downloadBinFile(dialList.get(index).getBinUrl(),dialList.get(index).getDialNum());
             }
         });
     }
 
 
     private void downloadBinFile(String url,String fileName){
+        dialBottomDialogView.setDialogBtnStatus("准备中..");
         DownloadUtils.getInstance().downBin(url, DOWN_BIN_FILE_PATH, fileName+".bin", new onDownloadListener() {
             @Override
             public void onStart(float length) {
                 Log.e(TAG,"----onStart="+length);
-
             }
 
             @Override
@@ -159,6 +166,8 @@ public class F18DialCenterFragment extends BaseFragment {
             public void onComplete() {
                 Log.e(TAG,"----onComplete--");
                 dialBottomDialogView.setDialogBtnStatus("下载完成");
+                setDialToDevice(DOWN_BIN_FILE_PATH+fileName+".bin");
+
             }
 
             @Override
@@ -168,6 +177,46 @@ public class F18DialCenterFragment extends BaseFragment {
             }
         });
     }
+
+
+    private void setDialToDevice(String dialFile){
+        if(dialFile == null)
+            return;
+        Log.e(TAG,"-----表盘路径="+dialFile);
+        Watch7018Manager.getWatch7018Manager(getActivity()).setF18DialToDevice(new File(dialFile), (byte) 0, new OnF18DialStatusListener() {
+            @Override
+            public void startDial() {
+                if(dialBottomDialogView != null)
+                    dialBottomDialogView.setDialogBtnStatus("升级中..");
+            }
+
+            @Override
+            public void onError(int errorType, int errorCode) {
+                if(dialBottomDialogView != null)
+                    dialBottomDialogView.setDialogBtnStatus("升级失败"+errorCode+" "+errorType);
+            }
+
+            @Override
+            public void onStateChanged(int state, boolean cancelable) {
+                if(dialBottomDialogView != null)
+                    dialBottomDialogView.setDialogBtnStatus("升级中..");
+            }
+
+            @Override
+            public void onProgressChanged(int progress) {
+                if(dialBottomDialogView != null)
+                    dialBottomDialogView.setDialogBtnStatus("升级中:"+progress+"%");
+            }
+
+            @Override
+            public void onSuccess() {
+                if(dialBottomDialogView != null)
+                    dialBottomDialogView.setDialogBtnStatus("升级完成");
+            }
+        });
+    }
+
+
 
     //获取表盘
     private void getDialListData(){
@@ -216,7 +265,6 @@ public class F18DialCenterFragment extends BaseFragment {
 
             @Override
             public void onNext(@NonNull List<F18DialBean> f18DialBeans) {
-                Log.e(TAG,"-----获取表盘市场="+new Gson().toJson(f18DialBeans));
                 dialList.clear();
                 dialList.addAll(f18DialBeans);
                 dialCenterAdapter.notifyDataSetChanged();
@@ -229,6 +277,37 @@ public class F18DialCenterFragment extends BaseFragment {
 
             @Override
             public void onComplete() {
+
+            }
+        });
+    }
+
+
+
+    private void downLoadDial(){
+        DownloadUtils.getInstance().downBin("http://47.90.83.197/file/ios/dial.bin", DOWN_BIN_FILE_PATH, "dial.bin", new onDownloadListener() {
+            @Override
+            public void onStart(float length) {
+                Log.e("TAG","----onStart="+length);
+
+            }
+
+            @Override
+            public void onProgress(float progress) {
+                Log.e("TAG","----onProgress="+progress);
+
+            }
+
+            @Override
+            public void onComplete() {
+                Log.e("TAG","----onComplete--");
+
+
+            }
+
+            @Override
+            public void onFail() {
+                Log.e("TAG","----onFail--");
 
             }
         });

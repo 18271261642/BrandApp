@@ -3,6 +3,7 @@ package com.isport.brandapp.wu.activity;
 import android.content.Intent;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,6 +26,8 @@ import com.isport.blelibrary.utils.TimeUtils;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 import com.isport.brandapp.device.W81Device.W81DeviceDataModelImp;
+import com.isport.brandapp.device.f18.OnF18ItemClickListener;
+import com.isport.brandapp.device.f18.adapter.SignalHeartAdapter;
 import com.isport.brandapp.device.scale.view.OnceHrBarView;
 import com.isport.brandapp.util.ActivitySwitcher;
 import com.isport.brandapp.wu.bean.DrawRecDataBean;
@@ -40,8 +43,11 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonbean.UserInfoBean;
+import brandapp.isport.com.basicres.commonutil.LoadImageUtil;
 import brandapp.isport.com.basicres.commonutil.MessageEvent;
 import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.mvp.BaseMVPActivity;
@@ -78,6 +84,15 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
     private boolean isMeasure = false;
     private W81DeviceDataModelImp mW81DeviceDataModelImp;
 
+
+    private RecyclerView signalRecyclerView;
+    private SignalHeartAdapter signalHeartAdapter;
+    private List<DrawRecDataBean> singleList;
+
+    private TextView onceHeartGuidTv;
+
+    private ImageView htGuidImg;
+
     @Override
     protected int getLayoutId() {
         return R.layout.activity_once_hr_result;
@@ -85,6 +100,11 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
 
     @Override
     protected void initView(View view) {
+
+        htGuidImg = findViewById(R.id.htGuidImg);
+        onceHeartGuidTv = findViewById(R.id.onceHeartGuidTv);
+        signalRecyclerView = findViewById(R.id.signalRecyclerView);
+
         etValue = findViewById(R.id.et_value);
         btn_add = findViewById(R.id.btn_add);
 
@@ -118,11 +138,20 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
                 }, 200);
             }
         });
+
+
+        LoadImageUtil.getInstance().loadGifHr(this,R.drawable.icon_spide_guid,htGuidImg);
+
+        htGuidImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                htGuidImg.setVisibility(View.GONE);
+            }
+        });
     }
 
     @Override
     protected void initEvent() {
-
     }
 
     @Override
@@ -131,6 +160,7 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
         tv_title.setText(getResources().getString(R.string.mian_title_once_hr));
         iv_history = findViewById(R.id.iv_history);
         iv_back = findViewById(R.id.iv_back);
+        iv_history.setVisibility(View.INVISIBLE);
         iv_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -148,6 +178,33 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
 
     @Override
     protected void initData() {
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,true);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        signalRecyclerView.setLayoutManager(linearLayoutManager);
+        singleList = new ArrayList<>();
+        signalHeartAdapter = new SignalHeartAdapter(120,singleList,this);
+        signalRecyclerView.setAdapter(signalHeartAdapter);
+
+
+        signalHeartAdapter.setOnF18ItemClickListener(new OnF18ItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                onceHeartGuidTv.setText(singleList.get(position).getStrdate());
+                setCurrData(singleList.get(position));
+            }
+
+            @Override
+            public void onChildClick(int position, boolean isCheck) {
+
+            }
+
+            @Override
+            public void onLongClick(int position) {
+
+            }
+        });
+
         mhandler = new Handler();
         userInfoBean = CommonUserAcacheUtil.getUserInfo(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
         String birthday = "";
@@ -161,6 +218,42 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
         mActPresenter.getOnceHrNumData();
         ISportAgent.getInstance().registerListener(mBleReciveListener);
     }
+
+
+
+    private void setCurrData(DrawRecDataBean currData) {
+        try {
+            if (currData != null) {
+                int currentHr = currData.getValue();
+                tv_percent.setVisibility(View.VISIBLE);
+                tv_oxy_value.setText(currData.getValue()+"");
+                try {
+                    tv_oxy_value.setTextColor(HeartRateConvertUtils.hrValueColor(currData.getValue(), HeartRateConvertUtils.getMaxHeartRate(age, sex)));
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                tv_time.setText(currData.getStrdate()+"");
+
+                float precent = (float) HeartRateConvertUtils.hearRate2Percent(currentHr, HeartRateConvertUtils.getMaxHeartRate(age, sex));
+                int color = HeartRateConvertUtils.hrValueColor(currentHr, HeartRateConvertUtils.getMaxHeartRate(age, sex));
+
+                //渲染位置
+                mhandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        onceHrBarView.setCurrentBMIvalue(precent, color);
+                    }
+                }, 500);
+
+                // onceHrBarView.setCurrentBMIvalue(precent);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     protected void onDestroy() {
@@ -240,6 +333,8 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
     }
 
     private void setDataFromLocal() {
+        if(!ActivitySwitcher.isForeground(OnceHrDataResultActivity.this))
+            return;
         mCurrentInfo = mW81DeviceDataModelImp.getOneceHrLastData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
         Logger.myLog("mCurrentInfo:" + mCurrentInfo + "lastSingleId:" + lastTimestamp);
         trendview_oxy.setDeviceType(JkConfiguration.BODY_ONCE_HR);
@@ -261,7 +356,8 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
                 bean.setColors(HeartRateConvertUtils.hrValueColor(value, HeartRateConvertUtils.getMaxHeartRate(age, sex)));
                 bean.setStrdate(TimeUtils.getTimeByyyyyMMddhhmmss(mCurrentInfo.getTimestamp()));
                 trendview_oxy.setLocalData(bean);
-
+                singleList.add(0,bean);
+                signalHeartAdapter.notifyDataSetChanged();
             }
         }
     }
@@ -276,7 +372,7 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
 
         @Override
         public void onConnResult(boolean isConn, boolean isConnectByUser, BaseDevice baseDevice) {
-
+            AppConfiguration.isConnected = isConn;
         }
 
         @Override
@@ -286,6 +382,8 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
 
         @Override
         public void receiveData(IResult mResult) {
+            Log.e(TAG,"-------手动测量---心率--Result="+mResult.getType());
+
             if (mResult != null)
                 switch (mResult.getType()) {
                     //设备测量结果成功
@@ -299,7 +397,13 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
                                 case DeviceMessureData.measure_once_hr:
                                     isMeasure = false;
                                     btn_measure.setText(R.string.start_measure);
-                                    setDataFromLocal();
+                                    mhandler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            setDataFromLocal();
+                                        }
+                                    },1000);
+
                                     Logger.myLog("measure_oxygen success");
                                     break;
                             }
@@ -353,10 +457,18 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
         } finally {
             if (list.size() > 0) {
 
+                singleList.addAll(list);
+                signalHeartAdapter.notifyDataSetChanged();
+
+                htGuidImg.setVisibility(singleList.size()>=7 ? View.VISIBLE : View.GONE);
+
+                setCurrData(singleList.get(singleList.size()-1));
+
                 mCurrentInfo = info.get(0);
                 trendview_oxy.setdata(list, JkConfiguration.BODY_ONCE_HR);
                 setData();
             } else {
+                htGuidImg.setVisibility(View.GONE);
                 trendview_oxy.setDeviceType(JkConfiguration.BODY_ONCE_HR);
                 tv_percent.setVisibility(View.INVISIBLE);
                 tv_oxy_value.setText("--");

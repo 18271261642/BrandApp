@@ -1,5 +1,7 @@
 package com.isport.brandapp.wu.bean;
 
+import com.isport.brandapp.util.DateTimeUtils;
+
 public class BPInfo {
 
     /**
@@ -76,7 +78,7 @@ public class BPInfo {
     }
 
     public String getStrDate() {
-        return strDate;
+        return strDate == null ? DateTimeUtils.getFormatDate(getTimestamp(),"yyyy-MM-dd HH:mm:ss") : strDate;
     }
 
     public void setStrDate(String strDate) {

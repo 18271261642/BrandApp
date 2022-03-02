@@ -17,10 +17,12 @@ import com.isport.blelibrary.db.table.watch_w516.Watch_W516_NotifyModel;
 import com.isport.blelibrary.db.table.watch_w516.Watch_W516_SleepAndNoDisturbModel;
 import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
 import com.isport.blelibrary.deviceEntry.interfaces.IDeviceType;
+import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.utils.BleRequest;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
+import com.isport.brandapp.util.AppSP;
 import com.isport.brandapp.util.DateTimeUtils;
 import com.isport.brandapp.util.DeviceTypeUtil;
 
@@ -38,8 +40,25 @@ public class ContentUtils {
             if (device == null) {
                 return;
             }
-            String devcieName = device.deviceName;
-            int deviceType = device.deviceType;
+
+
+            String devcieName = device.getDeviceName();
+            int deviceType = device.getDeviceType();
+
+
+            if(DeviceTypeUtil.isContainF18(deviceType)){
+                String name = ContentUtils.contactNameByNumber(context, incomingNumber);
+                if (TextUtils.isEmpty(name)) {
+                    name = incomingNumber;
+                }
+                int phoneStatusCode = AppSP.getInt(context,AppSP.F18_PHONE_ALERT,0);
+                if(phoneStatusCode == 1){
+                    Watch7018Manager.getWatch7018Manager().sendNoticeToDevice((byte) 0x01,name,UIUtils.getString(R.string.incomingNumber));
+                }
+
+                return;
+            }
+
             Watch_W516_NotifyModel watch_w516_notifyModelByDeviceId = Watch_W516_NotifyModelAction.findWatch_W516_NotifyModelByDeviceId(devcieName, TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()));
 
             Logger.myLog("sendCall" + device + "------" + watch_w516_notifyModelByDeviceId);

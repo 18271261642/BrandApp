@@ -19,10 +19,9 @@ import com.isport.blelibrary.utils.BleRequest;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
+import com.isport.brandapp.util.ActivitySwitcher;
 
 import org.greenrobot.eventbus.EventBus;
-
-import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import brandapp.isport.com.basicres.BaseActivity;
@@ -66,11 +65,16 @@ public class MeassureActivity extends BaseActivity {
     private void getIntentValue() {
         measueType = getIntent().getIntExtra("device_type", 0);
         int measureDuring ;
-        if(Objects.requireNonNull(AppConfiguration.deviceMainBeanList.get(JkConfiguration.DeviceType.Watch_F18)).getDeviceType() == 7018){
-            measureDuring = 60 * 1000;
+        if(AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_F18)){
+            measureDuring = 70 * 1000;
         }else{
             measureDuring = 30 * 1000;
         }
+//        if(Objects.requireNonNull(AppConfiguration.deviceMainBeanList.get(JkConfiguration.DeviceType.Watch_F18)).getDeviceType() == 7018){
+//            measureDuring = 60 * 1000;
+//        }else{
+//            measureDuring = 30 * 1000;
+//        }
         handler.sendEmptyMessageDelayed(0x00,measureDuring);
     }
 
@@ -127,7 +131,7 @@ public class MeassureActivity extends BaseActivity {
     }
 
 
-    private BleReciveListener mBleReciveListener = new BleReciveListener() {
+    private final BleReciveListener mBleReciveListener = new BleReciveListener() {
 
         @Override
         public void onConnResult(boolean isConn, boolean isConnectByUser, BaseDevice baseDevice) {
@@ -135,9 +139,13 @@ public class MeassureActivity extends BaseActivity {
             if (isConn) {
 
             } else {
-                ToastUtils.showToast(UIUtils.getContext(), getString(R.string.measure_fail));
-                EventBus.getDefault().post(new MessageEvent(MessageEvent.measure_end));
-                finish();
+                //判断是否在前台
+                if(ActivitySwitcher.isForeground(MeassureActivity.this)){
+                    ToastUtils.showToast(UIUtils.getContext(), getString(R.string.measure_fail));
+                    EventBus.getDefault().post(new MessageEvent(MessageEvent.measure_end));
+                    finish();
+                }
+
             }
 
         }

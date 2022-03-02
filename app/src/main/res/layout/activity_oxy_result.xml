@@ -15,7 +15,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <include layout="@layout/include_result_title"></include>
+        <include layout="@layout/include_result_title"/>
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
@@ -57,9 +57,9 @@
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
                         android:layout_gravity="center_horizontal"
-                        android:textStyle="bold"
                         android:textColor="@color/common_tips_color"
                         android:textSize="@dimen/sp14"
+                        android:textStyle="bold"
                         tools:text="2019-11-06 18:52:22" />
 
 
@@ -220,11 +220,12 @@
 
 
                     <TextView
+                        android:id="@+id/onceSpo2ValueTv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="13dp"
-                        android:textStyle="bold"                        android:gravity="center"
-                        android:text="@string/oxyresult_oxy_measure_trend"
+                        android:textStyle="bold"
+                        android:gravity="center"
                         android:textColor="@color/common_text_color"
                         android:textSize="@dimen/dp12" />
 
@@ -233,7 +234,31 @@
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/dp150"
                         android:layout_marginLeft="10dp"
+                        android:visibility="gone"
                         android:layout_marginRight="@dimen/dp10" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/signalSpo2RecyclerView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/sp140"/>
+
+
+                        <ImageView
+                            android:id="@+id/spo2GuidImg"
+                            android:layout_width="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_height="150dp"/>
+
+
+                    </FrameLayout>
+
+
+
 
                 </LinearLayout>
 
@@ -263,6 +288,15 @@
                         android:text="@string/oxyresult_oxy_des"
                         android:textColor="@color/common_white"
                         android:textSize="@dimen/sp14" />
+
+
+                    <TextView
+                        android:textColor="@color/common_name_color"
+                        android:textSize="@dimen/sp14"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/string_no_duty"/>
                 </LinearLayout>
 
 

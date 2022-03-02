@@ -15,6 +15,13 @@ import java.util.Locale;
 public class DateTimeUtils {
 
 
+    public static String getFormatDate(long time,String format){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format,Locale.CHINA);
+
+        return simpleDateFormat.format(new Date(time));
+    }
+
+
     public static int formatLongDateToInt(Long timeStr){
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.CHINA);

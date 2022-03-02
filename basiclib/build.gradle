@@ -41,13 +41,22 @@ repositories {
 dependencies {
     implementation files('libs/AMap_Search_V6.9.3_20190722.jar')
     implementation files('libs/commons-lang-2.5.jar')
+    implementation files('libs\\umeng-share-core-7.1.7.jar')
+    // implementation files('libs/rtk-core-1.2.1.jar')
+    //implementation files('libs/rtk-dfu-3.3.9.jar')
     def deps = rootProject.ext.deps
     api fileTree(dir: 'libs', include: ['*.jar'])
-    api(name: 'crpblelib_141', ext: 'aar')
+    //魔样SDK
+   // api(name: 'crpblelib_141', ext: 'aar')
+    api(name: 'crpblelib-1.5.8', ext: 'aar')
 
     //F18拓步SDK
     api(name:'libraryCore_v1.1.7', ext: 'aar')
-    //api(name:'libraryDfu_v1.0.4', ext: 'aar')
+    api(name:'libraryDfu_v1.0.4', ext: 'aar')
+
+    //图片选择框架
+    api "com.zhihu.android:matisse:0.5.3-beta3"
+
 
     //RxAndroidBle
     api 'com.polidea.rxandroidble2:rxandroidble:1.11.1'
@@ -65,15 +74,10 @@ dependencies {
     implementation files('libs/umeng-apm-v1.1.1.aar') // native crash包依赖(必选)
 
     implementation deps.appcompat
-//    testImplementation 'junit:junit:4.12'
-//    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-//    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
     api 'androidx.cardview:cardview:1.0.0'
 
-    /* api 'com.squareup.okhttp:okhttp:latest.integration'
-     api 'com.squareup.okio:okio:latest.integration'*/
-//    api 'com.tencent.bugly:crashreport:latest.release'
-//    api 'com.tencent.bugly:nativecrashreport:latest.release'
+
     api 'com.google.code.gson:gson:2.8.7'
 
     //图片加载库
@@ -82,9 +86,7 @@ dependencies {
    // api 'jp.wasabeef:glide-transformations:2.0.2'
 
      api 'com.github.bumptech.glide:glide:4.10.0'
-    //annotationProcessor 'com.github.bumptech.glide:compiler:4.10.0'
 
-   // api 'com.githang:status-bar-compat:0.7'
 
     //权限控制
     // rxjava

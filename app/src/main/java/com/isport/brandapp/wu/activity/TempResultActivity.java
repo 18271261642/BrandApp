@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,6 +24,9 @@ import com.isport.blelibrary.utils.TimeUtils;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 import com.isport.brandapp.device.W81Device.W81DeviceDataModelImp;
+import com.isport.brandapp.device.f18.OnF18ItemClickListener;
+import com.isport.brandapp.device.f18.adapter.SingleTempAdapter;
+import com.isport.brandapp.util.ActivitySwitcher;
 import com.isport.brandapp.wu.bean.TempInfo;
 import com.isport.brandapp.wu.mvp.TempHistoryView;
 import com.isport.brandapp.wu.mvp.presenter.TempHistoryPresenter;
@@ -36,7 +40,10 @@ import java.util.List;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import brandapp.isport.com.basicres.BaseApp;
+import brandapp.isport.com.basicres.commonutil.LoadImageUtil;
 import brandapp.isport.com.basicres.commonutil.MessageEvent;
 import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.commonutil.UIUtils;
@@ -68,6 +75,16 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
     private EditText etTemp;
     private Button btnAdd;
 
+    
+    private RecyclerView tempRecyclerView;
+    private List<TempInfo> tempInfoList;
+    private SingleTempAdapter singleTempAdapter;
+
+    //展示引导图片
+    private ImageView temperGuidImg;
+
+    private TextView onceTempDescTv;
+    
     @Override
     protected int getLayoutId() {
         return R.layout.activity_tempresult;
@@ -75,7 +92,9 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
 
     @Override
     protected void initView(View view) {
-
+        onceTempDescTv = findViewById(R.id.onceTempDescTv);
+        temperGuidImg = findViewById(R.id.temperGuidImg);
+        tempRecyclerView = findViewById(R.id.tempRecyclerView);
 //        setTranslucentStatus(getResources().getColor(R.color.common_view_color));
         tv_start_temp1 = findViewById(R.id.tv_start_temp1);
         tv_start_temp2 = findViewById(R.id.tv_start_temp2);
@@ -92,6 +111,15 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
         stateList.add(iv_state_low);
         stateList.add(iv_state_high);
 
+
+        LoadImageUtil.getInstance().loadGifHr(this,R.drawable.icon_spide_guid,temperGuidImg);
+
+        temperGuidImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                temperGuidImg.setVisibility(View.GONE);
+            }
+        });
 
         tv_value = findViewById(R.id.tv_value);
         tv_unitl = findViewById(R.id.tv_unitl);
@@ -140,10 +168,10 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
             // view_temp_low_fever.setData(String.format(UIUtils.getString(R.string.temp_low_fever_title), "37.3" + UIUtils.getString(R.string.temperature_degree_centigrade), "38.0" + UIUtils.getString(R.string.temperature_degree_centigrade)));
             //  view_temp_high_fever.setData(String.format(UIUtils.getString(R.string.temp_high_fever_title), "38.1" + UIUtils.getString(R.string.temperature_degree_centigrade)));
         } else {
-            tv_start_temp1.setText("35.0" + UIUtils.getString(R.string.temperature_fahrenheit));
-            tv_start_temp2.setText("37.2" + UIUtils.getString(R.string.temperature_fahrenheit));
-            tv_start_temp3.setText("38.0" + UIUtils.getString(R.string.temperature_fahrenheit));
-            tv_start_temp4.setText("42.0" + UIUtils.getString(R.string.temperature_fahrenheit));
+            tv_start_temp1.setText("95.0" + UIUtils.getString(R.string.temperature_fahrenheit));
+            tv_start_temp2.setText("98.9" + UIUtils.getString(R.string.temperature_fahrenheit));
+            tv_start_temp3.setText("100.4" + UIUtils.getString(R.string.temperature_fahrenheit));
+            tv_start_temp4.setText("107.6" + UIUtils.getString(R.string.temperature_fahrenheit));
             //  view_temp_normal.setData(String.format(UIUtils.getString(R.string.temp_norm_temp_title), CommonDateUtil.formatOnePoint(CommonDateUtil.ctof(35.0f)) + UIUtils.getString(R.string.temperature_fahrenheit), CommonDateUtil.formatOnePoint(CommonDateUtil.ctof(37.2f)) + UIUtils.getString(R.string.temperature_fahrenheit)));
             // view_temp_low_fever.setData(String.format(UIUtils.getString(R.string.temp_low_fever_title), CommonDateUtil.formatOnePoint(CommonDateUtil.ctof(37.3f)) + UIUtils.getString(R.string.temperature_fahrenheit), CommonDateUtil.formatOnePoint(CommonDateUtil.ctof(38.0f)) + UIUtils.getString(R.string.temperature_fahrenheit)));
             // view_temp_high_fever.setData(String.format(UIUtils.getString(R.string.temp_high_fever_title), CommonDateUtil.formatOnePoint(CommonDateUtil.ctof(38.1f)) + UIUtils.getString(R.string.temperature_fahrenheit)));
@@ -162,8 +190,39 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
         mActPresenter.getTempUnitl(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
         ISportAgent.getInstance().registerListener(mBleReciveListener);
 
+        if(Objects.requireNonNull(AppConfiguration.deviceMainBeanList.get(JkConfiguration.DeviceType.Watch_F18)).getDeviceType() == 7018){
+            iv_measure_way.setVisibility(View.INVISIBLE);
+        }
+
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,true);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        tempRecyclerView.setLayoutManager(linearLayoutManager);
+        tempInfoList = new ArrayList<>();
+        singleTempAdapter = new SingleTempAdapter(tempInfoList,this);
+        tempRecyclerView.setAdapter(singleTempAdapter);
+
+        singleTempAdapter.setOnF18ItemClickListener(new OnF18ItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                onceTempDescTv.setText(tempInfoList.get(position).getStrDate());
+                setCurrentValue(tempInfoList.get(position));
+            }
+
+            @Override
+            public void onChildClick(int position, boolean isCheck) {
+
+            }
+
+            @Override
+            public void onLongClick(int position) {
+
+            }
+        });
+
+
         titleBarView.setTitle(getResources().getString(R.string.temp));
-        titleBarView.setRightIcon(R.drawable.icon_sleep_history);
+     //   titleBarView.setRightIcon(R.drawable.icon_sleep_history);
         titleBarView.setOnTitleBarClickListener(new TitleBarView.OnTitleBarClickListener() {
             @Override
             public void onLeftClicked(View view) {
@@ -178,6 +237,37 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
             }
         });
     }
+
+
+    private void setCurrentValue(TempInfo tempInfo) {
+        Log.e(TAG,"-------点击温度="+tempInfo.toString());
+        try {
+            if (tempInfo != null) {
+                if (tempInfo.equals("0")) {
+                    tv_value.setText(tempInfo.getCentigrade());
+                } else {
+                    tv_value.setText(tempInfo.getFahrenheit());
+                }
+                //iv_bg_temp_state.setImageResource(mCurrentInfo.getResId());
+                // tv_state.setTextColor(mCurrentInfo.getColor());
+                tv_value.setTextColor(tempInfo.getColor());
+                tv_unitl.setTextColor(tempInfo.getColor());
+                tv_state.setText(tempInfo.getState());
+                tv_bp_time.setText(tempInfo.getStrDate());
+
+                for (int i = 0; i < stateList.size(); i++) {
+                    stateList.get(i).setVisibility(View.INVISIBLE);
+                }
+                stateList.get(mCurrentInfo.getResId() - 1).setVisibility(View.VISIBLE);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+
+
 
     @Override
     protected void initEvent() {
@@ -212,8 +302,13 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
 
 
     private void setDataFromLocal() {
-        mActPresenter.getLastTempData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
-
+        try {
+            if(ActivitySwitcher.isForeground(TempResultActivity.this)){
+                mActPresenter.getLastTempData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 
@@ -233,12 +328,12 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
     private void startMeasure() {
         if (AppConfiguration.isConnected) {
             int measureDuring ;
-            if(Objects.requireNonNull(AppConfiguration.deviceMainBeanList.get(JkConfiguration.DeviceType.Watch_F18)).getDeviceType() == 7018){
-                measureDuring = 60 * 1000;
+            if(AppConfiguration.deviceMainBeanList.containsKey(JkConfiguration.DeviceType.Watch_F18)){
+                measureDuring = 80 * 1000;
             }else{
                 measureDuring = 5 * 1000;
             }
-            handler.sendEmptyMessageDelayed(0x00,measureDuring);
+            handler.sendEmptyMessageDelayed(0x01,measureDuring);
             isMeasure = true;
             btn_measure.setText(R.string.measureing);
             ISportAgent.getInstance().requestBle(BleRequest.MEASURE_TEMP, true);
@@ -276,11 +371,11 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
         return new TempHistoryPresenter();
     }
 
-    private BleReciveListener mBleReciveListener = new BleReciveListener() {
+    private final BleReciveListener mBleReciveListener = new BleReciveListener() {
 
         @Override
         public void onConnResult(boolean isConn, boolean isConnectByUser, BaseDevice baseDevice) {
-
+            AppConfiguration.isConnected = isConn;
         }
 
         @Override
@@ -309,12 +404,18 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
                                 case DeviceMessureData.today_temp:
                                     handler.removeMessages(0x01);
                                     isMeasure = false;
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            setDataFromLocal();
+                                        }
+                                    },1000);
                                     btn_measure.setText(R.string.start_measure);
-                                    setDataFromLocal();
+
                                     break;
                             }
                         } catch (Exception e) {
-
+                            e.printStackTrace();
                         }
 
                         break;
@@ -339,7 +440,14 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
             trendview_temp.setData(info, currentTempUtil);
             mCurrentInfo = info.get(0);
             setData();
+            tempInfoList.clear();
+            tempInfoList.addAll(info);
+            singleTempAdapter.notifyDataSetChanged();
+
+            temperGuidImg.setVisibility(tempInfoList.size()>6 ? View.VISIBLE : View.GONE);
+
         } else {
+            temperGuidImg.setVisibility( View.GONE);
             tv_bp_time.setText("--");
             //tv_bp_sys.setText("--");
             //tv_bp_dias.setText("--");
@@ -351,6 +459,9 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
         mCurrentInfo = mW81DeviceDataModelImp.getTempInfoeLastData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
         setData();
         trendview_temp.setLocalData(mCurrentInfo, currentTempUtil);
+
+        tempInfoList.add(0,info);
+        singleTempAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -362,7 +473,7 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
             tv_unitl.setText(UIUtils.getString(R.string.temperature_fahrenheit));
         }
         setDefTitle();
-        mActPresenter.getTempNumberHistory(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), 7);
+        mActPresenter.getTempNumberHistory(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), 50);
     }
 
 

@@ -1,12 +1,14 @@
 package com.isport.blelibrary.db.table.f18;
 
+import java.io.Serializable;
+
 /**
  * F18设置相关bean
  * Created by Admin
  * Date 2022/1/17
  */
 
-public class F18DeviceSetData {
+public class F18DeviceSetData implements Serializable {
 
 
     //userId

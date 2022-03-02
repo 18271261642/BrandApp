@@ -3,16 +3,18 @@ package com.isport.brandapp.device.sleep;
 import android.content.Context;
 import android.text.format.DateFormat;
 
+import com.isport.blelibrary.utils.CommonDateUtil;
 import com.isport.brandapp.R;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import brandapp.isport.com.basicres.BaseApp;
-import com.isport.blelibrary.utils.CommonDateUtil;
 import brandapp.isport.com.basicres.commonutil.UIUtils;
 
 public class TimeUtil {
@@ -500,6 +502,32 @@ public class TimeUtil {
     public static String formatMinute(int hour, int minute) {
         return String.format("%02d:%02d", hour, minute);
     }
+
+
+
+    //获取上一天的日期
+    public static String getYesterday(String currDay){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
+        try {
+            long dateStr = Objects.requireNonNull(sdf.parse(currDay)).getTime();
+            long yesStr = dateStr - 86400L*1000;
+            return sdf.format(new Date(yesStr));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    //将分钟转换成HH：mm格式
+    public static String formatMinuteToStr(int time){
+        if(time == 0)
+            return "00:00";
+        int hour = time / 60;
+        int minute = time % 60;
+        return String.format("%02d",hour)+":"+String.format("%02d",minute);
+    }
+
 
     public static String longformatMinute(long time) {
         Calendar c = Calendar.getInstance();

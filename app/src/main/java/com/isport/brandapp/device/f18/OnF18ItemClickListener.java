@@ -8,5 +8,7 @@ public interface OnF18ItemClickListener {
 
     void onItemClick(int position);
 
-    void onChildClick(int position);
+    void onChildClick(int position,boolean isCheck);
+
+    void onLongClick(int position);
 }

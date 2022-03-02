@@ -1,0 +1,52 @@
+package com.isport.brandapp.wu.util;
+
+import android.content.Context;
+import android.graphics.Paint;
+
+/**
+ *
+ */
+
+public class DimenUtil {
+    /**
+     * dp转px
+     */
+    public static int dp2px(Context context, float dp) {
+        return (int) (dp * context.getResources().getDisplayMetrics().density + 0.5f);
+    }
+
+    /**
+     * px转dp
+     */
+    public static float px2dp(Context context, int px) {
+        return (px / context.getResources().getDisplayMetrics().density + 0.5f);
+    }
+
+    /**
+     * 将sp值转换为px值
+     */
+    public static int sp2px(Context context, float sp) {
+        return (int) (sp * context.getResources().getDisplayMetrics().scaledDensity + 0.5f);
+    }
+
+    /**
+     * 测量文字高度
+     * @param paint
+     * @return
+     */
+    public static float measureTextHeight(Paint paint) {
+        Paint.FontMetrics fontMetrics = paint.getFontMetrics();
+        return (Math.abs(fontMetrics.ascent) - fontMetrics.descent);
+    }
+
+    /**
+     * 获取文字的宽度
+     *
+     * @param
+     *
+     * @return
+     */
+    public static float getTextWidth(Paint paint, String text) {
+        return  paint.measureText(text);
+    }
+}

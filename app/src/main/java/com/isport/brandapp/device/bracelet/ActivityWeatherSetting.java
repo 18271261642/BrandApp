@@ -130,6 +130,7 @@ public class ActivityWeatherSetting extends BaseTitleActivity implements BaseVie
                         public void run() {
                             showCurrentCityView(true, Constants.cityName);
                             setLocationText(UIUtils.getString(R.string.weather_location), "start");
+
                             weatherPresenter.getWeather(Constants.mLocationLatitude, Constants.mLocationLongitude, Constants.cityName, deviceType);
                         }
                     }, 2000);
@@ -137,6 +138,8 @@ public class ActivityWeatherSetting extends BaseTitleActivity implements BaseVie
                 break;
         }
     }
+
+
 
     boolean isLoction = false;
 

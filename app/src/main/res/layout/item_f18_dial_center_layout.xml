@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+<brandapp.isport.com.basicres.commonview.RoundImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="110dp"
     android:layout_gravity="center"
     android:layout_margin="5dp"
+    app:border_outside_color="@color/white"
+    app:border_thickness="1dp"
     android:id="@+id/itemF18DialImgView"
     android:layout_height="110dp">
 
-</ImageView>
+
+</brandapp.isport.com.basicres.commonview.RoundImageView>
