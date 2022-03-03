@@ -340,15 +340,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
     private void getHomeData(){
 
         Log.e(TAG,"------deviceId="+AppConfiguration.braceletID+" "+AppConfiguration.deviceMainBeanList.get(JkConfiguration.DeviceType.Watch_F18));
-        mFragPresenter.getDeviceStepLastTwoData(IDeviceType.TYPE_WATCH_7018);
-        mFragPresenter.getDeviceBloodPressure();
-        mFragPresenter.getDevcieOnceHrData();
-        //mFragPresenter.getDeviceLastNetHeart();
-        mFragPresenter.getDevcieOxygenData();
 
-        mFragPresenter.getTempData();
-        mFragPresenter.getWatchSleepLastData();
-        mFragPresenter.getExerciseTodaySum(IDeviceType.TYPE_WATCH_7018);
 
         BaseDevice baseDevice = ISportAgent.getInstance().getCurrnetDevice();
 
@@ -368,6 +360,17 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
         mFragPresenter.uploadF18BloodData(deviceId,userId);
         mFragPresenter.upgradeOnceHrData(deviceId,userId);
         mFragPresenter.updateTempData(deviceId,userId);
+
+
+        mFragPresenter.getDeviceStepLastTwoData(IDeviceType.TYPE_WATCH_7018);
+        mFragPresenter.getDeviceBloodPressure();
+        mFragPresenter.getDevcieOnceHrData();
+        //mFragPresenter.getDeviceLastNetHeart();
+        mFragPresenter.getDevcieOxygenData();
+
+        mFragPresenter.getTempData();
+        mFragPresenter.getWatchSleepLastData();
+        mFragPresenter.getExerciseTodaySum(IDeviceType.TYPE_WATCH_7018);
     }
 
     @Override
@@ -454,7 +457,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
             dataTempHolder = new DataHeartRateHolder(context, lists, R.layout
                     .app_fragment_data_device_item, JkConfiguration.BODY_TEMP);
             dataTempHolder.setHeartRateItemClickListener(F18HomeFragment.this, F18HomeFragment.this);
-          //  mFragPresenter.getTempData();
+            mFragPresenter.getTempData();
             return dataTempHolder;
         }
 

@@ -928,23 +928,21 @@ public class Watch7018Manager extends BaseManager {
             //分钟
             int intervalMinute = (int) (intervalTime / 1000 /60);
 
-            if(sleepStatus == 1){   //深睡  传后台是清醒
+            if(changeSleepStatus(sleepStatus) == 1){   //深睡  传后台是清醒
                // deepSleepTime +=intervalMinute;
                 soberTime += intervalMinute;
             }
 
-            if(sleepStatus == 2){  //浅睡
+            if(changeSleepStatus(sleepStatus) == 2){  //浅睡
                 lightSleepTime +=intervalMinute;
             }
 
-            if(sleepStatus == 3){   //清醒 传后台是深睡
+            if(changeSleepStatus(sleepStatus) == 3){   //清醒 传后台是深睡
                // soberTime += intervalMinute;
                 deepSleepTime +=intervalMinute;
             }
 
             //上传后台，1清醒；2浅睡；3深睡
-
-
 
             itemSleeep.add(changeSleepStatus(sleepData.getStatus()) + "");
             itemSleeep.add(CommonDateUtil.getTimeFromLong(startTime) + "");

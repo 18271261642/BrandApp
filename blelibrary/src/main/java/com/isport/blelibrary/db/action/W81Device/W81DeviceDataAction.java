@@ -47,8 +47,8 @@ public class W81DeviceDataAction {
         if(w81DeviceDetailData != null){
 
             Log.e("bb","----wristId="+w81DeviceDetailData.getWristbandSportDetailId());
-            if(w81DeviceDetailData.getWristbandSportDetailId() != null)
-                return;
+//            if(w81DeviceDetailData.getWristbandSportDetailId() != null)
+//                return;
             w81DeviceDetailData.setStepArray(analysisStepArray(stepArray,w81DeviceDetailData.getStepArray()));
             w81DeviceDetailData.setDateStr(dateStr);
             Log.e("保存计步",w81DeviceDetailData.toString());
