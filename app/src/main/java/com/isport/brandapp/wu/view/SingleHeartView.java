@@ -78,7 +78,7 @@ public class SingleHeartView extends View {
         topImgPaint.setStyle(Paint.Style.FILL);
         topImgPaint.setAntiAlias(true);
 
-        bgBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.icon_bottom_move);
+       // bgBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.icon_bottom_move);
     }
 
 

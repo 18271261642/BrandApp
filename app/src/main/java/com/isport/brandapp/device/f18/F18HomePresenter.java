@@ -854,6 +854,15 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
                 if(stepArr != null && !stepArr.equals("[]")){
                     List<String[]> yesStepList = new Gson().fromJson(stepArr,new TypeToken<List<String[]>>(){}.getType());
                     Log.e(TAG,"------本地的数据库="+new Gson().toJson(yesStepList));
+                    //如果本地数据库中没有，就只保存昨天的
+                    if(yesStepList == null || yesStepList.isEmpty()){
+                        new W81DeviceDataAction().saveDeviceStepArrayData(deviceId, userId,null,DateUtil.getYestDay(),new Gson().toJson(stepArray));
+
+                        F18DeviceSetAction.deleteF18DetailStepBean(userId,deviceId,DateUtil.getYestDay());
+
+                        return;
+                    }
+
                     //本地数据库有，与原始整理的数据合并
                     if(yesStepList.size() == stepArray.size()){
                         List<String[]> yesResultList = new ArrayList<>();

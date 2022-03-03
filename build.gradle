@@ -9,14 +9,14 @@ buildscript {
         jcenter()
         mavenCentral()
         maven { url "https://jitpack.io" }
-        maven { url 'https://dl.bintray.com/umsdk/release' }
-        maven { url "https://dl.bintray.com/thelasterstar/maven/" }
+        //maven { url 'https://dl.bintray.com/umsdk/release' }
+       // maven { url "https://dl.bintray.com/thelasterstar/maven/" }
         maven {
             url 'http://maven.aliyun.com/nexus/content/repositories/releases/'
         }
         maven { url  'https://repo1.maven.org/maven2/'}
         // 新浪微博官方分享SDK
-        maven { url "https://dl.bintray.com/thelasterstar/maven/" }
+       // maven { url "https://dl.bintray.com/thelasterstar/maven/" }
     }
 
     dependencies {
@@ -38,11 +38,11 @@ allprojects {
         maven {
             url 'http://maven.aliyun.com/nexus/content/repositories/releases/'
         }
-        maven { url 'https://dl.bintray.com/umsdk/release' }
-        maven { url "https://dl.bintray.com/thelasterstar/maven/" }
+       // maven { url 'https://dl.bintray.com/umsdk/release' }
+       // maven { url "https://dl.bintray.com/thelasterstar/maven/" }
         maven { url  'https://repo1.maven.org/maven2/'}
         // 新浪微博官方分享SDK
-        maven { url "https://dl.bintray.com/thelasterstar/maven/" }
+        //maven { url "https://dl.bintray.com/thelasterstar/maven/" }
         flatDir {
             dirs 'libs'
         }
