@@ -160,8 +160,14 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
         adapter.setOnF18ItemClickListener(new OnF18ItemClickListener() {
             @Override
             public void onItemClick(int position) {
+                bpInfoList.get(position).setClick(true);
+                for(int i = 0;i<bpInfoList.size();i++){
+                   bpInfoList.get(i).setClick(i == position);
+                }
+
+                adapter.notifyDataSetChanged();
                 Log.e("TAG","---desc="+bpInfoList.get(position).getStrDate());
-                onceBpDescTv.setText(bpInfoList.get(position).getStrDate());
+
                 setCurrentData(bpInfoList.get(position));
             }
 
@@ -181,6 +187,7 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
 
 
     private void setCurrentData(BPInfo bpInfo){
+        onceBpDescTv.setText(bpInfo.getStrDate());
         tv_bp_time.setText(TimeUtils.getTimeByyyyyMMddhhmmss(bpInfo.getTimestamp()));
         bp_barview.setProgress(bpInfo.getSpValue(), bpInfo.getDpValue());
         tv_bp_sys.setText("" + bpInfo.getSpValue());
@@ -220,8 +227,10 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
 
             setData();
             trendview_bp.setLocalData(mCurrentInfo);
-
             bpInfoList.add(0,mCurrentInfo);
+            for(int i = 0;i<bpInfoList.size();i++){
+                bpInfoList.get(i).setClick(i == 0);
+            }
             adapter.notifyDataSetChanged();
         }catch (Exception e){
             e.printStackTrace();
@@ -275,8 +284,14 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
             lastTimestamp = mCurrentInfo.getTimestamp().longValue();
             bpInfoList.clear();
             bpInfoList.addAll(info);
+            bpInfoList.get(0);
+            bpInfoList.get(0).setClick(true);
+            setCurrentData(bpInfoList.get(0));
+            for(int i = 0;i<bpInfoList.size();i++){
+                bpInfoList.get(i).setClick(i == 0);
+            }
             adapter.notifyDataSetChanged();
-            setCurrentData(bpInfoList.get(bpInfoList.size()-1));
+
             bpGuidImg.setVisibility(bpInfoList.size()>=7 ? View.VISIBLE : View.GONE);
             setData();
         } else {

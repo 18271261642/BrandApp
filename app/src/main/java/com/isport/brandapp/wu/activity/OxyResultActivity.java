@@ -163,7 +163,10 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
         signalHeartAdapter.setOnF18ItemClickListener(new OnF18ItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                onceSpo2ValueTv.setText(singleList.get(position).getStrdate());
+                for(int i = 0;i<singleList.size();i++){
+                    singleList.get(i).setClick(i == position);
+                }
+                signalHeartAdapter.notifyDataSetChanged();
                 setCurrentData(singleList.get(position));
             }
 
@@ -181,6 +184,7 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
 
     private void setCurrentData(DrawRecDataBean currentData) {
         try {
+            onceSpo2ValueTv.setText(currentData.getStrdate());
             tv_percent.setVisibility(View.VISIBLE);
             if (currentData.getValue() > 80) {
                 progressOxyView.setProgress(currentData.getValue());
@@ -268,6 +272,9 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
 
                 }
                 singleList.add(0,bean);
+                for(int i = 0;i<singleList.size();i++){
+                    singleList.get(i).setClick(i == 0);
+                }
                 signalHeartAdapter.notifyDataSetChanged();
                 trendview_oxy.setLocalData(bean);
             }
@@ -317,6 +324,8 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
 
                 singleList.clear();
                 singleList.addAll(list);
+                singleList.get(0).setClick(true);
+                setCurrentData(singleList.get(0));
                 signalHeartAdapter.notifyDataSetChanged();
                 spo2GuidImg.setVisibility(singleList.size()>=7 ? View.VISIBLE : View.GONE);
                 trendview_oxy.setdata(list, JkConfiguration.BODY_OXYGEN);

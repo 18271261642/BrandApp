@@ -10,6 +10,7 @@ import com.isport.blelibrary.db.table.f18.F18DetailStepBean;
 import com.isport.blelibrary.db.table.f18.F18StepBean;
 import com.isport.blelibrary.gen.F18CommonDbBeanDao;
 import com.isport.blelibrary.gen.F18DetailStepBeanDao;
+import com.isport.blelibrary.utils.DateUtil;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 
@@ -26,7 +27,7 @@ public class F18DeviceSetAction {
 
 
     //保存手表返回的计步数据，手表同步数据后返回数据，返回数据后即情况手表中的数据，再次同步后不再返回
-    public static synchronized void saveF18DeviceDetailStep(String userId, String deviceId,String day,long time, F18StepBean f18StepBean){
+    public static synchronized void saveF18DeviceDetailStep(String userId, String deviceId,String day,long time, F18StepBean f18StepBean,int status){
 
         if(TextUtils.isEmpty(userId) || TextUtils.isEmpty(deviceId) || TextUtils.isEmpty(day))
             return;
@@ -41,6 +42,7 @@ public class F18DeviceSetAction {
         f18DetailStepBean.setStep(f18StepBean.getStep());
         f18DetailStepBean.setDistance(f18StepBean.getDistance());
         f18DetailStepBean.setKcal(f18StepBean.getKcal());
+        f18DetailStepBean.setStatus(0);
         Log.e(TAG,"-------保存详细计步到数据库="+f18DetailStepBean.toString());
         f18DetailStepBeanDao.insert(f18DetailStepBean);
 
@@ -58,6 +60,29 @@ public class F18DeviceSetAction {
         return null;
     }
 
+    //查询数据
+    public static List<F18DetailStepBean> getF18DetailList(String userId,String deviceId,String day,int status){
+        QueryBuilder<F18DetailStepBean> queryBuilder = BleAction.getDaoSession().queryBuilder(F18DetailStepBean.class);
+        queryBuilder.where(F18DetailStepBeanDao.Properties.UserId.eq(userId),F18DetailStepBeanDao.Properties.DeviceTypeId.eq(deviceId),F18DetailStepBeanDao.Properties.DayStr.eq(day),F18DetailStepBeanDao.Properties.Status.eq(status));
+        if(queryBuilder.list().size()>0){
+            List<F18DetailStepBean> f18DetailStepBeanList = queryBuilder.list();
+            return f18DetailStepBeanList;
+        }
+        return null;
+    }
+
+
+
+    //查询数据
+    public static List<F18DetailStepBean> getF18DetailList(String userId,String deviceId){
+        QueryBuilder<F18DetailStepBean> queryBuilder = BleAction.getDaoSession().queryBuilder(F18DetailStepBean.class);
+        queryBuilder.where(F18DetailStepBeanDao.Properties.UserId.eq(userId),F18DetailStepBeanDao.Properties.DeviceTypeId.eq(deviceId));
+        if(queryBuilder.list().size()>0){
+            List<F18DetailStepBean> f18DetailStepBeanList = queryBuilder.list();
+            return f18DetailStepBeanList;
+        }
+        return null;
+    }
 
 
     public static long deleteF18DetailStepBean(String userId,String deviceId,String day){
@@ -69,6 +94,21 @@ public class F18DeviceSetAction {
             }
         }
         return 0;
+    }
+
+
+
+    //更改状态0未上传，1上传
+    public static void  updateF18DetailStep(String userId,String deviceId,String day){
+        List<F18DetailStepBean> uL = getF18DetailList(userId,deviceId, day);
+        if(uL == null)
+            return ;
+        F18DetailStepBeanDao f18DetailStepBeanDao = BleAction.getF18DetailStepBeanDao();
+        for(F18DetailStepBean fb :uL){
+            fb.setStatus(1);
+            f18DetailStepBeanDao.update(fb);
+        }
+
     }
 
 

@@ -29,6 +29,17 @@ public class BPInfo {
     private String wristbandBloodPressureId;
     private String strDate;
 
+    //是否点击
+    private boolean isClick;
+
+    public boolean isClick() {
+        return isClick;
+    }
+
+    public void setClick(boolean click) {
+        isClick = click;
+    }
+
     public String getDeviceId() {
         return deviceId;
     }
@@ -95,6 +106,7 @@ public class BPInfo {
                 ", userId='" + userId + '\'' +
                 ", wristbandBloodPressureId='" + wristbandBloodPressureId + '\'' +
                 ", strDate='" + strDate + '\'' +
+                ", isClick=" + isClick +
                 '}';
     }
 }

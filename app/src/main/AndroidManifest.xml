@@ -87,7 +87,8 @@
         android:roundIcon="@drawable/ic_t_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:allowBackup">
+        tools:replace="android:allowBackup"
+        tools:targetApi="n">
 
 
         <!-- 表示当前项目已经适配了分区存储特性 -->

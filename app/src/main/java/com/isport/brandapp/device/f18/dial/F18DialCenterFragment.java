@@ -1,9 +1,13 @@
 package com.isport.brandapp.device.f18.dial;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.XXPermissions;
@@ -44,6 +48,7 @@ public class F18DialCenterFragment extends BaseFragment {
 
     private static  String DOWN_BIN_FILE_PATH ;
 
+    private AlertDialog.Builder permissionDialog;
 
 
     public static F18DialCenterFragment getInstance(){
@@ -149,8 +154,29 @@ public class F18DialCenterFragment extends BaseFragment {
 
 
     private void downloadBinFile(String url,String fileName){
-        dialBottomDialogView.setDialogBtnStatus("准备中..");
-        DownloadUtils.getInstance().downBin(url, DOWN_BIN_FILE_PATH, fileName+".bin", new onDownloadListener() {
+
+       boolean isW = XXPermissions.isGranted(getActivity(),Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if(!isW){
+            XXPermissions.with(this).permission(Manifest.permission.WRITE_EXTERNAL_STORAGE).request(new OnPermissionCallback() {
+                @Override
+                public void onGranted(List<String> list, boolean b) {
+                    Log.e(TAG,"-------写权限="+b);
+                }
+
+                @Override
+                public void onDenied(List<String> permissions, boolean never) {
+                    if(never){
+                        showPermissDialog();
+
+                    }
+                }
+            }   );
+
+            return;
+        }
+        dialBottomDialogView.setDialogBtnStatus(getResources().getString(R.string.string_download_so));
+     DownloadUtils.getInstance().downBin(url, DOWN_BIN_FILE_PATH, fileName+".bin", new onDownloadListener() {
             @Override
             public void onStart(float length) {
                 Log.e(TAG,"----onStart="+length);
@@ -159,13 +185,13 @@ public class F18DialCenterFragment extends BaseFragment {
             @Override
             public void onProgress(float progress) {
                 Log.e(TAG,"----onProgress="+progress);
-                dialBottomDialogView.setDialogBtnStatus("下载进度="+(progress * 100));
+                dialBottomDialogView.setDialogBtnStatus(String.format(getString(R.string.file_downlod_present),(progress * 100)+""));
             }
 
             @Override
             public void onComplete() {
                 Log.e(TAG,"----onComplete--");
-                dialBottomDialogView.setDialogBtnStatus("下载完成");
+                dialBottomDialogView.setDialogBtnStatus(getResources().getString(R.string.string_download_complete));
                 setDialToDevice(DOWN_BIN_FILE_PATH+fileName+".bin");
 
             }
@@ -187,31 +213,31 @@ public class F18DialCenterFragment extends BaseFragment {
             @Override
             public void startDial() {
                 if(dialBottomDialogView != null)
-                    dialBottomDialogView.setDialogBtnStatus("升级中..");
+                    dialBottomDialogView.setDialogBtnStatus(getResources().getString(R.string.string_upgrad_so_on));
             }
 
             @Override
             public void onError(int errorType, int errorCode) {
                 if(dialBottomDialogView != null)
-                    dialBottomDialogView.setDialogBtnStatus("升级失败"+errorCode+" "+errorType);
+                    dialBottomDialogView.setDialogBtnStatus(getResources().getString(R.string.device_upgrade_fail)+errorCode+" "+errorType);
             }
 
             @Override
             public void onStateChanged(int state, boolean cancelable) {
                 if(dialBottomDialogView != null)
-                    dialBottomDialogView.setDialogBtnStatus("升级中..");
+                    dialBottomDialogView.setDialogBtnStatus(getResources().getString(R.string.string_upgrad_so_on));
             }
 
             @Override
             public void onProgressChanged(int progress) {
                 if(dialBottomDialogView != null)
-                    dialBottomDialogView.setDialogBtnStatus("升级中:"+progress+"%");
+                    dialBottomDialogView.setDialogBtnStatus(String.format(getResources().getString(R.string.device_upgrade_present),progress+""));
             }
 
             @Override
             public void onSuccess() {
                 if(dialBottomDialogView != null)
-                    dialBottomDialogView.setDialogBtnStatus("升级完成");
+                    dialBottomDialogView.setDialogBtnStatus(getResources().getString(R.string.device_upgrade_success));
             }
         });
     }
@@ -285,7 +311,20 @@ public class F18DialCenterFragment extends BaseFragment {
 
 
     private void downLoadDial(){
-        DownloadUtils.getInstance().downBin("http://47.90.83.197/file/ios/dial.bin", DOWN_BIN_FILE_PATH, "dial.bin", new onDownloadListener() {
+        boolean isWrite = XXPermissions.isPermanentDenied(getActivity(),Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if(isWrite){
+            XXPermissions.with(this).permission(Manifest.permission.WRITE_EXTERNAL_STORAGE).request(new OnPermissionCallback() {
+                @Override
+                public void onGranted(List<String> list, boolean b) {
+
+
+                }
+            });
+
+            return;
+        }
+
+        DownloadUtils.getInstance().downBin("https://api.mini-banana.com/common_files/dial.bin", DOWN_BIN_FILE_PATH, "dial.bin", new onDownloadListener() {
             @Override
             public void onStart(float length) {
                 Log.e("TAG","----onStart="+length);
@@ -311,5 +350,33 @@ public class F18DialCenterFragment extends BaseFragment {
 
             }
         });
+    }
+
+
+    private void showPermissDialog(){
+        permissionDialog = new AlertDialog.Builder(getActivity())
+                .setCancelable(false)
+                .setTitle(getResources().getString(R.string.tips))
+                .setMessage("存储权限已拒绝，无法使用此功能，是否手动打开?")
+                .setPositiveButton("打开", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        XXPermissions.startPermissionActivity(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    }
+                })
+                .setNegativeButton("关闭", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog at = permissionDialog.create();
+        at.show();
+        Button sureBtn = at.getButton(DialogInterface.BUTTON_POSITIVE);
+        Button cancelBtn = at.getButton(DialogInterface.BUTTON_NEGATIVE);
+
+        sureBtn.setTextColor(Color.BLACK);
+        cancelBtn.setTextColor(Color.BLACK);
     }
 }

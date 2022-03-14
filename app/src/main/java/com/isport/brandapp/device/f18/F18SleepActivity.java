@@ -103,6 +103,7 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
 
     private void showPageData(WatchSleepDayData watchSleepDayData) {
         try {
+
             //睡眠总时长
             int allSleepTime = watchSleepDayData.getTotalSleepTime();
             //清醒时长
@@ -115,16 +116,69 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
             //无数据
             //深睡和浅睡都为0时，可表示无正常睡眠
             if(deepSleepTime+lightSleepTime == 0){
-                showEmptyView();
-                return;
+
+                //遍历睡眠数组，判断是否有睡眠
+                String sleepStr = watchSleepDayData.getSporadicNapSleepTimeStr();
+                if(!TextUtils.isEmpty(sleepStr)){
+                    List<String[]> sleepArrList = new Gson().fromJson(sleepStr,new TypeToken<List<String[]>>(){}.getType());
+                    if(sleepArrList == null || sleepArrList.size()==0){
+                        showEmptyView();
+                        return;
+                    }
+
+                    int dpTime = 0;
+                    int ligTime = 0;
+                    int awakeTime = 0;
+                    for(int i = 0;i<sleepArrList.size();i++) {
+                        String[] itemStr = sleepArrList.get(i);
+                        //F18 1：深睡；2：浅睡：3：清醒 >>转换后 1 清醒 2浅睡 3 深睡
+
+                        //图表 0 4：清醒；1：快速眼动；2：浅睡；3：深睡；
+                        //睡眠类型
+                        int typeCode = Integer.parseInt(itemStr[0]);
+                        //时长
+                        int typeLength = Integer.parseInt(itemStr[3]);
+                        if (typeCode == 1) {
+                            awakeTime +=typeLength;
+                        }
+                        if (typeCode == 2) {
+                            ligTime +=typeLength;
+                        }
+                        if (typeCode == 3) {
+                            dpTime +=typeLength;
+                        }
+                    }
+
+                    if(dpTime == 0 && ligTime == 0){
+                        showEmptyView();
+                        return;
+                    }
+
+
+                    deepSleepTime = dpTime;
+                    lightSleepTime = ligTime;
+                    awakeSleepTime = awakeTime;
+
+                }
+
+                if(deepSleepTime+lightSleepTime == 0){
+                    showEmptyView();
+                    return;
+                }
+
             }
 
+            watchSleepDayData.setDeepSleepTime(deepSleepTime);
+            watchSleepDayData.setAwakeSleepTime(allSleepTime);
+            watchSleepDayData.setLightLV1SleepTime(lightSleepTime);
 
             //展示时间
             tv_update_time.setText(watchSleepDayData.getDateStr());
-            setHourMinute(0xFF4DDA64,(deepSleepTime+lightSleepTime)/60,(deepSleepTime+lightSleepTime)%60);
-            setPieData(allSleepTime-(deepSleepTime+lightSleepTime),0,(allSleepTime-awakeSleepTime),watchSleepDayData.getDeepSleepTime(),false);
-            setSleepSummary((allSleepTime-(deepSleepTime+lightSleepTime)),0,watchSleepDayData.getLightLV1SleepTime(),watchSleepDayData.getDeepSleepTime());
+            setHourMinute(0xFFADADBB,(deepSleepTime+lightSleepTime)/60,(deepSleepTime+lightSleepTime)%60);
+            setPieData(allSleepTime-(deepSleepTime+lightSleepTime),0,(allSleepTime-awakeSleepTime),deepSleepTime,false);
+            setSleepSummary((allSleepTime-(deepSleepTime+lightSleepTime)),0,watchSleepDayData.getLightLV1SleepTime(),deepSleepTime);
+
+
             showSleepChartView(watchSleepDayData);
 
             deepTime = deepSleepTime;
@@ -141,7 +195,7 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
 
 
     private void showSleepChartView(WatchSleepDayData watchSleepDayData){
-        Log.e(TAG,"----睡眠="+watchSleepDayData.toString(0));
+       // Log.e(TAG,"----睡眠="+watchSleepDayData.toString(0));
         try {
             ContinousBarChartTotalEntity barChartTotalEntity = new ContinousBarChartTotalEntity();
             List<ContinousBarChartEntity> datas = new ArrayList<>();
@@ -196,20 +250,20 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
                 //图表 0 4：清醒；1：快速眼动；2：浅睡；3：深睡；
                 //睡眠类型
                 int typeCode = Integer.parseInt(itemStr[0]);
-                if(typeCode == 1){
-                    chartTypeCode = 3;
-                }
-                if(typeCode == 2){
-                    chartTypeCode = 2;
-                }
-                if(typeCode == 3){
-                    chartTypeCode = 4;
-                }
+//                if(typeCode == 1){
+//                    chartTypeCode = 3;
+//                }
+//                if(typeCode == 2){
+//                    chartTypeCode = 2;
+//                }
+//                if(typeCode == 3){
+//                    chartTypeCode = 4;
+//                }
                 //时长
                 int typeLength = Integer.parseInt(itemStr[3]);
 
                 for(int k = 0;k<typeLength;k++){
-                    datas.add(new ContinousBarChartEntity(1, 200,chartTypeCode));
+                    datas.add(new ContinousBarChartEntity(1, 200,typeCode));
                 }
             }
 

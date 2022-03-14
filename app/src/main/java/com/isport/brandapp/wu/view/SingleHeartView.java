@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -35,11 +36,13 @@ public class SingleHeartView extends View {
 
     private float mWidth,mHeight;
 
+
+
+
     private int currValue;
     private int maxValue;
 
 
-    private Bitmap bgBitmap;
     //每个柱子的宽度
     private float mCurrWidth = 50f;
 
@@ -101,10 +104,24 @@ public class SingleHeartView extends View {
 
         if(drawRecDataBean == null)
             return;
-        float middleV = mHeight / maxValue;
+
+
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon_move_bottom);
+        //图片的宽高
+        float imgWidth = bitmap.getWidth();
+        float imgHeight = bitmap.getHeight();
+        RectF imgRectF = new RectF((mCurrWidth/2)-(imgWidth/3)+2f,-mHeight,imgWidth+8f,-mHeight+imgHeight);
+
+        //Rect srcRect = new Rect((int)(mCurrWidth / 2 - (imgWidth / 2)),-(int) mHeight,(int) imgWidth,-(int)( mHeight+imgHeight));
+
+        if(drawRecDataBean.isClick())
+            canvas.drawBitmap(bitmap,null,imgRectF,topImgPaint);
+
+
+        float middleV = (mHeight-imgHeight) / maxValue;
 
         float mRightPoint = mWidth / 2;
-
 
         //绘制底部的数值
         String txt = String.valueOf(drawRecDataBean.getValue());
@@ -113,7 +130,7 @@ public class SingleHeartView extends View {
        // currPaint.setColor(drawRecDataBean.getColors());
 
         //总的背景
-        RectF bgRectF = new RectF(mRightPoint-mCurrWidth/2,-mHeight+10,mRightPoint+mCurrWidth/2,-DimenUtil.measureTextHeight(txtPaint)*2.5f);
+        RectF bgRectF = new RectF(mRightPoint-mCurrWidth/2,-maxValue * middleV,mRightPoint+mCurrWidth/2,-DimenUtil.measureTextHeight(txtPaint)*2.5f);
         canvas.drawRoundRect(bgRectF,mCurrWidth/2,mCurrWidth/2,backPaint);
 
         currPaint.setColor(drawRecDataBean.getColors());
@@ -143,4 +160,8 @@ public class SingleHeartView extends View {
 
     }
 
+
+    public int getMaxValue() {
+        return maxValue;
+    }
 }

@@ -190,7 +190,10 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
         signalHeartAdapter.setOnF18ItemClickListener(new OnF18ItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                onceHeartGuidTv.setText(singleList.get(position).getStrdate());
+                for(int i = 0;i<singleList.size();i++){
+                    singleList.get(i).setClick(i == position);
+                }
+                signalHeartAdapter.notifyDataSetChanged();
                 setCurrData(singleList.get(position));
             }
 
@@ -224,6 +227,7 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
     private void setCurrData(DrawRecDataBean currData) {
         try {
             if (currData != null) {
+                onceHeartGuidTv.setText(currData.getStrdate());
                 int currentHr = currData.getValue();
                 tv_percent.setVisibility(View.VISIBLE);
                 tv_oxy_value.setText(currData.getValue()+"");
@@ -357,6 +361,9 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
                 bean.setStrdate(TimeUtils.getTimeByyyyyMMddhhmmss(mCurrentInfo.getTimestamp()));
                 trendview_oxy.setLocalData(bean);
                 singleList.add(0,bean);
+                for(int i = 0;i<singleList.size();i++){
+                    singleList.get(i).setClick(i == 0);
+                }
                 signalHeartAdapter.notifyDataSetChanged();
             }
         }
@@ -458,13 +465,15 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
             if (list.size() > 0) {
 
                 singleList.addAll(list);
+                for(int i = 0;i<singleList.size();i++){
+                    singleList.get(i).setClick(i == 0);
+                }
+
+                setCurrData(singleList.get(0));
                 signalHeartAdapter.notifyDataSetChanged();
 
                 htGuidImg.setVisibility(singleList.size()>=7 ? View.VISIBLE : View.GONE);
-
-                setCurrData(singleList.get(singleList.size()-1));
-
-                mCurrentInfo = info.get(0);
+                                mCurrentInfo = info.get(0);
                 trendview_oxy.setdata(list, JkConfiguration.BODY_ONCE_HR);
                 setData();
             } else {

@@ -110,6 +110,7 @@ public class SpashActivity extends BaseActivity implements Runnable {
                 public void onConfirmClick() {
                     showPrivacyDialogView.dismiss();
                     AppSP.putBoolean(SpashActivity.this,AppSP.IS_FIRST_OPEN_APP,true);
+                    App.getInstance().initUm();
                     showPermission();
                 }
             });
@@ -197,7 +198,7 @@ public class SpashActivity extends BaseActivity implements Runnable {
                         bean.getGender().equals("Male") ? 1 : 0,
                         TimeUtils.getAge(bean.getBirthday()), bean.getUserId());
                 ActivitySwitcher.goMainAct(this);
-                initUMeng();
+
                 finish();
             } else {
                 Intent intentActivityLogin = new Intent(this, ActivityLogin.class);
@@ -256,58 +257,5 @@ public class SpashActivity extends BaseActivity implements Runnable {
             finish();
         }
     }
-
-
-    private void initUMeng() {
-       /* if (true) {
-            return;
-        }*/
-
-
-        UMConfigure.setLogEnabled(true);
-        try {
-            Class<?> aClass = Class.forName("com.umeng.commonsdk.UMConfigure");
-            Field[] fs = aClass.getDeclaredFields();
-            for (Field f : fs) {
-                Log.e("xxxxxx", "ff=" + f.getName() + "   " + f.getType().getName());
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        //初始化组件化基础库, 统计SDK/推送SDK/分享SDK都必须调用此初始化接口
-        UMConfigure.init(this, null, null, UMConfigure.DEVICE_TYPE_PHONE,
-                null);
-        // interval 单位为毫秒，如果想设定为40秒，interval应为 40*1000.
-        MobclickAgent.setSessionContinueMillis(30 * 1000);//黑屏，应用后台运行超过30s启动都算一次启动
-        // 选用AUTO页面采集模式
-        MobclickAgent.setPageCollectionMode(MobclickAgent.PageMode.AUTO);
-
-
-        // 微信
-        //    public final static String APP_ID_WX = "wx83ad7682b33e28e5";
-        //    public final static String APP_SECRET_WX = "d673af9518942cd8ef8490837502c12e";
-        PlatformConfig.setWeixin("wx83ad7682b33e28e5", "d673af9518942cd8ef8490837502c12e");
-        // 新浪微博 2511584848 8be44eb4339235c451f978d1059c2763
-        PlatformConfig.setSinaWeibo("2511584848", "8be44eb4339235c451f978d1059c2763", "http://sns.whalecloud.com");
-        // QQ APP ID 1108767316
-        //APP KEY bsAfYGPH8dW47RG8
-        // PlatformConfig.setQQZone("1108767316", "bsAfYGPH8dW47RG8");
-        PlatformConfig.setQQZone("1110159454", "Ziwl5Fje7wi3327f");
-        PlatformConfig.setQQFileProvider("com.isport.brandapp.fileProvider");
-
-       /* UMConfigure.init(this, "5bbdb11cf1f556058a0002b6", "Umeng", UMConfigure.DEVICE_TYPE_PHONE,
-                "iSport健康管家");*/
-
-        // 友盟分享
-      /*  Config.DEBUG = true;// 开启debug模式，方便定位错误
-//        Config.REDIRECT_URL = "http://sns.whalecloud.com";
-        QueuedWork.isUseThreadPool = false;
-
-        UMShareConfig config = new UMShareConfig();
-        config.isNeedAuthOnGetUserInfo(true);
-        UMShareAPI.get(this).setShareConfig(config);
-        UMShareAPI.get(this);*/
-    }
-
 
 }

@@ -259,33 +259,33 @@ public class ActivityLogin extends BaseMVPActivity<LoginBaseView, LoginPresenter
 
 
         if (!TokenUtil.getInstance().getAppFirst(BaseApp.getApp())) {
-            priDialog = new PriDialog(this, new PriDialog.OnTypeClickListenter() {
-                @Override
-                public void changeDevcieonClick(int type) {
-
-                    switch (type) {
-                        case 0:
-                            finish();
-                            break;
-                        case 1:
-                            TokenUtil.getInstance().updateAPPfirst(BaseApp.getApp(), "true");
-                            //requestPermission();
-
-                            break;
-                        case 2:
-                            TokenUtil.getInstance().updateAPPfirst(BaseApp.getApp(), "true");
-                            //requestPermission();
-                            startPrivacyActivity();
-                            break;
-                        case 3:
-                            TokenUtil.getInstance().updateAPPfirst(BaseApp.getApp(), "true");
-                            //requestPermission();
-
-                            startAgreementActivity();
-                            break;
-                    }
-                }
-            });
+//            priDialog = new PriDialog(this, new PriDialog.OnTypeClickListenter() {
+//                @Override
+//                public void changeDevcieonClick(int type) {
+//
+//                    switch (type) {
+//                        case 0:
+//                            finish();
+//                            break;
+//                        case 1:
+//                            TokenUtil.getInstance().updateAPPfirst(BaseApp.getApp(), "true");
+//                            //requestPermission();
+//
+//                            break;
+//                        case 2:
+//                            TokenUtil.getInstance().updateAPPfirst(BaseApp.getApp(), "true");
+//                            //requestPermission();
+//                            startPrivacyActivity();
+//                            break;
+//                        case 3:
+//                            TokenUtil.getInstance().updateAPPfirst(BaseApp.getApp(), "true");
+//                            //requestPermission();
+//
+//                            startAgreementActivity();
+//                            break;
+//                    }
+//                }
+//            });
         } else {
 
             //requestPermission();

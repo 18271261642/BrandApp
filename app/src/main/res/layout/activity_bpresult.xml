@@ -255,7 +255,7 @@
                             android:layout_marginLeft="10dp"
                             android:layout_marginRight="10dp"
                             android:layout_gravity="bottom"
-                            android:layout_height="140dp"/>
+                            android:layout_height="160dp"/>
 
 
                         <ImageView

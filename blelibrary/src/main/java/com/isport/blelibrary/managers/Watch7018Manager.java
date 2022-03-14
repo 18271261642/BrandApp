@@ -9,7 +9,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Vibrator;
 import android.util.Log;
-
 import com.google.gson.Gson;
 import com.htsmart.wristband2.WristbandApplication;
 import com.htsmart.wristband2.WristbandManager;
@@ -81,7 +80,6 @@ import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.StepArithmeticUtil;
 import com.isport.blelibrary.utils.ThreadPoolUtils;
 import com.isport.blelibrary.utils.TimeUtils;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -90,7 +88,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import androidx.annotation.NonNull;
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
@@ -276,7 +273,7 @@ public class Watch7018Manager extends BaseManager {
     public void connectDevice(String bleMac, boolean isBind) {
         setConnectListener();
         boolean isBindDevice = mWristbandManager.isBindOrLogin();
-        Log.e(TAG,"----isBindDevice="+isBindDevice+" userId="+mUserId+" "+mCurrentDevice.getDeviceName());
+      //  Log.e(TAG,"----isBindDevice="+isBindDevice+" userId="+mUserId+" "+mCurrentDevice.getDeviceName());
         if(mUserId == null)
             mUserId = userId;
         if(mUserId == null){
@@ -672,9 +669,15 @@ public class Watch7018Manager extends BaseManager {
                 }).doOnComplete(new Action() {  //数据同步完成
             @Override
             public void run() throws Exception {
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        sendActionBroad(SYNC_DATA_COMPLETE,"");
+                        sendActionBroad(SYNC_UNBIND_DATA_COMPLETE,"");
+                    }
+                },1000);
                 Log.e(TAG,"-----数据同步完成---");
-                sendActionBroad(SYNC_DATA_COMPLETE,"");
-                sendActionBroad(SYNC_UNBIND_DATA_COMPLETE,"");
+
             }
         })
                 .subscribe(new Action() {
@@ -695,6 +698,8 @@ public class Watch7018Manager extends BaseManager {
     //处理详细的计步数据 key = yyyy-MM-dd HH 格式日期
     private Map<String,F18StepBean> tempMap = new HashMap<>();
     private void analysisDetalStep(List<StepData> dataList){
+        if(dataList==null || dataList.size() ==0)
+            return;
         try {
             tempMap.clear();
             String userId = mUserId;
@@ -707,10 +712,9 @@ public class Watch7018Manager extends BaseManager {
                 tmpFb.setStep(stepData.getStep());
                 tmpFb.setKcal(stepData.getCalories());
                 tmpFb.setDistance(stepData.getDistance());
-                F18DeviceSetAction.saveF18DeviceDetailStep(userId,deviceId,dayStr,stepData.getTimeStamp(),tmpFb);
+                F18DeviceSetAction.saveF18DeviceDetailStep(userId,deviceId,dayStr,stepData.getTimeStamp(),tmpFb,0);
 
             }
-
 
             saveEmptyDetailStep(userId,deviceId);
         }catch (Exception e){
@@ -774,12 +778,12 @@ public class Watch7018Manager extends BaseManager {
                         String.valueOf(collStep.getStep()),String.valueOf(collStep.getDistance()),String.valueOf(collStep.getKcal())};
                 stepArray.add(stArr);
             }
-
-            Log.e(TAG,"-----转换后的map="+new Gson().toJson(stepArray));
-
             Log.e(TAG,"------详细计步数据保存数据库="+new Gson().toJson(stepArray));
 
-            new W81DeviceDataAction().saveDeviceStepArrayData(mCurrentDevice.getDeviceName(),BaseManager.mUserId,null,DateUtil.getCurrDay(),new Gson().toJson(stepArray));
+         //   F18DeviceSetAction.deleteF18DetailStepBean(userId,deviceId,DateUtil.getCurrDay());
+            new W81DeviceDataAction().saveDeviceStepArrayData("0",mCurrentDevice.getDeviceName(),BaseManager.mUserId,null,DateUtil.getCurrDay(),new Gson().toJson(stepArray));
+
+            F18DeviceSetAction.updateF18DetailStep(userId,deviceId,DateUtil.getCurrDay());
 
         }catch (Exception e){
             e.printStackTrace();
@@ -901,6 +905,11 @@ public class Watch7018Manager extends BaseManager {
     private void analysisSleepData(List<SleepData> sleepDataList) {
         if(sleepDataList == null)
             return;
+        Log.e(TAG,"-----详细睡眠数据="+new Gson().toJson(sleepDataList));
+
+        //F18DeviceSetAction.saveF18DeviceDetailStep(userId,mCurrentDevice.getDeviceName(),DateUtil.getCurrDay(),System.currentTimeMillis(),);
+
+
         List<SleepItemData> f18SleepList = sleepDataList.get(sleepDataList.size()-1).getItems();
 
         final ArrayList<ArrayList<String>> sleepDetail = new ArrayList<>();
@@ -953,31 +962,14 @@ public class Watch7018Manager extends BaseManager {
             sleepDetail.add(itemSleeep);
         }
 
-        int finalDeepSleepTime = deepSleepTime;
-        int finalLightSleepTime = lightSleepTime;
-        int finalSoberTime = soberTime;
+        Log.e(TAG,"-----保存睡眠="+deepSleepTime +" "+ lightSleepTime + " "+soberTime);
 
-        ThreadPoolUtils.getInstance().addTask(new Runnable() {
-            @Override
-            public void run() {
-                Gson gson = new Gson();
-                W81DeviceDataAction w81DeviceDataAction = new W81DeviceDataAction();
-                w81DeviceDataAction.saveW81DeviceSleepData(mCurrentDevice.getDeviceName(), String.valueOf(BaseManager.mUserId),
-                        "0", TimeUtils.getTimeByyyyyMMdd(sleepDataList.get(sleepDataList.size()-1).getTimeStamp()), System.currentTimeMillis(), finalDeepSleepTime+ finalLightSleepTime+finalSoberTime, finalDeepSleepTime, finalLightSleepTime, finalSoberTime, gson.toJson(sleepDetail));
-            }
-        });
+        Gson gson = new Gson();
+        W81DeviceDataAction w81DeviceDataAction = new W81DeviceDataAction();
+        w81DeviceDataAction.saveW81DeviceSleepData(mCurrentDevice.getDeviceName(), String.valueOf(BaseManager.mUserId),
+                "0", TimeUtils.getTimeByyyyyMMdd(sleepDataList.get(sleepDataList.size()-1).getTimeStamp()), System.currentTimeMillis(), deepSleepTime+ lightSleepTime+soberTime, deepSleepTime, lightSleepTime, soberTime, gson.toJson(sleepDetail));
 
-//        if(deepSleepTime !=0 && lightSleepTime != 0){
-//            ThreadPoolUtils.getInstance().addTask(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Gson gson = new Gson();
-//                    W81DeviceDataAction w81DeviceDataAction = new W81DeviceDataAction();
-//                    w81DeviceDataAction.saveW81DeviceSleepData(mCurrentDevice.getDeviceName(), String.valueOf(BaseManager.mUserId),
-//                            "0", TimeUtils.getTimeByyyyyMMdd(sleepDataList.get(sleepDataList.size()-1).getTimeStamp()), System.currentTimeMillis(), finalDeepSleepTime+ finalLightSleepTime+finalSoberTime, finalDeepSleepTime, finalLightSleepTime, finalSoberTime, gson.toJson(sleepDetail));
-//                }
-//            });
-//        }
+
     }
 
 

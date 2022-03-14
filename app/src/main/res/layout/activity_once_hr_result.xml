@@ -172,7 +172,7 @@
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/signalRecyclerView"
                             android:layout_width="wrap_content"
-                            android:layout_height="@dimen/sp140"/>
+                            android:layout_height="160dp"/>
 
 
                         <ImageView

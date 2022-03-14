@@ -28,6 +28,17 @@ public class TempInfo {
     private String state;
     private Integer resId;
 
+    //是否点击
+    private boolean isClick;
+
+    public boolean isClick() {
+        return isClick;
+    }
+
+    public void setClick(boolean click) {
+        isClick = click;
+    }
+
     public String getDeviceId() {
         return deviceId;
     }
@@ -130,6 +141,7 @@ public class TempInfo {
                 ", color=" + color +
                 ", state='" + state + '\'' +
                 ", resId=" + resId +
+                ", isClick=" + isClick +
                 '}';
     }
 }

@@ -41,6 +41,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -59,8 +60,8 @@ import brandapp.isport.com.basicres.net.userNet.CommonUserAcacheUtil;
 import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 
 public class DayReportFragment extends BaseMVPFragment<BraceletStepView, BraceletStepPresenter> implements BraceletStepView, WatchPopCalendarView.MonthDataListen {
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    private SimpleDateFormat dateFormatMMDD = new SimpleDateFormat("yyyy-MM");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
+    private SimpleDateFormat dateFormatMMDD = new SimpleDateFormat("yyyy-MM",Locale.CHINA);
     private TextView tv_update_time;
     W81DataPresenter w81DataPresenter;
 

@@ -775,7 +775,7 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
         int currMonth = monthC.get(Calendar.MONTH);
 
         Log.e(TAG,"------月="+currMonth);
-        w81DataPresenter.getW81MonthStep(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), "0", monthC.getTimeInMillis());
+        //w81DataPresenter.getW81MonthStep(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), "0", monthC.getTimeInMillis());
         Calendar yesMonthC = Calendar.getInstance();
 
 
@@ -794,8 +794,9 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
         try {
             tempMap.clear();
             //先查询本地的数据库，是否有保存昨天的数据
-            List<F18DetailStepBean> saveList = F18DeviceSetAction.getF18DetailList(userId,deviceId, DateUtil.getYestDay());
+            List<F18DetailStepBean> saveList = F18DeviceSetAction.getF18DetailList(userId,deviceId, DateUtil.getYestDay(),0);
             Log.e(TAG,"-----是否有昨天的数据="+new Gson().toJson(saveList));
+
             if(saveList != null){
                 for(F18DetailStepBean fb : saveList){
                     String dayStr = DateUtil.getFormatTime(fb.getTimeLong(),"yyyy-MM-dd HH");
@@ -856,9 +857,9 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
                     Log.e(TAG,"------本地的数据库="+new Gson().toJson(yesStepList));
                     //如果本地数据库中没有，就只保存昨天的
                     if(yesStepList == null || yesStepList.isEmpty()){
-                        new W81DeviceDataAction().saveDeviceStepArrayData(deviceId, userId,null,DateUtil.getYestDay(),new Gson().toJson(stepArray));
+                        new W81DeviceDataAction().saveDeviceStepArrayData("0",deviceId, userId,null,DateUtil.getYestDay(),new Gson().toJson(stepArray));
 
-                        F18DeviceSetAction.deleteF18DetailStepBean(userId,deviceId,DateUtil.getYestDay());
+                        F18DeviceSetAction.updateF18DetailStep(userId,deviceId,DateUtil.getYestDay());
 
                         return;
                     }
@@ -886,9 +887,10 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
                         Log.e(TAG,"-----已经组装完成的数据="+new Gson().toJson(yesResultList));
                         if(yesResultList.isEmpty())
                             return;
-                        new W81DeviceDataAction().saveDeviceStepArrayData(deviceId, userId,null,DateUtil.getYestDay(),new Gson().toJson(yesResultList));
+                        //昨天的已经组装完成，直接保存数据库即可
+                        new W81DeviceDataAction().saveDeviceStepArrayData("1",deviceId, userId,null,DateUtil.getYestDay(),new Gson().toJson(yesResultList));
 
-                        F18DeviceSetAction.deleteF18DetailStepBean(userId,deviceId,DateUtil.getYestDay());
+                        F18DeviceSetAction.updateF18DetailStep(userId,deviceId,DateUtil.getYestDay());
 
                     }
                 }

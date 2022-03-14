@@ -245,7 +245,7 @@
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/signalSpo2RecyclerView"
                             android:layout_width="wrap_content"
-                            android:layout_height="@dimen/sp140"/>
+                            android:layout_height="160dp"/>
 
 
                         <ImageView

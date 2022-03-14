@@ -5,6 +5,16 @@ public class DrawRecDataBean {
     int colors;
     int value;
 
+    private boolean isClick;
+
+    public boolean isClick() {
+        return isClick;
+    }
+
+    public void setClick(boolean click) {
+        isClick = click;
+    }
+
     public String getStrdate() {
         return strdate;
     }

@@ -338,10 +338,9 @@ public class W81DataPresenter {
                     }
                     //String deviceId, String userId, String wristbandSportDetailId, String dateStr, long timestamp, int step, int dis, int cal
                     iw81DeviceDataModel.saveStepData(bean.getDeviceId(), bean.getUserId(), bean.getWristbandSportDetailId(), bean.getDateStr(), System.currentTimeMillis(), bean.getTotalSteps(), (int) Float.parseFloat(bean.getTotalDistance()), (int) Float.parseFloat(bean.getTotalCalories()), true);
-
-
-                    new W81DeviceDataAction().saveDeviceStepArrayData(bean.getDeviceId(), bean.getUserId(),bean.getWristbandSportDetailId(), bean.getDateStr(),bean.getStepDetailArray());
-
+                    if(isMonth){
+                        new W81DeviceDataAction().saveDeviceStepArrayData("网络获取保存",bean.getDeviceId(), bean.getUserId(),bean.getWristbandSportDetailId(), bean.getDateStr(),bean.getStepDetailArray());
+                    }
 
                 }
                 if (!isMonth) {

@@ -534,10 +534,22 @@ public class App extends BaseApp {
 
 
     private void initUmenData(){
+
+        UMConfigure.preInit(instanceApp,"5bbdb11cf1f556058a0002b6","yyb");
+        boolean isAgree =    AppSP.getBoolean(instanceApp,AppSP.IS_FIRST_OPEN_APP,false);
+        if(isAgree){    //用户已经同意了隐私政策后再初始化友盟
+            initUm();
+        }
+
+
+    }
+
+
+    public void initUm(){
         UMConfigure.setLogEnabled(true);
         String fileProvider = "com.isport.brandapp.fileprovider";
         //初始化组件化基础库, 统计SDK/推送SDK/分享SDK都必须调用此初始化接口
-        UMConfigure.init(this, null, null, UMConfigure.DEVICE_TYPE_PHONE,
+        UMConfigure.init(this, "5bbdb11cf1f556058a0002b6", "yyb", UMConfigure.DEVICE_TYPE_PHONE,
                 null);
         // interval 单位为毫秒，如果想设定为40秒，interval应为 40*1000.
         MobclickAgent.setSessionContinueMillis(30 * 1000);//黑屏，应用后台运行超过30s启动都算一次启动
@@ -551,7 +563,7 @@ public class App extends BaseApp {
         PlatformConfig.setWXFileProvider(fileProvider);
         // 新浪微博 2511584848 8be44eb4339235c451f978d1059c2763
         PlatformConfig.setSinaWeibo("2511584848", "8be44eb4339235c451f978d1059c2763", "http://sns.whalecloud.com");
-         PlatformConfig.setSinaFileProvider(fileProvider);
+        PlatformConfig.setSinaFileProvider(fileProvider);
         // QQ APP ID 1108767316
         //APP KEY bsAfYGPH8dW47RG8
         // PlatformConfig.setQQZone("1108767316", "bsAfYGPH8dW47RG8");

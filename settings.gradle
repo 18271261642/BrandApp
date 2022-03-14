@@ -2,4 +2,3 @@ include ':webSocket'
 include ':util'
 include ':train'
 include ':app', ':basiclib', ':basicres', ':viewlibray', ':blelibrary', ':socialmodule', ':commonres',":todaystepcounterlib",":FlycoTabLayout_Lib",":dfu"
-include ':alibbLib'

@@ -259,7 +259,8 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
      */
     private void getDeviceList() {
         list.clear();
-        list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_F18, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_7018_FILTER), R.drawable.icon_scan_f18));
+        //Constants.WATCH_7018_FILTER
+        list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_F18, String.format(UIUtils.getString(R.string.detail_watch),"BL-F18X" ), R.drawable.icon_f18_dd));
         list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W910, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_910_FILTER), R.drawable.icon_scan_w910));
         list.add(new DeviceBean(JkConfiguration.DeviceType.WATCH_W516, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_FILTER), R.drawable.icon_w516));
         list.add(new DeviceBean(JkConfiguration.DeviceType.Watch_W556, String.format(UIUtils.getString(R.string.detail_watch), Constants.WATCH_556_FILTER), R.drawable.icon_scan_w526));

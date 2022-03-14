@@ -1,5 +1,6 @@
 package com.isport.brandapp.device.bracelet;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -19,6 +20,8 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.XXPermissions;
 import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.brandapp.R;
 import com.isport.brandapp.banner.recycleView.utils.ToastUtil;
@@ -37,6 +40,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Observable;
 
 import androidx.annotation.NonNull;
@@ -211,6 +215,16 @@ public class CamaraActivity1 extends BaseActivity implements View.OnClickListene
 
 
     private void checkCameraPersiomm() {
+
+        XXPermissions.with(this).permission(Manifest.permission.RECORD_AUDIO).request(new OnPermissionCallback() {
+            @Override
+            public void onGranted(List<String> list, boolean b) {
+
+            }
+        });
+
+
+
         PermissionManageUtil permissionManage = new PermissionManageUtil(this);
         permissionManage.requestPermissionsGroup(new RxPermissions(this),
                 PermissionGroup.CAMERA_STORAGE, new PermissionManageUtil
@@ -225,6 +239,10 @@ public class CamaraActivity1 extends BaseActivity implements View.OnClickListene
                         ToastUtil.showTextToast(CamaraActivity1.this, UIUtils.getString(R.string.location_permissions));
                     }
                 });
+
+
+
+
 
     }
 

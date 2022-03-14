@@ -1,5 +1,6 @@
 package com.isport.brandapp.device.f18;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.XXPermissions;
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.db.action.DeviceInformationTableAction;
 import com.isport.blelibrary.db.action.DeviceTempUnitlTableAction;
@@ -46,6 +49,7 @@ import com.isport.brandapp.view.VerBatteryView;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import bike.gymproject.viewlibray.ItemDeviceSettingView;
@@ -577,6 +581,16 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
 
     private void requestCameraPermission(){
        // if(XXPermissions.isGranted(this, R.ma))
+        boolean isCamera = XXPermissions.isPermanentDenied(this, Manifest.permission.CAMERA);
+        if(isCamera){
+            XXPermissions.with(this).permission(Manifest.permission.CAMERA).request(new OnPermissionCallback() {
+                @Override
+                public void onGranted(List<String> list, boolean b) {
+
+                }
+            });
+            return;
+        }
         Watch7018Manager.getWatch7018Manager().intoTakePhotoStatus(true);
         Intent intentCamara = new Intent(context, CamaraActivity1.class);
         startActivity(intentCamara);
@@ -612,17 +626,17 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
         //加强测量
         f18DeviceStrongItem.setChecked(f18DeviceSetData.isStrengthMeasure());
         //抬腕亮屏
-        f18DeviceTurnScreenItem.setContentText(f18DeviceSetData.getTurnWrist());
+        f18DeviceTurnScreenItem.setContentText(f18DeviceSetData.getTurnWrist() == null || f18DeviceSetData.getTurnWrist().equals("未开启") ? getResources().getString(R.string.display_no_count) : f18DeviceSetData.getTurnWrist());
         //勿扰模式
-        f18DeviceDNTItem.setContentText(f18DeviceSetData.getDNT() == null ?getResources().getString(R.string.display_no_count)  : f18DeviceSetData.getDNT().equals("未开启") ? getResources().getString(R.string.display_no_count) : (f18DeviceSetData.getDNT().equals("已开启")?getResources().getString(R.string.setting_start) : f18DeviceSetData.getDNT()));
+        f18DeviceDNTItem.setContentText(f18DeviceSetData.getDNT() == null || f18DeviceSetData.getDNT().equals("未开启") ? getResources().getString(R.string.display_no_count) : (f18DeviceSetData.getDNT().equals("已开启")?getResources().getString(R.string.setting_start) : f18DeviceSetData.getDNT()));
         //喝水提醒
-        f18DeviceDrinkItem.setContentText(f18DeviceSetData.getDrinkAlert());
+        f18DeviceDrinkItem.setContentText(f18DeviceSetData.getDrinkAlert() == null || f18DeviceSetData.getDrinkAlert().equals("未开启")? getResources().getString(R.string.display_no_count) : f18DeviceSetData.getDrinkAlert() );
         //久坐提醒
-        f18DeviceLongSitAlertItem.setContentText(f18DeviceSetData.getLongSitStr());
+        f18DeviceLongSitAlertItem.setContentText(f18DeviceSetData.getLongSitStr() == null || f18DeviceSetData.getLongSitStr().equals("未开启") ? getResources().getString(R.string.display_no_count) : f18DeviceSetData.getLongSitStr());
         //联系人
        // f18DeviceContractItem.setContentText("已设置"+f18DeviceSetData.getContactNumber()+"个");
         //定时检测
-        f18ContinueItem.setContentText(f18DeviceSetData.getContinuMonitor());
+        f18ContinueItem.setContentText(f18DeviceSetData.getContinuMonitor() == null || f18DeviceSetData.getContinuMonitor().equals("未开启") ? getResources().getString(R.string.display_no_count) : f18DeviceSetData.getContinuMonitor());
         //消息开启个数
         f18DeviceAppMsgItem.setContentText(!f18DeviceSetData.isAllAppMsgStatus() ? getResources().getString(R.string.display_no_count) : String.format(getResources().getString(R.string.string_open_number),f18DeviceSetData.getAppMsgs()+""));
         //固件版本

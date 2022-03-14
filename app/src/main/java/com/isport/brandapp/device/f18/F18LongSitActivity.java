@@ -93,7 +93,7 @@ public class F18LongSitActivity extends BaseMVPTitleActivity<F18SetView,F18SetPr
                 //间隔
                 String intervalStr = iv_watch_stable_remind_time.getContentText();
               //  String tmpInterval = StringUtils.substringBefore(intervalStr,"分");
-                int drinkInterval = 120;
+                int drinkInterval = 60;
 
 
                 if(endTime-startTime<drinkInterval){
@@ -217,7 +217,7 @@ public class F18LongSitActivity extends BaseMVPTitleActivity<F18SetView,F18SetPr
         iv_watch_stable_remind_time.setVisibility(View.VISIBLE);
        // iv_watch_stable_remind_time.setOnClickListener(this);
         iv_watch_stable_remind_time.setShowArrow(false);
-        iv_watch_stable_remind_time.setContentText("120" +getResources().getString(R.string.minute));
+        iv_watch_stable_remind_time.setContentText("60" +getResources().getString(R.string.minute));
 
         f18DntLongSitView.setVisibility(View.VISIBLE);
 

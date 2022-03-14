@@ -1,6 +1,8 @@
 package com.isport.brandapp.wu.view;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -31,6 +33,9 @@ public class SingleTemptureView extends View {
     private float mWidth,mHeight;
 
     private TempInfo tempInfo;
+
+    //点击头部的bg图片
+    private Paint topImgPaint;
 
     //最大值
     private float maxValue;
@@ -64,6 +69,11 @@ public class SingleTemptureView extends View {
         txtPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         txtPaint.setAntiAlias(true);
         txtPaint.setTextSize(DimenUtil.dp2px(getContext(),14f));
+
+
+        topImgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        topImgPaint.setStyle(Paint.Style.FILL);
+        topImgPaint.setAntiAlias(true);
     }
 
 
@@ -84,7 +94,19 @@ public class SingleTemptureView extends View {
         if(tempInfo == null)
             return;
 
-        float middleV = mHeight / maxValue;
+
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon_move_bottom);
+        //图片的宽高
+        float imgWidth = bitmap.getWidth();
+        float imgHeight = bitmap.getHeight();
+        RectF imgRectF = new RectF((mCurrWidth/2)-(imgWidth/3)+2f,-mHeight,imgWidth+9f,-mHeight+imgHeight);
+        if(tempInfo.isClick())
+            canvas.drawBitmap(bitmap,null,imgRectF,topImgPaint);
+
+
+
+        float middleV = (mHeight -imgHeight)/ maxValue;
 
         float mRightPoint = mWidth / 2;
         Log.e("TAG","----温度="+tempInfo.toString());

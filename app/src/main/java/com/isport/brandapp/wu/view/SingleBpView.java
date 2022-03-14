@@ -1,6 +1,8 @@
 package com.isport.brandapp.wu.view;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,6 +12,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.isport.brandapp.R;
 import com.isport.brandapp.wu.bean.BPInfo;
 import com.isport.brandapp.wu.util.DimenUtil;
 
@@ -24,11 +27,16 @@ public class SingleBpView extends View {
     private static final String TAG = "SingleBpView";
 
 
+    private int startRawX;
+    private int startRawY;
+
     private Paint backPaint;
     private Paint lBpPaint; //低压的画笔
     private Paint hBpPaint; //高压的画笔
     //数值的画笔
     private Paint txtPaint;
+    //顶部点击图片的画笔
+    private Paint imgPaint;
 
     private float mWidth,mHeight;
 
@@ -39,6 +47,9 @@ public class SingleBpView extends View {
     private float signalWidth = 30f;
     //间隔
     private float signalInterval = 8f;
+
+    //是否点击，点击绘制顶部图片
+    private boolean isClick = false;
 
 
     public SingleBpView(Context context) {
@@ -75,6 +86,10 @@ public class SingleBpView extends View {
         txtPaint.setTextSize(DimenUtil.dp2px(context,13f));
         txtPaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
+        imgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        imgPaint.setTextAlign(Paint.Align.CENTER);
+        imgPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+
     }
 
 
@@ -98,9 +113,20 @@ public class SingleBpView extends View {
 
         Log.e("BP","----bpInfo="+mWidth+" "+mHeight+" "+bpInfo.toString());
 
-        //329
-        float middleV = mHeight / maxValue;
 
+
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon_move_bottom);
+        //图片的宽高
+        float imgWidth = bitmap.getWidth();
+        float imgHeight = bitmap.getHeight();
+        RectF rectF = new RectF(3f,-mHeight,imgWidth,-mHeight+imgHeight);
+        if(bpInfo.isClick())
+        canvas.drawBitmap(bitmap,null,rectF,imgPaint);
+
+
+        //329
+        float middleV = (mHeight-imgHeight) / maxValue;
 
         //绘制高压和低压的数值
         int hBpValue = bpInfo.getSpValue();
@@ -138,15 +164,24 @@ public class SingleBpView extends View {
 
 
 
+
+
         //绘制头部的图片效果
-       // canvas.drawBitmap();
+      //  canvas.drawBitmap(bitmap,0,-maxValue * middleV,imgPaint);
     }
 
 
     @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        Log.e(TAG,"--22-dispatchTouchEvent--="+event.getAction());
+
+        return super.dispatchTouchEvent(event);
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        Log.e(TAG,"---触摸事件--="+event.getAction());
+        Log.e(TAG,"--22-触摸事件--="+event.getAction());
 
         if(event.getAction() == MotionEvent.ACTION_DOWN){   //按下
 
@@ -156,7 +191,25 @@ public class SingleBpView extends View {
         if(event.getAction() == MotionEvent.ACTION_HOVER_EXIT){
 
         }
+        int x = (int) event.getX();
+        int y = (int) event.getY();
+        int rawX = (int) event.getRawX();
+        int rawY = (int) event.getRawY();
+        int action = event.getAction();
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                startRawX = rawX;
+                startRawY = rawY;
+                break;
+            case MotionEvent.ACTION_MOVE:
 
+                break;
+            case MotionEvent.ACTION_UP:
+                if (x + getLeft() < getRight() && y + getTop() < getBottom()) {
+                    Log.e(TAG,"-----action_Up=");
+                }
+                break;
+        }
 
         return super.onTouchEvent(event);
     }

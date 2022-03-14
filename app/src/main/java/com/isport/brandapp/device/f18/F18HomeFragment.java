@@ -348,7 +348,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
         String userId = TokenUtil.getInstance().getPeopleIdInt(getActivity());
         if(deviceId == null)
             return;
-
+        mFragPresenter.dealWithYesDayStep(userId,deviceId);
         mFragPresenter.getBloodPressure();
         mFragPresenter.getNumOxyGen();
         mFragPresenter.getNetTempData();
@@ -437,7 +437,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
         public CustomHolder getHeader(Context context, List lists, int itemID) {
             dataHeaderHolder = new DataHeaderHolder(context, lists, R.layout.app_fragment_data_head);
             dataHeaderHolder.setOnCourseOnclickLister(F18HomeFragment.this);
-            //mFragPresenter.getDeviceStepLastTwoData(IDeviceType.TYPE_WATCH_7018);
+            mFragPresenter.getDeviceStepLastTwoData(IDeviceType.TYPE_WATCH_7018);
             return dataHeaderHolder;
         }
 
@@ -447,7 +447,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
             dataOxygenDataHolder = new DataHeartRateHolder(context, lists, R.layout
                     .app_fragment_data_device_item, JkConfiguration.BODY_OXYGEN);
             dataOxygenDataHolder.setHeartRateItemClickListener(F18HomeFragment.this, F18HomeFragment.this);
-          //  mFragPresenter.getDevcieOxygenData();
+            mFragPresenter.getDevcieOxygenData();
             return dataOxygenDataHolder;
         }
 
@@ -467,7 +467,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
             dataOnceHrHolder = new DataHeartRateHolder(context, lists, R.layout
                     .app_fragment_data_device_item, JkConfiguration.BODY_ONCE_HR);
             dataOnceHrHolder.setHeartRateItemClickListener(F18HomeFragment.this, F18HomeFragment.this);
-          //  mFragPresenter.getDevcieOnceHrData();
+            mFragPresenter.getDevcieOnceHrData();
             return dataOnceHrHolder;
         }
 
@@ -478,7 +478,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
             dataBloodPresureDataHolder = new DataHeartRateHolder(context, lists, R.layout
                     .app_fragment_data_device_item, JkConfiguration.BODY_BLOODPRESSURE);
             dataBloodPresureDataHolder.setHeartRateItemClickListener(F18HomeFragment.this, F18HomeFragment.this);
-           // mFragPresenter.getDeviceBloodPressure();
+            mFragPresenter.getDeviceBloodPressure();
             return dataBloodPresureDataHolder;
         }
 
@@ -489,6 +489,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
                     .app_fragment_data_device_item, JkConfiguration.BODY_EXCERICE);
             dataExerciseDataHolder.setHeartRateItemClickListener(F18HomeFragment.this, F18HomeFragment.this);
             int currentType = AppSP.getInt(context, AppSP.DEVICE_CURRENTDEVICETYPE, JkConfiguration.DeviceType.WATCH_W516);
+            mFragPresenter.getExerciseTodaySum(JkConfiguration.DeviceType.Watch_F18);
             return dataExerciseDataHolder;
         }
 
@@ -498,7 +499,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
             dataSleepHolder = new DataSleepHolder(context, lists, R.layout
                     .app_fragment_data_device_item);
             dataSleepHolder.setSleepItemClickListener(F18HomeFragment.this, F18HomeFragment.this);
-            //mFragPresenter.getWatchSleepLastData();
+            mFragPresenter.getWatchSleepLastData();
             return dataSleepHolder;
         }
     };

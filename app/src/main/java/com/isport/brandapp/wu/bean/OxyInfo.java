@@ -19,6 +19,17 @@ public class OxyInfo {
     private String wristbandBloodOxygenId;
     private String strDate;
 
+    //是否点击
+    private boolean isClick;
+
+    public boolean isClick() {
+        return isClick;
+    }
+
+    public void setClick(boolean click) {
+        isClick = click;
+    }
+
     public String getDeviceId() {
         return deviceId;
     }
@@ -77,6 +88,7 @@ public class OxyInfo {
                 ", userId='" + userId + '\'' +
                 ", wristbandBloodOxygenId='" + wristbandBloodOxygenId + '\'' +
                 ", strDate='" + strDate + '\'' +
+                ", isClick=" + isClick +
                 '}';
     }
 }

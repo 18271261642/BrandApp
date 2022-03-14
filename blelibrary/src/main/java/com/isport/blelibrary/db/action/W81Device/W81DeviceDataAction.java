@@ -42,14 +42,15 @@ public class W81DeviceDataAction {
     }
 
 
-    public synchronized void saveDeviceStepArrayData(String deviceId, String userId,String wrisId, String dateStr,String stepArray){
+    public synchronized void saveDeviceStepArrayData(String tag,String deviceId, String userId,String wrisId, String dateStr,String stepArray){
+
+        Log.e("TAG","-----来源="+tag +" 日期="+dateStr+"\n"+stepArray);
+
         W81DeviceDetailData w81DeviceDetailData = getW81DeviceDetialData(deviceId, userId, dateStr);
         if(w81DeviceDetailData != null){
-
-            Log.e("bb","----wristId="+w81DeviceDetailData.getWristbandSportDetailId());
-//            if(w81DeviceDetailData.getWristbandSportDetailId() != null)
-//                return;
-            w81DeviceDetailData.setStepArray(analysisStepArray(stepArray,w81DeviceDetailData.getStepArray()));
+            String dealStep = analysisStepArray(tag,w81DeviceDetailData.getStep(),stepArray,w81DeviceDetailData.getStepArray());
+            Log.e("TT","-------处理完成后的计步="+dealStep);
+            w81DeviceDetailData.setStepArray(dealStep);
             w81DeviceDetailData.setDateStr(dateStr);
             Log.e("保存计步",w81DeviceDetailData.toString());
 
@@ -69,42 +70,111 @@ public class W81DeviceDataAction {
     }
 
 
+    //合并步数方法
+    //当tag=0时，表明是从手表同步的步数，直接合并
+    private String analysisStepArray(String tag,int localStepCount ,String currStepArr,String localStepArr){
 
-    private String analysisStepArray(String currStepArr,String localStepArr){
+        Log.e("TAG","------需要保存的="+currStepArr+"\n"+ "本地的="+localStepArr);
+
+       //判断当前总的计步，如果详情计步比总步数小，可以合并，否则不合并
+        int countStep = localStepCount;
+
         if(localStepArr == null || localStepArr.equals("[]"))
             return currStepArr;
         if(currStepArr == null || currStepArr.equals("[]"))
             return localStepArr;
         //当前的计步详情
         List<String[]> currStepList = new Gson().fromJson(currStepArr,new TypeToken<List<String[]>>(){}.getType());
+
         //已经存在的计步详情
         List<String[]> localStepList = new Gson().fromJson(localStepArr,new TypeToken<List<String[]>>(){}.getType());
+        if(localStepList == null || localStepList.size() == 0)
+            return currStepArr;
 
+        if(currStepList == null || currStepList.size() == 0)
+            return localStepArr;
 
-        //本地数据库有，与原始整理的数据合并
-        if(currStepList.size() == localStepList.size()){
-            List<String[]> yesResultList = new ArrayList<>();
-            for(int i = 0;i<currStepList.size();i++){
-                String[] sourceItem = currStepList.get(i);
-                String[] localItem = localStepList.get(i);
+        if(tag.equals("0")){
+            //本地数据库有，与原始整理的数据合并
+            if(currStepList.size() == localStepList.size()){
+                List<String[]> yesResultList = new ArrayList<>();
+                for(int i = 0;i<currStepList.size();i++){
+                    String[] sourceItem = currStepList.get(i);
+                    String[] localItem = localStepList.get(i);
 
-                //合并
-                String[] resultStr = new String[4];
-                //小时
-                resultStr[0] = sourceItem[0];
-                //步数
-                resultStr[1] = (Integer.parseInt(sourceItem[1])+Integer.parseInt(localItem[1]))+"";
-                //距离
-                resultStr[2] = StepArithmeticUtil.addNumber(Float.parseFloat(sourceItem[2]),Float.parseFloat(localItem[2]))+"";
-                //卡路里
-                resultStr[3] = StepArithmeticUtil.addNumber(Float.parseFloat(sourceItem[3]),Float.parseFloat(localItem[3]))+"";
-                yesResultList.add(resultStr);
+                    //合并
+                    String[] resultStr = new String[4];
+                    //小时
+                    resultStr[0] = sourceItem[0];
+                    //步数
+                    resultStr[1] = (Integer.parseInt(sourceItem[1])+Integer.parseInt(localItem[1]))+"";
+                    //距离
+                    resultStr[2] = StepArithmeticUtil.addNumber(Float.parseFloat(sourceItem[2]),Float.parseFloat(localItem[2]))+"";
+                    //卡路里
+                    resultStr[3] = StepArithmeticUtil.addNumber(Float.parseFloat(sourceItem[3]),Float.parseFloat(localItem[3]))+"";
+                    yesResultList.add(resultStr);
+                }
+
+                return new Gson().toJson(yesResultList);
             }
-
-            return new Gson().toJson(yesResultList);
         }
 
-        return null;
+        //昨天的数据，已经组装完成，直接保存
+        if(tag.equals("1")){
+
+            return currStepArr;
+        }
+
+
+        int localCountStep = 0;
+        for(String[] lStr : localStepList){
+            localCountStep +=Integer.parseInt(lStr[1]);
+        }
+        if(countStep == localCountStep){
+            return localStepArr;
+        }
+
+        //本地和来源的累计步数，如果一致就任意返回一个
+        int currCountStep = 0;
+        for(String[] currStr : currStepList){
+            currCountStep += Integer.parseInt(currStr[1]);
+        }
+
+
+        if(currCountStep == localCountStep){
+            return currStepArr;
+        }
+
+        if(localCountStep > currCountStep){
+
+            return localStepArr;
+        }
+
+        if(countStep>(localCountStep+currCountStep)){
+            //本地数据库有，与原始整理的数据合并
+            if(currStepList.size() == localStepList.size()){
+                List<String[]> yesResultList = new ArrayList<>();
+                for(int i = 0;i<currStepList.size();i++){
+                    String[] sourceItem = currStepList.get(i);
+                    String[] localItem = localStepList.get(i);
+
+                    //合并
+                    String[] resultStr = new String[4];
+                    //小时
+                    resultStr[0] = sourceItem[0];
+                    //步数
+                    resultStr[1] = (Integer.parseInt(sourceItem[1])+Integer.parseInt(localItem[1]))+"";
+                    //距离
+                    resultStr[2] = StepArithmeticUtil.addNumber(Float.parseFloat(sourceItem[2]),Float.parseFloat(localItem[2]))+"";
+                    //卡路里
+                    resultStr[3] = StepArithmeticUtil.addNumber(Float.parseFloat(sourceItem[3]),Float.parseFloat(localItem[3]))+"";
+                    yesResultList.add(resultStr);
+                }
+
+                return new Gson().toJson(yesResultList);
+            }
+        }
+        return currStepArr;
     }
 
 
@@ -289,7 +359,7 @@ public class W81DeviceDataAction {
     private synchronized long saveW81DeviceDetailData(W81DeviceDetailData deviceDetailData) {
         W81DeviceDetailDataDao w81DeviceDetailDataDao = BleAction.getsW81DeviceDetailDataDao();
         if (w81DeviceDetailDataDao == null) {
-            return 0l;
+            return 0L;
         }
         long id = w81DeviceDetailDataDao.insertOrReplace(deviceDetailData);
         Logger.myLog("saveW81DeviceDetailData：" + deviceDetailData.toString() + " save id:" + id);

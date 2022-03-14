@@ -205,7 +205,10 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
         singleTempAdapter.setOnF18ItemClickListener(new OnF18ItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                onceTempDescTv.setText(tempInfoList.get(position).getStrDate());
+                for(int i = 0;i<tempInfoList.size();i++){
+                    tempInfoList.get(i).setClick(i == position);
+                }
+                singleTempAdapter.notifyDataSetChanged();
                 setCurrentValue(tempInfoList.get(position));
             }
 
@@ -240,10 +243,11 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
 
 
     private void setCurrentValue(TempInfo tempInfo) {
-        Log.e(TAG,"-------点击温度="+tempInfo.toString());
+       // Log.e(TAG,"-------点击温度="+tempInfo.toString());
         try {
             if (tempInfo != null) {
-                if (tempInfo.equals("0")) {
+                onceTempDescTv.setText(tempInfo.getStrDate());
+                if (tempInfo.getTempUnitl().equals("0")) {
                     tv_value.setText(tempInfo.getCentigrade());
                 } else {
                     tv_value.setText(tempInfo.getFahrenheit());
@@ -442,6 +446,10 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
             setData();
             tempInfoList.clear();
             tempInfoList.addAll(info);
+            for(int i = 0;i<tempInfoList.size();i++){
+                tempInfoList.get(i).setClick(i == 0);
+            }
+            setCurrentValue(tempInfoList.get(0));
             singleTempAdapter.notifyDataSetChanged();
 
             temperGuidImg.setVisibility(tempInfoList.size()>6 ? View.VISIBLE : View.GONE);
@@ -459,9 +467,12 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
         mCurrentInfo = mW81DeviceDataModelImp.getTempInfoeLastData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
         setData();
         trendview_temp.setLocalData(mCurrentInfo, currentTempUtil);
-
         tempInfoList.add(0,info);
+        for(int i = 0;i<tempInfoList.size();i++){
+            tempInfoList.get(i).setClick(i == 0);
+        }
         singleTempAdapter.notifyDataSetChanged();
+        setCurrentValue(tempInfoList.get(0));
     }
 
     @Override

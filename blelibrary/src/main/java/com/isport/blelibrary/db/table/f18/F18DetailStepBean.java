@@ -36,9 +36,14 @@ public class F18DetailStepBean {
     //卡路里
     private float kcal;
 
-    @Generated(hash = 709398268)
-    public F18DetailStepBean(Long id, String userId, String deviceTypeId,
-            String dayStr, long timeLong, int step, float distance, float kcal) {
+
+    //是否已经上传 上传状态：0未上传；1已上传
+    private int status;
+
+
+
+    @Generated(hash = 969456343)
+    public F18DetailStepBean(Long id, String userId, String deviceTypeId, String dayStr, long timeLong, int step, float distance, float kcal, int status) {
         this.id = id;
         this.userId = userId;
         this.deviceTypeId = deviceTypeId;
@@ -47,6 +52,7 @@ public class F18DetailStepBean {
         this.step = step;
         this.distance = distance;
         this.kcal = kcal;
+        this.status = status;
     }
 
     @Generated(hash = 1235186861)
@@ -109,16 +115,26 @@ public class F18DetailStepBean {
         this.kcal = kcal;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "F18DetailStepBean{" +
-                "userId='" + userId + '\'' +
+                "id=" + id +
+                ", userId='" + userId + '\'' +
                 ", deviceTypeId='" + deviceTypeId + '\'' +
                 ", dayStr='" + dayStr + '\'' +
                 ", timeLong=" + timeLong +
                 ", step=" + step +
                 ", distance=" + distance +
                 ", kcal=" + kcal +
+                ", status=" + status +
                 '}';
     }
 

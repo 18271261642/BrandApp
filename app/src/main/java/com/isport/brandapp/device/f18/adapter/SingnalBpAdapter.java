@@ -49,6 +49,7 @@ public class SingnalBpAdapter extends RecyclerView.Adapter<SingnalBpAdapter.Sing
         singnalBpViewHolder.singleBpView.setMaxValue(160);
         singnalBpViewHolder.singleBpView.setBpInfo(list.get(i));
 
+
         singnalBpViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -62,6 +63,11 @@ public class SingnalBpAdapter extends RecyclerView.Adapter<SingnalBpAdapter.Sing
     @Override
     public int getItemCount() {
         return list.size();
+    }
+
+
+    public void setViewDataSetChange(){
+
     }
 
     class SingnalBpViewHolder extends RecyclerView.ViewHolder{

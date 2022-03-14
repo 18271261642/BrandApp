@@ -260,15 +260,7 @@ public class CustomizeF18DialFragment extends BaseFragment {
             //删除
             @Override
             public void onChildClick(int position, boolean isCheck) {
-                if(f18CusDialSelectDialogView != null){
-//                    f18CusDialSelectDialogView.clearResources();
-                    f18CusDialSelectDialogView.dismiss();
-                }
                 alertDelete(f18DialBean);
-
-//                boolean isDelete = FileUtil.deleteFileLast(f18DialBean.getPreviewImgUrl());
-//                Log.e("TAG","------删除图片="+isDelete);
-//                readLocalFile();
             }
 
             //开始设置表盘
@@ -283,29 +275,25 @@ public class CustomizeF18DialFragment extends BaseFragment {
 
     //提示是否删除
     private void alertDelete(F18DialBean fileUrlBean){
-        Log.e("TAG","------删除图片="+fileUrlBean.getPreviewImgUrl());
-        if(deleteAlert == null)
-            deleteAlert = new AlertDialog.Builder(getContext())
+        File f = new File(fileUrlBean.getPreviewImgUrl());
+            AlertDialog.Builder deleteAlert = new AlertDialog.Builder(getContext())
                     .setTitle(getResources().getString(R.string.tips))
                     .setMessage(getResources().getString(R.string.string_alert_delete))
                     .setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            if(f18CusDialSelectDialogView != null){
+                                f18CusDialSelectDialogView.dismiss();
+                            }
                             dialog.dismiss();
                             boolean isGetP = XXPermissions.isPermanentDenied(getActivity(),Manifest.permission.WRITE_EXTERNAL_STORAGE);
                             if(isGetP){
                                 Toast.makeText(getActivity(),getResources().getString(R.string.string_no_read_permission),Toast.LENGTH_SHORT).show();
                                 return;
                             }
-
-
-                            Log.e("TAG","------文件是否存在="+(new File(fileUrlBean.getPreviewImgUrl()).isFile()));
-                            
-                            Message message = handler.obtainMessage();
-                            message.what = -1;
-                            message.obj = fileUrlBean.getPreviewImgUrl();
-                            handler.sendMessage(message);
-
+                            FileUtil.deleteFile(f);
+                            readLocalFile();
+//
                         }
                     }).setNegativeButton(getResources().getString(R.string.no), new DialogInterface.OnClickListener() {
                         @Override

@@ -190,6 +190,9 @@ public class SettingActivity extends BaseTitleActivity implements View.OnClickLi
                 PublicAlertDialog.getInstance().showDialog("", context.getResources().getString(R.string.log_out_notice), context, getResources().getString(R.string.common_dialog_cancel), getResources().getString(R.string.common_dialog_ok), new AlertDialogStateCallBack() {
                     @Override
                     public void determine() {
+                        if(DeviceTypeUtil.isContainF18()){
+                            AppSP.putString(SettingActivity.this,AppSP.F18_SAVE_MAC,null);
+                        }
                         ISportAgent.getInstance().disConDevice(false);
                         TokenUtil.getInstance().clear(context);
                         DeviceTypeUtil.clearDevcieInfo(context);

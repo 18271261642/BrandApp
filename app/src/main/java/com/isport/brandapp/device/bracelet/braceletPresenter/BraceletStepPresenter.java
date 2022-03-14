@@ -66,7 +66,7 @@ public class BraceletStepPresenter extends BasePresenter<BraceletStepView> {//im
                 } else if (DeviceTypeUtil.isContainWatch(currentType)) {
 
                     strDates = iw516Model.getMonthData(strDate);
-                } else if (DeviceTypeUtil.isContainW81(currentType)) {
+                } else if (DeviceTypeUtil.isContainW81(currentType) || DeviceTypeUtil.isContainF18(currentType)) {
                     strDates = iw81DeviceDataModel.getMonthData(strDate, deviceId);
                 }
                 // ArrayList<String> strDates = iw311DataModel.getMonthData(strDate, deviceId);
