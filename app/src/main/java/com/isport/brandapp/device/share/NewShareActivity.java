@@ -11,6 +11,7 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -33,6 +34,8 @@ import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
 import com.google.gson.Gson;
 import com.gyf.immersionbar.ImmersionBar;
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.XXPermissions;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.brandapp.App;
 import com.isport.brandapp.R;
@@ -154,6 +157,10 @@ public class NewShareActivity extends BaseActivity implements View.OnClickListen
     private PremissionUtil util;
     private File file;
 
+
+    //图片保存的地址
+    private String saveImgPath;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -163,6 +170,7 @@ public class NewShareActivity extends BaseActivity implements View.OnClickListen
     protected int getLayoutId() {
         return R.layout.activity_new_share;
     }
+
 
     @Override
     protected void initView(View view) {
@@ -322,11 +330,21 @@ public class NewShareActivity extends BaseActivity implements View.OnClickListen
         util.setOnResultLister(this);
 
         requestPermiss();
+
+        saveImgPath = Environment.getExternalStorageDirectory().getPath()+"/Download/";
     }
 
 
     private void requestPermiss(){
-        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE},0x00);
+        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},0x00);
+
+        XXPermissions.with(this).permission(Manifest.permission.CAMERA).request(new OnPermissionCallback() {
+            @Override
+            public void onGranted(List<String> list, boolean b) {
+
+            }
+        });
+
     }
 
 
@@ -454,7 +472,9 @@ public class NewShareActivity extends BaseActivity implements View.OnClickListen
             case R.id.iv_qq:
                 if (PackageUtil.isWxInstall(NewShareActivity.this, PackageUtil.qqPakage)) {
                     hideView();
-                    util.checkNewShareCameraPersiomm(this, this, fl_share_content, "qq");
+                    //util.checkNewShareCameraPersiomm(this, this, fl_share_content, "qq");
+
+                    util.checkCameraPersiomm(this,this,fl_share_content,"qq",saveImgPath);
                 } else {
                     ToastUtils.showToast(NewShareActivity.this, UIUtils.getString(R.string.please_install_software));
                     return;
@@ -464,7 +484,7 @@ public class NewShareActivity extends BaseActivity implements View.OnClickListen
             case R.id.iv_friend:
                 if (PackageUtil.isWxInstall(NewShareActivity.this, PackageUtil.weichatPakage)) {
                     hideView();
-                    util.checkCameraPersiomm(this, this, fl_share_content, "friend");
+                    util.checkCameraPersiomm(this, this, fl_share_content, "friend",saveImgPath);
                 } else {
 
                     ToastUtils.showToast(NewShareActivity.this, UIUtils.getString(R.string.please_install_software));
@@ -474,7 +494,7 @@ public class NewShareActivity extends BaseActivity implements View.OnClickListen
             case R.id.iv_wechat:
                 if (PackageUtil.isWxInstall(NewShareActivity.this, PackageUtil.weichatPakage)) {
                     hideView();
-                    util.checkCameraPersiomm(this, this, fl_share_content, "wechat");
+                    util.checkCameraPersiomm(this, this, fl_share_content, "wechat",saveImgPath);
                 } else {
 
                     ToastUtils.showToast(NewShareActivity.this, UIUtils.getString(R.string.please_install_software));
@@ -486,7 +506,7 @@ public class NewShareActivity extends BaseActivity implements View.OnClickListen
 //                util.checkCameraPersiomm(this, this, fl_share_content, "weibo");
                 if (PackageUtil.isWxInstall(NewShareActivity.this, PackageUtil.weiboPakage)) {
                     hideView();
-                    util.checkCameraPersiomm(this, this, fl_share_content, "weibo");
+                    util.checkCameraPersiomm(this, this, fl_share_content, "weibo",saveImgPath);
                 } else {
                     ToastUtils.showToast(NewShareActivity.this, UIUtils.getString(R.string.please_install_software));
                     return;
@@ -501,7 +521,7 @@ public class NewShareActivity extends BaseActivity implements View.OnClickListen
                 }
 
                 hideView();
-                util.checkCameraPersiomm(this, this, fl_share_content, "facebook");
+                util.checkCameraPersiomm(this, this, fl_share_content, "facebook",saveImgPath);
 
 //                //判断facebook是否安装，没有按钮
 //                if (PackageUtil.isWxInstall(NewShareActivity.this, PackageUtil.facebookPakage)) {
@@ -515,7 +535,7 @@ public class NewShareActivity extends BaseActivity implements View.OnClickListen
 
             case R.id.iv_more:
                 hideView();
-                util.checkCameraPersiomm(this, this, fl_share_content, "more");
+                util.checkCameraPersiomm(this, this, fl_share_content, "more",saveImgPath);
                 break;
 
             case R.id.btn_custom_bg:

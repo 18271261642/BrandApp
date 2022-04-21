@@ -45,7 +45,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
     <!-- <uses-permission android:name="android.permission.READ_LOGS"></uses-permission> -->
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" /> <!-- 用于定位 -->
@@ -82,6 +82,7 @@
         android:icon="@drawable/ic_t_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
+        android:usesCleartextTraffic="true"
         android:networkSecurityConfig="@xml/network_security_config"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@drawable/ic_t_launcher"
@@ -90,6 +91,7 @@
         tools:replace="android:allowBackup"
         tools:targetApi="n">
 
+        <uses-library android:name="org.apache.http.legacy" android:required="false" />
 
         <!-- 表示当前项目已经适配了分区存储特性 -->
         <meta-data
@@ -134,7 +136,9 @@
             <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".home.MainActivity" />
+        <activity android:name=".home.MainActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".login.ActivityLogin"
             android:launchMode="singleTask" />
@@ -384,7 +388,7 @@
             android:name="com.umeng.facebook.FacebookContentProvider"
             android:exported="true"/>-->
 
-
+        <activity android:name=".device.F18TestActivity"/>
 
         <provider
             android:name="com.facebook.FacebookContentProvider"

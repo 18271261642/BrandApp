@@ -62,7 +62,7 @@
         <receiver
             android:name=".TodayStepAlertReceive"
             android:enabled="true"
-            android:exported="false"></receiver>
+            android:exported="false"/>
 
         <service
             android:name=".JobSchedulerService"

@@ -18,4 +18,14 @@ public class F18StepHourMap {
         }
         return map;
     }
+
+
+    public static Map<String, String[]> getF1824HourMap(){
+        Map<String,String[]> map = new HashMap<>();
+        for(int i = 0;i<24;i++){
+            map.put(String.format("%02d",i),new String[]{"00","0","0","0"});
+        }
+        return map;
+    }
+
 }

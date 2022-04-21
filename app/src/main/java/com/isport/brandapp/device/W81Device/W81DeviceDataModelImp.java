@@ -1,6 +1,7 @@
 package com.isport.brandapp.device.W81Device;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.crrepa.ble.conn.bean.CRPSleepInfo;
 import com.google.gson.Gson;
@@ -77,7 +78,7 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
         wristbandstep.setStepKm(CommonDateUtil.formatTwoPoint(dis));
         wristbandstep.setCalorie(String.valueOf(model.getCal()));
         wristbandstep.setStepNum(String.valueOf(model.getStep()));
-        wristbandstep.setLastServerTime(model.getTimestamp());
+        wristbandstep.setLastServerTime(model.getTimestamp() == null ? 0 : model.getTimestamp());
         wristbandstep.setStrDate(model.getDateStr());
         String stepArray = model.getStepArray();
         ArrayList<Integer> stepList = new ArrayList<>();
@@ -354,6 +355,51 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
 
         return list1;
     }
+
+
+
+
+    public List<WatchInsertBean> getAllNoUpgradeW81DeviceDetailData(String deviceId, String userId,  boolean isUpgradeToday) {
+
+        List<W81DeviceDetailData> list = w81DeviceDataAction.getUnUpgradeW81DeviceDetialData(deviceId, userId);
+
+        Logger.myLog("1111getNoUpgradeW81DevcieDetailData" + list + "---------" + isUpgradeToday);
+        W81DeviceDetailData deviceDetailData;
+        WatchInsertBean watchInsertBean;
+        List<WatchInsertBean> list1 = new ArrayList<>();
+        if (list != null && list.size() > 0) {
+
+            for (int i = 0; i < list.size(); i++) {
+
+                deviceDetailData = list.get(i);
+               /* if (!isUpgradeToday && deviceDetailData.getDateStr().equals(TimeUtils.getTodayYYYYMMDD())) {
+                    continue;
+                }*/
+                watchInsertBean = new WatchInsertBean();
+                watchInsertBean.setIsHaveHeartRate((deviceDetailData.getHasHR() == WatchData.HAS_HR) ? "1" : "0");
+                watchInsertBean.setTotalSleepTime(String.valueOf(deviceDetailData.getTotalTime()));
+                watchInsertBean.setTotalDistance(String.valueOf(deviceDetailData.getDis()));//传输的是米
+                watchInsertBean.setTotalCalories(String.valueOf(deviceDetailData.getCal()));
+                watchInsertBean.setTotalSteps(deviceDetailData.getStep());
+                watchInsertBean.setDateStr(deviceDetailData.getDateStr());
+                watchInsertBean.setDeviceId(deviceDetailData.getDeviceId());
+                watchInsertBean.setUserId(deviceDetailData.getUserId());
+                watchInsertBean.setSleepDetailArray(deviceDetailData.getSleepArray());
+                watchInsertBean.setStepDetailArray(deviceDetailData.getStepArray());
+                watchInsertBean.setHeartRateDetailArray(deviceDetailData.getHrArray());
+                watchInsertBean.setTotalDeep(String.valueOf(deviceDetailData.getRestfulTime()));
+                watchInsertBean.setTotalLight(String.valueOf(deviceDetailData.getLightTime()));
+                list1.add(watchInsertBean);
+            }
+
+        }
+
+        return list1;
+    }
+
+
+
+
 
     @Override
     public void saveHrData(String deviceId, String userId, String wristbandSportDetailId, String dateStr, long timestamp, String hrList, int timeInterval) {

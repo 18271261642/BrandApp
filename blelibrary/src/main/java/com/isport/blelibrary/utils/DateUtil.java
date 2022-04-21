@@ -56,6 +56,33 @@ public class DateUtil {
     }
 
 
+    //获取前一天的日期 yyyy-MM-dd
+    public static String getPreviousDay(String dayStr){
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd",Locale.CHINA);
+            long dayStrLong = sdf.parse(dayStr).getTime();
+            long previousLong = dayStrLong - 86400000L;
+            return sdf.format(new Date(previousLong));
+        }catch (Exception e){
+            e.printStackTrace();
+            return dayStr;
+        }
+    }
+
+    //获取几天前的天 0 当天 ；1昨天
+    public static String getPreviousNumDay(int dayNum){
+        try {
+            String currDay = getCurrDay();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd",Locale.CHINA);
+            long dayStrLong = sdf.parse(currDay).getTime();
+            long previousLong = dayStrLong - (86400000L * dayNum);
+            return sdf.format(new Date(previousLong));
+        }catch (Exception e){
+            e.printStackTrace();
+            return getCurrDay();
+        }
+    }
+
 
     //yyyy-MM-dd HH:mm格式，获取HH
     public static String getDateHourStr(String timeStr){

@@ -266,7 +266,6 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:button="@drawable/check_box_button_bg_selector"
-            android:clickable="true"
             android:gravity="center"
             android:paddingTop="@dimen/dp5"
             android:paddingRight="@dimen/dp10"

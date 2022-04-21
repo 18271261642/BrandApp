@@ -576,8 +576,8 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
     //上传数据
     public synchronized void getNoUpgradeW81DevcieDetailData(String userId, String deviceId, String defWriId, boolean isToday) {
 
-        List<WatchInsertBean> upgradeList = iw81DeviceDataModel.getAllNoUpgradeW81DeviceDetailData(deviceId, userId, defWriId, isToday);
-        Logger.myLog("getNoUpgradeW81DevcieDetailData:" + userId + ",deviceId:" + deviceId + ",defWriId:" + defWriId + upgradeList);
+        List<WatchInsertBean> upgradeList = new W81DeviceDataModelImp().getAllNoUpgradeW81DeviceDetailData(deviceId, userId, isToday);
+        Logger.myLog("11111getNoUpgradeW81DevcieDetailData:" + userId + ",deviceId:" + deviceId + ",defWriId:" + defWriId + upgradeList);
         WatchInsertBean watchInsertBean;
         for (int i = 0; i < upgradeList.size(); i++) {
             Constants.isSyncData = true;
@@ -603,7 +603,7 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
                 public void onNext(UpdateSuccessBean updateSuccessBean) {
                     //需要去更新 id;
                     Constants.isSyncData = false;
-                    Logger.myLog("UpdateSuccessBean:" + userId + ",deviceId:" + deviceId + ",updateSuccessBean.getPublicId():" + updateSuccessBean.getPublicId() + "finalWatchInsertBean.getDateStr()" + finalWatchInsertBean.getDateStr());
+                    Logger.myLog("1111UpdateSuccessBean:" + userId + ",deviceId:" + deviceId + ",updateSuccessBean.getPublicId():" + updateSuccessBean.getPublicId() + "finalWatchInsertBean.getDateStr()" + finalWatchInsertBean.getDateStr());
                     iw81DeviceDataModel.updateWriId(finalWatchInsertBean.getDeviceId(), finalWatchInsertBean.getUserId(), finalWatchInsertBean.getDateStr(), String.valueOf(updateSuccessBean.getPublicId()));
                 }
             });
@@ -787,38 +787,51 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
     }
 
 
+    //处理历史数据，暂定处理7天
+    public void dealHistoryStep(String userId,String deviceId){
+        String dayStr = DateUtil.getYestDay();
+
+        for(int i = 1;i<=6;i++){
+            String day = DateUtil.getPreviousNumDay(i);
+            dealWithYesDayStep(userId,deviceId,day);
+        }
+
+    }
+
+
 
     //处理昨天的详细计步数据
     private Map<String, F18StepBean> tempMap = new HashMap<>();
-    public void dealWithYesDayStep(String userId,String deviceId){
+    public void dealWithYesDayStep(String userId,String deviceId,String dayStr){
         try {
             tempMap.clear();
             //先查询本地的数据库，是否有保存昨天的数据
-            List<F18DetailStepBean> saveList = F18DeviceSetAction.getF18DetailList(userId,deviceId, DateUtil.getYestDay(),0);
+            List<F18DetailStepBean> saveList = F18DeviceSetAction.getF18DetailList(userId,deviceId, dayStr);
+            if(saveList == null)
+                return;
             Log.e(TAG,"-----是否有昨天的数据="+new Gson().toJson(saveList));
 
-            if(saveList != null){
-                for(F18DetailStepBean fb : saveList){
-                    String dayStr = DateUtil.getFormatTime(fb.getTimeLong(),"yyyy-MM-dd HH");
-                    if(tempMap.get(dayStr)!=null){
-                        F18StepBean fbs = tempMap.get(dayStr);
-                        if(fbs != null){
-                            F18StepBean tmpFb = new F18StepBean();
-                            tmpFb.setStep(fbs.getStep()+fb.getStep());
-                            tmpFb.setKcal(StepArithmeticUtil.addNumber(fbs.getKcal(),fb.getKcal()));
-                            tmpFb.setDistance(StepArithmeticUtil.addNumber(fbs.getDistance(),fb.getDistance()));
-                            tempMap.put(dayStr,tmpFb);
-                        }
-
-                    }else{
-                        tempMap.put(dayStr,new F18StepBean(fb.getStep(),fb.getDistance(),fb.getKcal()));
+            for(F18DetailStepBean fb : saveList){
+                String sourceDayStr = DateUtil.getFormatTime(fb.getTimeLong(),"yyyy-MM-dd HH");
+                if(tempMap.get(sourceDayStr)!=null){
+                    F18StepBean fbs = tempMap.get(sourceDayStr);
+                    if(fbs != null){
+                        F18StepBean tmpFb = new F18StepBean();
+                        tmpFb.setStep(fbs.getStep()+fb.getStep());
+                        tmpFb.setKcal(StepArithmeticUtil.addNumber(fbs.getKcal(),fb.getKcal()));
+                        tmpFb.setDistance(StepArithmeticUtil.addNumber(fbs.getDistance(),fb.getDistance()));
+                        tempMap.put(sourceDayStr,tmpFb);
                     }
 
+                }else{
+                    tempMap.put(sourceDayStr,new F18StepBean(fb.getStep(),fb.getDistance(),fb.getKcal()));
                 }
+
             }
 
             if(tempMap.isEmpty())
                 return;
+
             Map<String, F18StepBean> hour24Map = F18StepHourMap.getF18HourMap();
             for(Map.Entry<String,F18StepBean> tm : tempMap.entrySet()){
                 String tmpKey = DateUtil.getDateHourStr(tm.getKey());  //转换成 HH格式
@@ -840,6 +853,8 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
                 }
             });
 
+            Map<String,String[]> resultMap = new HashMap<>();
+
             List<String[]> stepArray = new ArrayList<>();
             for(int i = 0;i<hourList.size();i++){
                 F18StepBean collStep = hour24Map.get(hourList.get(i));
@@ -849,53 +864,52 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
             }
             Log.e(TAG,"-------昨天整理完成的数据="+new Gson().toJson(stepArray));
             //查询下本地的数据库是否存在
-            W81DeviceDetailData yesW81 = new W81DeviceDataAction().getW81DeviceDetialData(deviceId,userId,DateUtil.getYestDay());
-            if(yesW81 != null){
-                String stepArr = yesW81.getStepArray();
-                if(stepArr != null && !stepArr.equals("[]")){
-                    List<String[]> yesStepList = new Gson().fromJson(stepArr,new TypeToken<List<String[]>>(){}.getType());
-                    Log.e(TAG,"------本地的数据库="+new Gson().toJson(yesStepList));
-                    //如果本地数据库中没有，就只保存昨天的
-                    if(yesStepList == null || yesStepList.isEmpty()){
-                        new W81DeviceDataAction().saveDeviceStepArrayData("0",deviceId, userId,null,DateUtil.getYestDay(),new Gson().toJson(stepArray));
+            W81DeviceDetailData yesW81 = new W81DeviceDataAction().getW81DeviceDetialData(deviceId,userId,dayStr);
 
-                        F18DeviceSetAction.updateF18DetailStep(userId,deviceId,DateUtil.getYestDay());
-
-                        return;
-                    }
-
-                    //本地数据库有，与原始整理的数据合并
-                    if(yesStepList.size() == stepArray.size()){
-                        List<String[]> yesResultList = new ArrayList<>();
-                        for(int i = 0;i<yesStepList.size();i++){
-                            String[] sourceItem = yesStepList.get(i);
-                            String[] localItem = stepArray.get(i);
-
-                            //合并
-                            String[] resultStr = new String[4];
-                            //小时
-                            resultStr[0] = sourceItem[0];
-                            //步数
-                            resultStr[1] = (Integer.parseInt(sourceItem[1])+Integer.parseInt(localItem[1]))+"";
-                            //距离
-                            resultStr[2] = StepArithmeticUtil.addNumber(Float.parseFloat(sourceItem[2]),Float.parseFloat(localItem[2]))+"";
-                            //卡路里
-                            resultStr[3] = StepArithmeticUtil.addNumber(Float.parseFloat(sourceItem[3]),Float.parseFloat(localItem[3]))+"";
-                            yesResultList.add(resultStr);
-                        }
-
-                        Log.e(TAG,"-----已经组装完成的数据="+new Gson().toJson(yesResultList));
-                        if(yesResultList.isEmpty())
-                            return;
-                        //昨天的已经组装完成，直接保存数据库即可
-                        new W81DeviceDataAction().saveDeviceStepArrayData("1",deviceId, userId,null,DateUtil.getYestDay(),new Gson().toJson(yesResultList));
-
-                        F18DeviceSetAction.updateF18DetailStep(userId,deviceId,DateUtil.getYestDay());
-
-                    }
-                }
-
+            if(yesW81 == null ){
+                new W81DeviceDataAction().saveDeviceStepArrayData("0",deviceId, userId,null,dayStr,new Gson().toJson(stepArray));
+                F18DeviceSetAction.updateF18DetailStep(userId,deviceId,dayStr);
+                return;
             }
+            String stepArr = yesW81.getStepArray();
+            List<String[]> yesStepList = new Gson().fromJson(stepArr,new TypeToken<List<String[]>>(){}.getType());
+
+            if(yesStepList == null ){
+                new W81DeviceDataAction().saveDeviceStepArrayData("0",deviceId, userId,null,dayStr,new Gson().toJson(stepArray));
+                F18DeviceSetAction.updateF18DetailStep(userId,deviceId,dayStr);
+                return;
+            }
+
+            for(String[] st : yesStepList){
+                String timeKey = st[0];
+                resultMap.put(timeKey,st);
+            }
+
+            for(String[] sourceSt : stepArray){
+                String timeKey = sourceSt[0];
+                resultMap.put(timeKey,sourceSt);
+            }
+
+            List<String> collList = new ArrayList<>();
+            for(Map.Entry<String,String[]> m : resultMap.entrySet()){
+                collList.add(m.getKey());
+            }
+
+            Collections.sort(collList, new Comparator<String>() {
+                @Override
+                public int compare(String o1, String o2) {
+                    return o1.compareTo(o2);
+                }
+            });
+
+            List<String[]> resultStepArrayList = new ArrayList<>();
+            for(int k = 0;k<collList.size();k++){
+                resultStepArrayList.add(resultMap.get(collList.get(k)));
+            }
+
+            new W81DeviceDataAction().saveDeviceStepArrayData("1",deviceId, userId,null,dayStr,new Gson().toJson(resultStepArrayList));
+            F18DeviceSetAction.updateF18DetailStep(userId,deviceId,dayStr);
+
         }catch (Exception e){
             e.printStackTrace();
         }

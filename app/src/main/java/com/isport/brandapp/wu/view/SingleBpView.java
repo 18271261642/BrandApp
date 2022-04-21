@@ -120,7 +120,7 @@ public class SingleBpView extends View {
         //图片的宽高
         float imgWidth = bitmap.getWidth();
         float imgHeight = bitmap.getHeight();
-        RectF rectF = new RectF(3f,-mHeight,imgWidth,-mHeight+imgHeight);
+        RectF rectF = new RectF(-3f,-mHeight,imgWidth,-mHeight+imgHeight);
         if(bpInfo.isClick())
         canvas.drawBitmap(bitmap,null,rectF,imgPaint);
 

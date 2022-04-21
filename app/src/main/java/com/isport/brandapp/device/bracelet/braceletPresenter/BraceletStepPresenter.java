@@ -1,5 +1,7 @@
 package com.isport.brandapp.device.bracelet.braceletPresenter;
 
+import android.util.Log;
+
 import com.isport.blelibrary.db.table.bracelet_w311.Bracelet_W311_RealTimeData;
 import com.isport.blelibrary.utils.DateUtil;
 import com.isport.blelibrary.utils.Logger;
@@ -390,7 +392,6 @@ public class BraceletStepPresenter extends BasePresenter<BraceletStepView> {//im
                 } else {
                     wristbandstep = new Wristbandstep();
                 }
-
                 emitter.onNext(wristbandstep);
                 emitter.onComplete();
             }
@@ -425,22 +426,27 @@ public class BraceletStepPresenter extends BasePresenter<BraceletStepView> {//im
 
     }
 
-    public void getWatchTargetSteps(String deviceId, int userId) {
-        Observable.create(new ObservableOnSubscribe<WatchTargetBean>() {
+    public void getWatchTargetSteps(String deviceId, String userId,String strDate) {
+        Log.e("查询F18历史数据","---str="+deviceId+"-="+userId+" str="+strDate);
+        Observable.create(new ObservableOnSubscribe<Wristbandstep>() {
             @Override
-            public void subscribe(ObservableEmitter<WatchTargetBean> emitter) throws Exception {
-                WatchTargetBean wristbandstep = new WatchTargetBean();
+            public void subscribe(ObservableEmitter<Wristbandstep> emitter) throws Exception {
+                Wristbandstep wristbandstep ;
+
+                wristbandstep = iw81DeviceDataModel.getStepData(userId, deviceId, strDate);
+                Log.e("TAG","--------查询历史数据="+wristbandstep.toString());
                 if (wristbandstep == null) {
-                    wristbandstep = new WatchTargetBean();
+                    wristbandstep = new Wristbandstep();
                 }
                 emitter.onNext(wristbandstep);
+                emitter.onComplete();
             }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).as(view.bindAutoDispose()).subscribe(new Consumer<WatchTargetBean>() {
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).as(view.bindAutoDispose()).subscribe(new Consumer<Wristbandstep>() {
             @Override
-            public void accept(WatchTargetBean wristbandstep) throws Exception {
+            public void accept(Wristbandstep wristbandstep) throws Exception {
                 NetProgressObservable.getInstance().hide();
                 if (view != null) {
-                    view.successTargetStep(wristbandstep);
+                    view.successLastSportsummary(wristbandstep);
                 }
             }
         });

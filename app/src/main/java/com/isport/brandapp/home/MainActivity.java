@@ -190,6 +190,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             //  isSave = false;
         }
         view_message_point = findViewById(R.id.view_message_point);
+
+        requestPermission();
     }
 
     private void addToList(Fragment fragment) {
@@ -749,5 +751,16 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         cancelBtn.setTextColor(Color.BLACK);
     }
 
+
+    private void requestPermission(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            XXPermissions.with(this).permission(Manifest.permission.MANAGE_EXTERNAL_STORAGE).request(new OnPermissionCallback() {
+                @Override
+                public void onGranted(List<String> list, boolean b) {
+
+                }
+            });
+        }
+    }
 
 }

@@ -140,6 +140,12 @@ public class Watch7018Manager extends BaseManager {
     private int connStauts = 0x00;
 
 
+    private F18HomeCountStepListener f18HomeCountStepListener;
+
+    public void setF18HomeCountStepListener(F18HomeCountStepListener f18HomeCountStepListener) {
+        this.f18HomeCountStepListener = f18HomeCountStepListener;
+    }
+
     private final Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
@@ -157,7 +163,10 @@ public class Watch7018Manager extends BaseManager {
 
                 if(mDeviceInformationTable == null)
                     mDeviceInformationTable = new DeviceInformationTable();
-                mDeviceInformationTable.setMac(mCurrentDevice.getAddress());
+                if(mCurrentDevice.getAddress() != null){
+                    mDeviceInformationTable.setMac(mCurrentDevice.getAddress());
+                }
+
                 mDeviceInformationTable.setDeviceId(mCurrentDevice.getDeviceName());
                 ParseData.saveOrUpdateDeviceInfo(mDeviceInformationTable, -1);
 
@@ -599,6 +608,14 @@ public class Watch7018Manager extends BaseManager {
     }
 
 
+    private int currStep;
+    private float currDistance;
+    private float currKcal ;
+
+    public String[] getCurrCountStep(){
+        return new String[]{currStep+"",currDistance/1000+"",currKcal/1000+""};
+    }
+
 
     //同步设备数据
     @SuppressLint("CheckResult")
@@ -876,19 +893,27 @@ public class Watch7018Manager extends BaseManager {
 
     //当天汇总计步
     private void analysisCurrDayStep(TodayTotalData todayTotalData){
-        //保存到数据库
-        ThreadPoolUtils.getInstance().addTask(new Runnable() {
-            @Override
-            public void run() {
-                long currentTime = System.currentTimeMillis();
-                W81DeviceDataAction w81DeviceDataAction = new W81DeviceDataAction();
-                int kcal = todayTotalData.getCalorie() ==0 ? 0 : todayTotalData.getCalorie();
 
-                kcal = kcal == 0 ? 0 : kcal / 1000;
-                w81DeviceDataAction.saveW81DeviceStepData(mCurrentDevice.getDeviceName(), String.valueOf(BaseManager.mUserId),
-                        "0", TimeUtils.getTimeByyyyyMMdd(currentTime), currentTime, todayTotalData.getStep(), todayTotalData.getDistance(), kcal, false);
-            }
-        });
+        //saveEmptyDetailStep(userId,mCurrentDevice.getDeviceName());
+        this.currStep = todayTotalData.getStep();
+        this.currKcal = todayTotalData.getCalorie();
+        this.currDistance = todayTotalData.getDistance();
+        if(f18HomeCountStepListener != null)
+            f18HomeCountStepListener.backHomeCountData(todayTotalData.getStep(),todayTotalData.getDistance(),todayTotalData.getCalorie());
+//
+//        //保存到数据库
+//        ThreadPoolUtils.getInstance().addTask(new Runnable() {
+//            @Override
+//            public void run() {
+//                long currentTime = System.currentTimeMillis();
+//                W81DeviceDataAction w81DeviceDataAction = new W81DeviceDataAction();
+//                int kcal = todayTotalData.getCalorie() ==0 ? 0 : todayTotalData.getCalorie();
+//
+//                kcal = kcal == 0 ? 0 : kcal / 1000;
+//                w81DeviceDataAction.saveW81DeviceStepData(mCurrentDevice.getDeviceName(), String.valueOf(BaseManager.mUserId),
+//                        "0", TimeUtils.getTimeByyyyyMMdd(currentTime), currentTime, todayTotalData.getStep(), todayTotalData.getDistance(), kcal, false);
+//            }
+//        });
     }
 
     //解析心率数据

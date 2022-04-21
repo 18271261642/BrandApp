@@ -241,7 +241,7 @@ public class F18DNTActivity extends BaseMVPTitleActivity<F18SetView,F18SetPresen
             Watch7018Manager.getWatch7018Manager().setNotDisturbConfig(f18DNTIsOpenItem.isChecked(),f18DNTIsAllOpenItem.isChecked(),startTimeArray[0],startTimeArray[1],endTimeArray[0],endTimeArray[1]);
 
             if(dntSetBean != null){
-                dntSetBean.setDNT(f18DNTIsAllOpenItem.isChecked() ? "全天开启" : f18DNTIsOpenItem.isChecked() ? (startTimeStr+"-"+endTimeStr) : "未开启");
+                dntSetBean.setDNT(f18DNTIsAllOpenItem.isChecked() ? getResources().getString(R.string.lift_to_view_info_all_day) : f18DNTIsOpenItem.isChecked() ? (startTimeStr+"-"+endTimeStr) : "未开启");
                 mActPresenter.saveAllSetData(TokenUtil.getInstance().getPeopleIdStr(F18DNTActivity.this),AppConfiguration.braceletID, F18DbType.F18_DEVICE_SET_TYPE,new Gson().toJson(dntSetBean));
             }
         }catch (Exception e){

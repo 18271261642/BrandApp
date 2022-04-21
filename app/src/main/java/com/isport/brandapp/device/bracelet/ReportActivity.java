@@ -180,7 +180,7 @@ public class ReportActivity extends BaseActivity implements View.OnClickListener
                 transaction.replace(R.id.content, fragmentList);
                 transaction.commitAllowingStateLoss();
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
 
 

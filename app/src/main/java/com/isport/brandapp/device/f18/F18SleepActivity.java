@@ -122,7 +122,7 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
                 if(!TextUtils.isEmpty(sleepStr)){
                     List<String[]> sleepArrList = new Gson().fromJson(sleepStr,new TypeToken<List<String[]>>(){}.getType());
                     if(sleepArrList == null || sleepArrList.size()==0){
-                        showEmptyView();
+                        showEmptyView(watchSleepDayData.getDateStr());
                         return;
                     }
 
@@ -150,7 +150,7 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
                     }
 
                     if(dpTime == 0 && ligTime == 0){
-                        showEmptyView();
+                        showEmptyView(watchSleepDayData.getDateStr());
                         return;
                     }
 
@@ -162,7 +162,7 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
                 }
 
                 if(deepSleepTime+lightSleepTime == 0){
-                    showEmptyView();
+                    showEmptyView(watchSleepDayData.getDateStr());
                     return;
                 }
 
@@ -311,9 +311,9 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
 
 
 
-    private void showEmptyView(){
+    private void showEmptyView(String dayStr){
         //先展示空的数据
-        tv_update_time.setText(DateTimeUtils.getCurrentDate());
+        tv_update_time.setText(dayStr);
         setHourMinute(0xFF4DDA64,0,0);
         setPieData(0,0,0,0,false);
         setSleepSummary(0,0,0,0);

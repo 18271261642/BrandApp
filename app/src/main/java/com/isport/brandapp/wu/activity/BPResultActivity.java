@@ -187,7 +187,7 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
 
 
     private void setCurrentData(BPInfo bpInfo){
-        onceBpDescTv.setText(bpInfo.getStrDate());
+        onceBpDescTv.setText(TimeUtils.getTimeByyyyyMMddhhmmss(bpInfo.getTimestamp()));
         tv_bp_time.setText(TimeUtils.getTimeByyyyyMMddhhmmss(bpInfo.getTimestamp()));
         bp_barview.setProgress(bpInfo.getSpValue(), bpInfo.getDpValue());
         tv_bp_sys.setText("" + bpInfo.getSpValue());
@@ -231,6 +231,7 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
             for(int i = 0;i<bpInfoList.size();i++){
                 bpInfoList.get(i).setClick(i == 0);
             }
+            setCurrentData(bpInfoList.get(0));
             adapter.notifyDataSetChanged();
         }catch (Exception e){
             e.printStackTrace();

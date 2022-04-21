@@ -34,6 +34,7 @@ import com.isport.blelibrary.utils.Logger;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
 import com.isport.brandapp.bean.DeviceBean;
+import com.isport.brandapp.device.F18TestActivity;
 import com.isport.brandapp.device.bracelet.ActivityWeatherSetting;
 import com.isport.brandapp.device.bracelet.CamaraActivity1;
 import com.isport.brandapp.device.f18.dial.F18DialActivity;
@@ -320,6 +321,15 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
         f18ContinueItem.setOnClickListener(this);
         f18DeviceDistanceGoalItem.setOnClickListener(this);
         f18DeviceKcalGoalItem.setOnClickListener(this);
+
+
+        f18DeviceWatchFaceItem.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                startActivity(F18TestActivity.class);
+                return true;
+            }
+        });
 
 
         f18Device24HourItem.setOnCheckedChangeListener(onItemViewCheckedChangeListener);

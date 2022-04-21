@@ -107,6 +107,9 @@ public class EditUserInfo extends BaseTitleActivity implements View.OnClickListe
     NestedScrollView scroll;
 
 
+    private String saveImgPath;
+
+
     @Override
     protected int getLayoutId() {
         return R.layout.friend_activity_setting_user_info;
@@ -145,7 +148,7 @@ public class EditUserInfo extends BaseTitleActivity implements View.OnClickListe
     @Override
     protected void initData() {
         // LoadImageUtil.getInstance().load(EditUserInfo.this, R.drawable.friend_bg_homepage, ivBg);
-
+        saveImgPath = Environment.getExternalStorageDirectory().getPath()+"/Download/";
 
         titleBarView.setRightIcon(R.drawable.icon_save_userinfo);
         titleBarView.setTitle(UIUtils.getString(R.string.edit_user_info));

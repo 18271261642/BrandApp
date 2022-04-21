@@ -3,14 +3,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="phone.gym.jkcq.com.socialmodule">
 
+
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
     <application
         android:name=".SocialApplication"
         android:allowBackup="true"
         android:icon="@drawable/default_avatar_picture"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/FriendAppTheme"
         tools:replace="android:allowBackup">
+
+
+        <uses-library android:name="org.apache.http.legacy" android:required="false" />
+
+
         <activity android:name=".activity.FriendQRCodeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

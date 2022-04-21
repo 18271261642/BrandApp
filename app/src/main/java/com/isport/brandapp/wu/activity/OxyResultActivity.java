@@ -275,6 +275,7 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
                 for(int i = 0;i<singleList.size();i++){
                     singleList.get(i).setClick(i == 0);
                 }
+                setCurrentData(singleList.get(0));
                 signalHeartAdapter.notifyDataSetChanged();
                 trendview_oxy.setLocalData(bean);
             }

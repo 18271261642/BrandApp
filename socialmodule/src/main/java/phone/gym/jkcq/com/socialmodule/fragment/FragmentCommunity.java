@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -745,8 +746,13 @@ public class FragmentCommunity extends BaseMVPFragment<AddDynamView, AddDynamPre
 
     private void requestPermiss(){
         XXPermissions.with(getActivity())
-                .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .permission(Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE)
                 .request(onPermissionCallback);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            XXPermissions.with(getActivity()).permission(Manifest.permission.MANAGE_EXTERNAL_STORAGE).request(onPermissionCallback);
+        }
+
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
 //            XXPermissions.with(getActivity())
 //                    .permission(Manifest.permission.MANAGE_EXTERNAL_STORAGE)

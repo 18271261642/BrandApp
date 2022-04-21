@@ -1,6 +1,7 @@
 package com.isport.brandapp.device.bracelet;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +48,8 @@ public class FragmentList extends Fragment {
         super.onCreate(savedInstanceState);
         type = getArguments().getInt("type", TYPE_DAY);
         deviceBean = (DeviceBean) getArguments().getSerializable(JkConfiguration.DEVICE);
+
+        Log.e("TAG","---deviceBean="+deviceBean.toString());
     }
 
     @Nullable
@@ -60,6 +63,8 @@ public class FragmentList extends Fragment {
         pagerAdapter = new FragmentStatePagerAdapter(getChildFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
+                Log.e("TAG","---------滑动type="+type+"--position="+position);
+
                 switch (type) {
                     case TYPE_DAY:
                         Calendar cal = Calendar.getInstance();
@@ -172,7 +177,7 @@ public class FragmentList extends Fragment {
                     selectCalendar.set(Calendar.MONTH, Integer.parseInt(strings[1]) - 1);
                     selectCalendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(strings[2]));
                 } catch (Exception e) {
-
+                    e.printStackTrace();
                 } finally {
                     Logger.myLog("FragmentList------calendar:" + TimeUtils.getTimeByyyyyMMdd(calendar) + ",,selectCalendar:" + TimeUtils.getTimeByyyyyMMdd(selectCalendar));
                     int days = daysBetween(calendar, selectCalendar);

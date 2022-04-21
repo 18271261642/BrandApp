@@ -529,7 +529,7 @@ public class ActivityLogin extends BaseMVPActivity<LoginBaseView, LoginPresenter
                 loginByWeChat();
                 break;
             case R.id.faceBookLayout:
-            case R.id.login_facebook:
+//            case R.id.login_facebook:
                 if(!checkBox.isChecked()){
                     ToastUtils.showToast(this,"请同意隐私权限和政策!");
                     return;

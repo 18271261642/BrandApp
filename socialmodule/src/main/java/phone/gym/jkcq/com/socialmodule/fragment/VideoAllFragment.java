@@ -3,6 +3,7 @@ package phone.gym.jkcq.com.socialmodule.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
@@ -16,6 +17,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.gyf.immersionbar.ImmersionBar;
+import com.polidea.rxandroidble2.exceptions.BleGattOperationType;
+import com.shuyu.gsyvideoplayer.GSYVideoManager;
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoView;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -60,6 +63,9 @@ import phone.gym.jkcq.com.socialmodule.util.TimeUtil;
 
 public class VideoAllFragment extends BaseMVPFragment<LikeView, LikePresent> implements LikeView, FriendView, ReportView, CommonAliView {
 
+    private static final String TAG = "VideoAllFragment";
+
+
     SampleCoverVideo gsyVideoManager;
     TextView view_pause;
 
@@ -101,6 +107,10 @@ public class VideoAllFragment extends BaseMVPFragment<LikeView, LikePresent> imp
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.e(TAG,"-------播放页面-------");
+
+
         if (getArguments() != null) {
             currentBean = (DynamBean) getArguments().getParcelable(FROMBEAN);
             userId = TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp());
@@ -142,9 +152,10 @@ public class VideoAllFragment extends BaseMVPFragment<LikeView, LikePresent> imp
             gsyVideoManager.setLooping(true);
             gsyVideoManager.setNeedShowWifiTip(false);
             gsyVideoManager.setShowFullAnimation(true);
-            gsyVideoManager.setDismissControlTime(0);
-        } catch (Exception e) {
+            gsyVideoManager.setDismissControlTime(1000);
 
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
 
@@ -192,7 +203,7 @@ public class VideoAllFragment extends BaseMVPFragment<LikeView, LikePresent> imp
                 public void run() {
                     gsyVideoManager.startPlayLogic();
                 }
-            }, 50);
+            }, 500);
         }
     }
 
@@ -204,7 +215,7 @@ public class VideoAllFragment extends BaseMVPFragment<LikeView, LikePresent> imp
     }
 
 
-    Handler handler = new Handler() {
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -248,11 +259,18 @@ public class VideoAllFragment extends BaseMVPFragment<LikeView, LikePresent> imp
         handler.removeCallbacksAndMessages(null);
 
         try {
-            mCurrentPosition = gsyVideoManager.getGSYVideoManager().getPlayer().getBufferedPercentage();
-            gsyVideoManager.onVideoPause();
+//            if(gsyVideoManager == null)
+//                return;
+//            if(gsyVideoManager.getGSYVideoManager() == null)
+//                return;
+//            mCurrentPosition = gsyVideoManager.getGSYVideoManager().getPlayer().getBufferedPercentage();
+//            gsyVideoManager.onVideoPause();
+
+            GSYVideoManager.onPause();
             video_bottom_progressbar.setProgress(0);
 
         } catch (Exception e) {
+            e.printStackTrace();
             mCurrentPosition = 0;
         }
         Log.e("Pause", "VideoAllFragment onPauseonPause mCurrentPosition" + mCurrentPosition);

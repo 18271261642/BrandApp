@@ -364,6 +364,9 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
                 for(int i = 0;i<singleList.size();i++){
                     singleList.get(i).setClick(i == 0);
                 }
+
+                setCurrData(singleList.get(0));
+
                 signalHeartAdapter.notifyDataSetChanged();
             }
         }

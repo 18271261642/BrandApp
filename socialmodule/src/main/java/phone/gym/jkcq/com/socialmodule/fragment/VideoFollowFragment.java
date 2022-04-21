@@ -1,8 +1,10 @@
 package phone.gym.jkcq.com.socialmodule.fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -129,6 +131,8 @@ public class VideoFollowFragment extends BaseMVPFragment<LikeView, LikePresent> 
         dismissControlTime = 0*/
         tv_profile.setMovementMethod(ScrollingMovementMethod.getInstance());
         tv_profile.setOnTouchListener(new View.OnTouchListener() {
+
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -150,7 +154,7 @@ public class VideoFollowFragment extends BaseMVPFragment<LikeView, LikePresent> 
             gsyVideoManager.setShowFullAnimation(true);
             gsyVideoManager.setDismissControlTime(0);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
     }
@@ -200,7 +204,7 @@ public class VideoFollowFragment extends BaseMVPFragment<LikeView, LikePresent> 
                 public void run() {
                     gsyVideoManager.startPlayLogic();
                 }
-            }, 50);
+            }, 500);
         }
     }
     @Override
@@ -211,7 +215,7 @@ public class VideoFollowFragment extends BaseMVPFragment<LikeView, LikePresent> 
     }
 
 
-    Handler handler = new Handler() {
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -283,6 +287,8 @@ public class VideoFollowFragment extends BaseMVPFragment<LikeView, LikePresent> 
         //gsyVideoManager.startPlayLogic();
         //gsyVideoManager.setUpLazy(url, false, null, null, "");
       //  gsyVideoManager.setUpLazy(url, true, null, null, "");
+        Log.e(TAG,"---------setUpLazy="+url);
+
         gsyVideoManager.setUpLazy(url, true, null, null, "");
 
         // gsyVideoManager.setUp(url, true, "");
@@ -726,9 +732,11 @@ public class VideoFollowFragment extends BaseMVPFragment<LikeView, LikePresent> 
         // FileUtil.getVideoFileName()
 
 
+
+
         String fileName = currentBean.getVideoUrl().replace("https://isportcloud.oss-cn-shenzhen.aliyuncs.com/", "");
 
-
+        Log.e("VIDEO","------获取token成功-------"+fileName);
         // //https://isportcloud.oss-cn-shenzhen.aliyuncs.com/seedFeed1221588761909000.mp4
         commonUserPresenter.downFileAli(ossBean.getBucketName(), ossBean.getAccessKeyId(), ossBean.getAccessKeySecret(), ossBean.getSecurityToken(), fileName, fileName);
 

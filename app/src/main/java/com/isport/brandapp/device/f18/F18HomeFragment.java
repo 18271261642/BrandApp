@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -17,6 +18,7 @@ import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
 import com.isport.blelibrary.deviceEntry.interfaces.IDeviceType;
 import com.isport.blelibrary.interfaces.BleReciveListener;
+import com.isport.blelibrary.managers.F18HomeCountStepListener;
 import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.result.IResult;
 import com.isport.blelibrary.utils.Constants;
@@ -31,6 +33,7 @@ import com.isport.brandapp.banner.recycleView.adapter.RefrushAdapter;
 import com.isport.brandapp.banner.recycleView.holder.CustomHolder;
 import com.isport.brandapp.banner.recycleView.inter.DefaultAdapterViewLisenter;
 import com.isport.brandapp.bean.DeviceBean;
+import com.isport.brandapp.device.F18TestActivity;
 import com.isport.brandapp.device.bracelet.ReportActivity;
 import com.isport.brandapp.home.bean.db.WatchSportMainData;
 import com.isport.brandapp.home.bean.http.WatchSleepDayData;
@@ -63,6 +66,7 @@ import java.util.Objects;
 import java.util.Vector;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonalertdialog.AlertDialogStateCallBack;
@@ -116,7 +120,11 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
 
     private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
-
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        AppSP.putInt(BaseApp.getApp(),AppSP.DEVICE_GOAL_KEY,0);
+    }
 
     private final Handler handler = new Handler(Looper.getMainLooper()){
         @Override
@@ -152,6 +160,40 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
         Objects.requireNonNull(getActivity()).registerReceiver(broadcastReceiver,intentFilter);
 
         initHomeMenu();
+
+        Watch7018Manager.getWatch7018Manager().setF18HomeCountStepListener(new F18HomeCountStepListener() {
+            @Override
+            public void backHomeCountData(int step, float distance, float kcal) {
+                WatchSportMainData wD = new WatchSportMainData();
+                wD.setStep(step+"");
+                wD.setCal(decimalFormat.format(Float.valueOf(distance/1000)));
+                wD.setDistance(decimalFormat.format(Float.valueOf(kcal/1000)));
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(dataHeaderHolder != null){
+                            dataHeaderHolder.updateUI(wD);
+                        }
+                    }
+                }, 500);
+            }
+        });
+
+
+        String[] getDeviceV = Watch7018Manager.getWatch7018Manager().getCurrCountStep();
+        WatchSportMainData wD = new WatchSportMainData();
+        wD.setStep(getDeviceV[0]);
+        wD.setCal(decimalFormat.format(Float.valueOf(getDeviceV[2])));
+        wD.setDistance(decimalFormat.format(Float.valueOf(getDeviceV[1])));
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(dataHeaderHolder != null){
+                    dataHeaderHolder.updateUI(wD);
+                }
+            }
+        }, 500);
+
 
         //下拉刷新
         home_refresh.setOnRefreshListener(new OnRefreshListener() {
@@ -348,7 +390,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
         String userId = TokenUtil.getInstance().getPeopleIdInt(getActivity());
         if(deviceId == null)
             return;
-        mFragPresenter.dealWithYesDayStep(userId,deviceId);
+       // mFragPresenter.dealWithYesDayStep(userId,deviceId);
         mFragPresenter.getBloodPressure();
         mFragPresenter.getNumOxyGen();
         mFragPresenter.getNetTempData();
@@ -437,7 +479,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
         public CustomHolder getHeader(Context context, List lists, int itemID) {
             dataHeaderHolder = new DataHeaderHolder(context, lists, R.layout.app_fragment_data_head);
             dataHeaderHolder.setOnCourseOnclickLister(F18HomeFragment.this);
-            mFragPresenter.getDeviceStepLastTwoData(IDeviceType.TYPE_WATCH_7018);
+          //  mFragPresenter.getDeviceStepLastTwoData(IDeviceType.TYPE_WATCH_7018);
             return dataHeaderHolder;
         }
 
@@ -545,6 +587,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
         switch (viewType){
             case JkConfiguration.BODY_TEMP: {   //体温
                 startActivity(new Intent(getActivity(), TempResultActivity.class));
+//                startActivity(new Intent(getActivity(), F18TestActivity.class));
             }
             break;
             //单次心率测量
@@ -671,10 +714,10 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
             if(action.equals(Watch7018Manager.SYNC_DATA_COMPLETE)){ //同步完成
                 handler.removeMessages(0x00);
                 endSyncDevice();
-                mFragPresenter.getDeviceStepLastTwoData(IDeviceType.TYPE_WATCH_7018);
+                //mFragPresenter.getDeviceStepLastTwoData(IDeviceType.TYPE_WATCH_7018);
 
-                mFragPresenter.dealWithYesDayStep(TokenUtil.getInstance().getPeopleIdStr(getContext()),AppConfiguration.braceletID);
-
+               // mFragPresenter.dealWithYesDayStep(TokenUtil.getInstance().getPeopleIdStr(getContext()),AppConfiguration.braceletID);
+                mFragPresenter.dealHistoryStep(TokenUtil.getInstance().getPeopleIdStr(getContext()),AppConfiguration.braceletID);
                 if (!Constants.isSyncData) {
                     mFragPresenter.getNoUpgradeW81DevcieDetailData(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), AppConfiguration.braceletID, "0", false);
                 }
@@ -702,19 +745,19 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
     public void successGetMainLastStepDataForDB(WatchSportMainData watchSportMainData) {
 
         Log.e(TAG,"-------详细计步数据="+watchSportMainData.toString()+(dataHeaderHolder == null));
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(dataHeaderHolder != null){
-                    String kcalStr = watchSportMainData.getCal();
-                    if(kcalStr != null){
-                        int integerK = Integer.parseInt(kcalStr);
-                        watchSportMainData.setCal(kcalStr);
-                    }
-                    dataHeaderHolder.updateUI(watchSportMainData);
-                }
-            }
-        }, 500);
+//        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                if(dataHeaderHolder != null){
+//                    String kcalStr = watchSportMainData.getCal();
+//                    if(kcalStr != null){
+//                        int integerK = Integer.parseInt(kcalStr);
+//                        watchSportMainData.setCal(kcalStr);
+//                    }
+//                    dataHeaderHolder.updateUI(watchSportMainData);
+//                }
+//            }
+//        }, 500);
 
     }
 

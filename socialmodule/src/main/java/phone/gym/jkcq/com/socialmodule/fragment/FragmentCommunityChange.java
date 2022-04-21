@@ -203,7 +203,7 @@ public class FragmentCommunityChange extends BaseMVPFragment<AddDynamView, AddDy
                 }
             });
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
 

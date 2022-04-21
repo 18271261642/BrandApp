@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -140,7 +141,12 @@ public class DayReportFragment extends BaseMVPFragment<BraceletStepView, Bracele
             iv_no_data.setVisibility(View.GONE);
         }
 
-        mFragPresenter.getBraceletDayData(userId, strDate, deviceId, currentType, date);
+        if(DeviceTypeUtil.isContainF18(currentType)){
+            mFragPresenter.getWatchTargetSteps(deviceId,userId,strDate);
+        }else{
+            mFragPresenter.getBraceletDayData(userId, strDate, deviceId, currentType, date);
+        }
+
     }
 
     @Override
@@ -198,7 +204,7 @@ public class DayReportFragment extends BaseMVPFragment<BraceletStepView, Bracele
 
     @Override
     public void successLastSportsummary(Wristbandstep wristbandstep) {
-
+       // Log.e(TAG,"------查询图表数据="+wristbandstep.toString());
 
         if (wristbandstep == null) {
             todayStep = "0";
