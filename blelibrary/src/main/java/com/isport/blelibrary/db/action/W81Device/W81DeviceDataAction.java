@@ -503,7 +503,10 @@ public class W81DeviceDataAction {
 
         if (models != null) {
             for (int i = 0; i < models.size(); i++) {
-                strings.add(models.get(i).getDateStr());
+                W81DeviceDetailData ib = models.get(i);
+                if(ib.getRestfulTime()+ib.getLightTime() != 0){
+                    strings.add(models.get(i).getDateStr());
+                }
             }
         }
 

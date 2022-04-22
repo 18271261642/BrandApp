@@ -166,8 +166,10 @@ public class Watch7018Manager extends BaseManager {
                 if(mCurrentDevice.getAddress() != null){
                     mDeviceInformationTable.setMac(mCurrentDevice.getAddress());
                 }
+                if(mCurrentDevice.getDeviceName() != null){
+                    mDeviceInformationTable.setDeviceId(mCurrentDevice.getDeviceName());
+                }
 
-                mDeviceInformationTable.setDeviceId(mCurrentDevice.getDeviceName());
                 ParseData.saveOrUpdateDeviceInfo(mDeviceInformationTable, -1);
 
                 if (mCurrentDevice != null) {

@@ -59,7 +59,6 @@
                             android:focusable="true"
                             android:gravity="center"
                             android:paddingTop="@dimen/dp8"
-                            android:text=""
                             android:textColor="@color/common_white"
                             android:textSize="@dimen/dp12"
                             android:textStyle="bold" />

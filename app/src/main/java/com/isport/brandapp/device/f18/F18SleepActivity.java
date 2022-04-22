@@ -162,6 +162,8 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
                 }
 
                 if(deepSleepTime+lightSleepTime == 0){
+                    tv_sum_hour.setText("00");
+                    tv_sum_min.setText("00");
                     showEmptyView(watchSleepDayData.getDateStr());
                     return;
                 }
@@ -313,11 +315,13 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
 
     private void showEmptyView(String dayStr){
         //先展示空的数据
-        tv_update_time.setText(dayStr);
+        tv_update_time.setText(mCurrentStr == null ? DateUtil.getCurrDay() : mCurrentStr);
         setHourMinute(0xFF4DDA64,0,0);
         setPieData(0,0,0,0,false);
         setSleepSummary(0,0,0,0);
         showSleepChartView(new WatchSleepDayData());
+        tv_sum_hour.setText("00");
+        tv_sum_min.setText("00");
 
     }
 
@@ -459,6 +463,9 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
     private void setPieData(int wakeUpTotalTime, int eyeMoveTotalTime, int sleepTotalTime, int deepSleepTotalTime, boolean hasData) {
         int totalTime = getTotalTime(wakeUpTotalTime, eyeMoveTotalTime, sleepTotalTime, deepSleepTotalTime);
 
+
+        Log.e(TAG,"------饼状图="+wakeUpTotalTime+" "+eyeMoveTotalTime +" "+sleepTotalTime +" "+deepSleepTotalTime);
+
         if (pieChartView != null) {
             List<PieChartData> pieChartDatas = new ArrayList<>();
             if (totalTime == 0) {
@@ -471,7 +478,7 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
                 if (deepSleepTotalTime != 0) {
                     pieChartDatas.add(new PieChartData(getPiePercent(deepSleepTotalTime, totalTime), UIUtils.getColor(R.color.common_deep_sleep)));//绿色
                 }
-                if ((eyeMoveTotalTime + sleepTotalTime) != 0) {
+                if ((sleepTotalTime ) != 0) {
                     pieChartDatas.add(new PieChartData(getPiePercent(eyeMoveTotalTime + sleepTotalTime, totalTime), UIUtils.getColor(R.color.common_light_sleep)));//橘黄
                 }
                 if (wakeUpTotalTime != 0) {
@@ -565,6 +572,7 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
                     mActPresenter.getWatchDayData(dateStr,deviceBean.getDeviceID(), deviceBean.getCurrentType(), TokenUtil.getInstance().getPeopleIdInt(F18SleepActivity.this));
                 }
 
+                tv_update_time.setText(mCurrentStr);
                 Logger.myLog("mCurrentStr:" + mCurrentStr + "dateStr:" + dateStr);
 
             }
