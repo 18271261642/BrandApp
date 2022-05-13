@@ -105,13 +105,17 @@ public class SingleHeartView extends View {
         if(drawRecDataBean == null)
             return;
 
-
+        float mRightPoint = mWidth / 2;
 
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon_move_bottom);
         //图片的宽高
         float imgWidth = bitmap.getWidth();
         float imgHeight = bitmap.getHeight();
-        RectF imgRectF = new RectF((mCurrWidth/2)-(imgWidth/3)+2f,-mHeight,imgWidth+8f,-mHeight+imgHeight);
+
+        Log.e(TAG,"------imgWidth="+imgWidth);
+        //  RectF imgRectF = new RectF((mCurrWidth/2)-(imgWidth/3)+7f,-mHeight,imgWidth+8f,-mHeight+imgHeight);
+
+        RectF imgRectF = new RectF(mRightPoint-mCurrWidth/2 -3f,-mHeight,3f+mRightPoint+mCurrWidth/2,-mHeight+imgHeight);
 
         //Rect srcRect = new Rect((int)(mCurrWidth / 2 - (imgWidth / 2)),-(int) mHeight,(int) imgWidth,-(int)( mHeight+imgHeight));
 
@@ -121,7 +125,7 @@ public class SingleHeartView extends View {
 
         float middleV = (mHeight-imgHeight) / maxValue;
 
-        float mRightPoint = mWidth / 2;
+
 
         //绘制底部的数值
         String txt = String.valueOf(drawRecDataBean.getValue());
@@ -134,7 +138,7 @@ public class SingleHeartView extends View {
         canvas.drawRoundRect(bgRectF,mCurrWidth/2,mCurrWidth/2,backPaint);
 
         currPaint.setColor(drawRecDataBean.getColors());
-        Log.e("BP","------value="+drawRecDataBean.getValue());
+       // Log.e("BP","------value="+drawRecDataBean.getValue());
         RectF rectF = new RectF(mRightPoint-mCurrWidth/2,-drawRecDataBean.getValue() * middleV,mRightPoint+mCurrWidth/2,-DimenUtil.measureTextHeight(txtPaint)*2.5f);
         canvas.drawRoundRect(rectF,mCurrWidth/2,mCurrWidth/2,currPaint);
 

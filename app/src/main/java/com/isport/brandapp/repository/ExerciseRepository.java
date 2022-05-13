@@ -158,28 +158,32 @@ public class ExerciseRepository {
 //                            if ((App.getDeviceBindTime() - exerciseData.getStartTimestamp() > 0)) {
 //                                continue;
 //                            }
-                            info.setAveRate(exerciseData.getAvgHr());
-                            info.setDeviceId(exerciseData.getDeviceId());
-                            info.setUserId(exerciseData.getUserId());
-                            info.setDateStr(exerciseData.getDateStr());
-                            info.setExerciseType(exerciseData.getExerciseType());
-                            info.setEndTimestamp(exerciseData.getEndTimestamp());
-                            //info.setEndTimestamp(1);
-                            // info.setStartTimestamp(1);
-                            info.setStartTimestamp(exerciseData.getStartTimestamp());
-                            info.setHeartRateDetailArray(exerciseData.getHrArray());
-                            info.setTotalCalories(exerciseData.getTotalCalories());
-                            info.setTotalDistance(exerciseData.getTotalDistance());
-                            info.setTotalSteps(exerciseData.getTotalSteps());
-                            info.setVaildTimeLength(exerciseData.getVaildTimeLength());
 
-                            //添加W560系列详细计步和距离，卡路里
-                            info.setHeartDetailArray(exerciseData.getHrArray());
-                            info.setStepDetailArray(exerciseData.getStepArray());
-                            info.setDistanceDetailArray(exerciseData.getDistanceArray());
-                            info.setCaloriesDetailArray(exerciseData.getCalorieArray());
+                            if(Integer.parseInt(exerciseData.getTotalSteps()) >=0 && exerciseData.getEndTimestamp() > exerciseData.getStartTimestamp()){
+                                info.setAveRate(exerciseData.getAvgHr());
+                                info.setDeviceId(exerciseData.getDeviceId());
+                                info.setUserId(exerciseData.getUserId());
+                                info.setDateStr(exerciseData.getDateStr());
+                                info.setExerciseType(exerciseData.getExerciseType());
+                                info.setEndTimestamp(exerciseData.getEndTimestamp());
+                                //info.setEndTimestamp(1);
+                                // info.setStartTimestamp(1);
+                                info.setStartTimestamp(exerciseData.getStartTimestamp());
+                                info.setHeartRateDetailArray(exerciseData.getHrArray());
+                                info.setTotalCalories(exerciseData.getTotalCalories());
+                                info.setTotalDistance(exerciseData.getTotalDistance());
+                                info.setTotalSteps(exerciseData.getTotalSteps());
+                                info.setVaildTimeLength(exerciseData.getVaildTimeLength());
 
-                            upgradeList.add(info);
+                                //添加W560系列详细计步和距离，卡路里
+                                info.setHeartDetailArray(exerciseData.getHrArray());
+                                info.setStepDetailArray(exerciseData.getStepArray());
+                                info.setDistanceDetailArray(exerciseData.getDistanceArray());
+                                info.setCaloriesDetailArray(exerciseData.getCalorieArray());
+
+                                upgradeList.add(info);
+                            }
+
                             // info
                         }
                     }

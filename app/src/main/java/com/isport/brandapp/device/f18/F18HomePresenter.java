@@ -4,19 +4,26 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.htsmart.wristband2.bean.data.SleepData;
+import com.htsmart.wristband2.bean.data.SleepItemData;
 import com.isport.blelibrary.db.action.W81Device.W81DeviceDataAction;
 import com.isport.blelibrary.db.action.f18.F18DeviceSetAction;
 import com.isport.blelibrary.db.parse.DeviceDataSave;
 import com.isport.blelibrary.db.table.DeviceTempUnitlTable;
 import com.isport.blelibrary.db.table.F18StepHourMap;
+import com.isport.blelibrary.db.table.f18.F18CommonDbBean;
+import com.isport.blelibrary.db.table.f18.F18DbType;
 import com.isport.blelibrary.db.table.f18.F18DetailStepBean;
 import com.isport.blelibrary.db.table.f18.F18StepBean;
 import com.isport.blelibrary.db.table.w811w814.W81DeviceDetailData;
+import com.isport.blelibrary.managers.BaseManager;
+import com.isport.blelibrary.utils.CommonDateUtil;
 import com.isport.blelibrary.utils.Constants;
 import com.isport.blelibrary.utils.DateUtil;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.StepArithmeticUtil;
 import com.isport.blelibrary.utils.ThreadPoolUtils;
+import com.isport.blelibrary.utils.TimeUtils;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.device.UpdateSuccessBean;
 import com.isport.brandapp.device.W81Device.IW81DeviceDataModel;
@@ -33,6 +40,7 @@ import com.isport.brandapp.repository.OnceHrRepository;
 import com.isport.brandapp.repository.OxygenRepository;
 import com.isport.brandapp.repository.TempRepository;
 import com.isport.brandapp.repository.W81DeviceDataRepository;
+import com.isport.brandapp.util.AppSP;
 import com.isport.brandapp.util.DeviceTypeUtil;
 import com.isport.brandapp.wu.bean.BPInfo;
 import com.isport.brandapp.wu.bean.OnceHrInfo;
@@ -425,8 +433,7 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
 
             @Override
             public void onError(ExceptionHandle.ResponeThrowable e) {
-
-                Logger.myLog(e.message);
+                e.printStackTrace();
 
             }
         });
@@ -567,7 +574,7 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
 
             @Override
             public void onError(ExceptionHandle.ResponeThrowable e) {
-
+                e.printStackTrace();
             }
         });
     }
@@ -576,8 +583,52 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
     //上传数据
     public synchronized void getNoUpgradeW81DevcieDetailData(String userId, String deviceId, String defWriId, boolean isToday) {
 
-        List<WatchInsertBean> upgradeList = new W81DeviceDataModelImp().getAllNoUpgradeW81DeviceDetailData(deviceId, userId, isToday);
-        Logger.myLog("11111getNoUpgradeW81DevcieDetailData:" + userId + ",deviceId:" + deviceId + ",defWriId:" + defWriId + upgradeList);
+        List<WatchInsertBean> upgradeList = new W81DeviceDataModelImp().getAllNoUpgradeW81DeviceDetailData(deviceId, userId, defWriId,isToday);
+        WatchInsertBean watchInsertBean;
+        for (int i = 0; i < upgradeList.size(); i++) {
+            Constants.isSyncData = true;
+            watchInsertBean = upgradeList.get(i);
+            if (isToday && TimeUtils.isToday(watchInsertBean.getDateStr(),"yyyy-MM-dd")) {
+                continue;
+            }
+            WatchInsertBean finalWatchInsertBean = watchInsertBean;
+
+            //Log.e(TAG,"-------上传天数数据="+finalWatchInsertBean.toString());
+            W81DeviceDataRepository.requstUpgradeW81Data(watchInsertBean).as(view.bindAutoDispose()).subscribe(new BaseObserver<UpdateSuccessBean>(BaseApp.getApp(), false) {
+                @Override
+                protected void hideDialog() {
+
+                }
+
+                @Override
+                protected void showDialog() {
+
+                }
+
+                @Override
+                public void onError(ExceptionHandle.ResponeThrowable e) {
+                    Constants.isSyncData = false;
+                }
+
+                @Override
+                public void onNext(UpdateSuccessBean updateSuccessBean) {
+
+                    //需要去更新 id;
+                    Constants.isSyncData = false;
+                    Logger.myLog("1111UpdateSuccessBean:" + userId + ",deviceId:" + deviceId + ",updateSuccessBean.getPublicId():" + updateSuccessBean.getPublicId() + "finalWatchInsertBean.getDateStr()" + finalWatchInsertBean.getDateStr());
+                    iw81DeviceDataModel.updateWriId(finalWatchInsertBean.getDeviceId(), finalWatchInsertBean.getUserId(), finalWatchInsertBean.getDateStr(), String.valueOf(updateSuccessBean.getPublicId()));
+                }
+            });
+        }
+
+    }
+
+
+
+    //上传数据
+    public synchronized void getNoUpgradeW81DevcieDetailData(String userId, String deviceId, boolean isToday) {
+
+        List<WatchInsertBean> upgradeList = new W81DeviceDataModelImp().getAllNoUpgradeW81DeviceDetailData(deviceId, userId,false);
         WatchInsertBean watchInsertBean;
         for (int i = 0; i < upgradeList.size(); i++) {
             Constants.isSyncData = true;
@@ -610,6 +661,12 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
         }
 
     }
+
+
+
+
+
+
 
     //获取血压，用于首页展示，先从后台获取再存到数据库，然后再展示
     public void getBloodPressure() {
@@ -779,13 +836,128 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
         Calendar yesMonthC = Calendar.getInstance();
 
 
-
-        //0 是步数 1 心率 2 睡眠
-        w81DataPresenter.getW81MonthStep(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), "0",instance.getTimeInMillis());
-        w81DataPresenter.getW81MonthHr(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), "1", instance.getTimeInMillis());
-        w81DataPresenter.getW81MothSleep(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), "2", instance.getTimeInMillis());
+//        //0 是步数 1 心率 2 睡眠
+//        w81DataPresenter.getW81MonthStep(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), "0",instance.getTimeInMillis());
+//        w81DataPresenter.getW81MonthHr(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), "1", instance.getTimeInMillis());
+//        w81DataPresenter.getW81MothSleep(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), "2", instance.getTimeInMillis());
     }
 
+
+
+
+
+    public void operateYesF18Sleep(String userId,String mac){
+        try {
+            String day = DateUtil.getYestDay();
+            ArrayList<F18CommonDbBean> f18CommonDbBeanLt = F18DeviceSetAction.queryListBean(userId,mac, "", F18DbType.F18_DEVICE_SLEEP_TYPE,day);
+            if(f18CommonDbBeanLt == null || f18CommonDbBeanLt.isEmpty()){
+
+                return;
+            }
+
+            Log.e(TAG,"-----睡眠原始数据="+new Gson().toJson(f18CommonDbBeanLt));
+            List<SleepItemData> f18SleepList = new ArrayList<>();
+            for(F18CommonDbBean f18CommonDbBean : f18CommonDbBeanLt){
+                String tmpStr = f18CommonDbBean.getTypeDataStr();
+                if(tmpStr == null)
+                    continue;
+                List<SleepData> sleepDataList = new Gson().fromJson(tmpStr,new TypeToken<List<SleepData>>(){}.getType());
+
+                if(sleepDataList != null && !sleepDataList.isEmpty()){
+                    for(SleepData sleepData : sleepDataList){
+                        if(DateUtil.getFormatTime(sleepData.getTimeStamp(),"yyyy-MM-dd").equals(day)){
+                            f18SleepList.addAll(sleepData.getItems());
+                        }
+                    }
+                }
+            }
+
+            if(f18SleepList.isEmpty()){
+               // syncComplete(isUnBind);
+                return;
+            }
+
+            analysSleep(f18SleepList,mac,day);
+        }catch (Exception e){
+            e.printStackTrace();
+
+        }
+    }
+
+
+    private void analysSleep(List<SleepItemData> lt,String mac,String day){
+        try {
+        List<SleepItemData> f18SleepList = lt;
+
+        final ArrayList<ArrayList<String>> sleepDetail = new ArrayList<>();
+
+        //总的睡眠时间
+        // long countSleep = f18SleepList.get(f18SleepList.size()-1).g.getTimeStamp();
+
+        int len = f18SleepList.size();
+
+        //深睡
+        int deepSleepTime = 0;
+        //浅睡
+        int lightSleepTime = 0;
+        //清醒
+        int soberTime = 0;
+
+        for (int i = 0; i < len; i++) {
+            ArrayList<String> itemSleeep = new ArrayList<>();
+            SleepItemData sleepData = f18SleepList.get(i);
+            int sleepStatus = sleepData.getStatus();
+            long startTime = sleepData.getStartTime();
+            long endTime = sleepData.getEndTime();
+            //间隔
+            long intervalTime = endTime-startTime;
+            //分钟
+            int intervalMinute = (int) (intervalTime / 1000 /60);
+
+            if(changeSleepStatus(sleepStatus) == 1){   //深睡  传后台是清醒
+                // deepSleepTime +=intervalMinute;
+                soberTime += intervalMinute;
+            }
+
+            if(changeSleepStatus(sleepStatus) == 2){  //浅睡
+                lightSleepTime +=intervalMinute;
+            }
+
+            if(changeSleepStatus(sleepStatus) == 3){   //清醒 传后台是深睡
+                // soberTime += intervalMinute;
+                deepSleepTime +=intervalMinute;
+            }
+
+            //上传后台，1清醒；2浅睡；3深睡
+
+            itemSleeep.add(changeSleepStatus(sleepData.getStatus()) + "");
+            itemSleeep.add(CommonDateUtil.getTimeFromLong(startTime) + "");
+            itemSleeep.add(CommonDateUtil.getTimeFromLong(endTime) + "");
+            itemSleeep.add(intervalMinute + "");
+
+            Log.e(TAG,"-----睡眠item="+new Gson().toJson(itemSleeep));
+            sleepDetail.add(itemSleeep);
+        }
+
+        Gson gson = new Gson();
+        W81DeviceDataAction w81DeviceDataAction = new W81DeviceDataAction();
+        w81DeviceDataAction.saveW81DeviceSleepData(mac, String.valueOf(BaseManager.mUserId),
+                "0", day, System.currentTimeMillis(), deepSleepTime+ lightSleepTime, deepSleepTime, lightSleepTime, soberTime, gson.toJson(sleepDetail));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    private int changeSleepStatus(int status){
+        if(status == 1)
+            return 3;
+        if(status == 2)
+            return 2;
+        if(status == 3)
+            return 1;
+        return 0;
+    }
 
     //处理历史数据，暂定处理7天
     public void dealHistoryStep(String userId,String deviceId){
@@ -797,7 +969,15 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
         }
 
     }
+    public void dealHistoryAllStep(String userId,String deviceId){
+        String dayStr = DateUtil.getYestDay();
 
+        for(int i = 1;i<=15;i++){
+            String day = DateUtil.getPreviousNumDay(i);
+            dealWithYesDayStep(userId,deviceId,day);
+        }
+
+    }
 
 
     //处理昨天的详细计步数据
@@ -859,7 +1039,7 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
             for(int i = 0;i<hourList.size();i++){
                 F18StepBean collStep = hour24Map.get(hourList.get(i));
                 String[] stArr = new String[]{hourList.get(i),
-                        String.valueOf(collStep.getStep()),String.valueOf(collStep.getDistance()),String.valueOf(collStep.getKcal())};
+                        String.valueOf(collStep.getStep()),String.valueOf(collStep.getDistance() * 1000),String.valueOf(collStep.getKcal())};
                 stepArray.add(stArr);
             }
             Log.e(TAG,"-------昨天整理完成的数据="+new Gson().toJson(stepArray));
@@ -867,7 +1047,7 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
             W81DeviceDetailData yesW81 = new W81DeviceDataAction().getW81DeviceDetialData(deviceId,userId,dayStr);
 
             if(yesW81 == null ){
-                new W81DeviceDataAction().saveDeviceStepArrayData("0",deviceId, userId,null,dayStr,new Gson().toJson(stepArray));
+                new W81DeviceDataAction().saveDeviceStepArrayData("0",deviceId, userId,"0",dayStr,new Gson().toJson(stepArray));
                 F18DeviceSetAction.updateF18DetailStep(userId,deviceId,dayStr);
                 return;
             }
@@ -875,7 +1055,7 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
             List<String[]> yesStepList = new Gson().fromJson(stepArr,new TypeToken<List<String[]>>(){}.getType());
 
             if(yesStepList == null ){
-                new W81DeviceDataAction().saveDeviceStepArrayData("0",deviceId, userId,null,dayStr,new Gson().toJson(stepArray));
+                new W81DeviceDataAction().saveDeviceStepArrayData("0",deviceId, userId,"0",dayStr,new Gson().toJson(stepArray));
                 F18DeviceSetAction.updateF18DetailStep(userId,deviceId,dayStr);
                 return;
             }
@@ -907,7 +1087,7 @@ public class F18HomePresenter extends BasePresenter<F18HomeView> {
                 resultStepArrayList.add(resultMap.get(collList.get(k)));
             }
 
-            new W81DeviceDataAction().saveDeviceStepArrayData("1",deviceId, userId,null,dayStr,new Gson().toJson(resultStepArrayList));
+            new W81DeviceDataAction().saveDeviceStepArrayData("1",deviceId, userId,"0",dayStr,new Gson().toJson(resultStepArrayList));
             F18DeviceSetAction.updateF18DetailStep(userId,deviceId,dayStr);
 
         }catch (Exception e){

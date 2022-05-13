@@ -8,8 +8,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Vibrator;
+import android.text.TextUtils;
 import android.util.Log;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.htsmart.wristband2.WristbandApplication;
 import com.htsmart.wristband2.WristbandManager;
 import com.htsmart.wristband2.bean.BatteryStatus;
@@ -125,20 +127,24 @@ public class Watch7018Manager extends BaseManager {
     //拍照
     public static final String F18_TAKE_PICK_ACTION = "com.isport.blelibrary.managers.take_photo";
 
+
+    //同步数据中，开始同步
+    public static final String SYNC_DEVICE_DATA_ING = "com.isport.blelibrary.managers.sync_start";
+
     private static Watch7018Manager watch7018Manager;
     private static Context mContext;
 
     //数据操作类
     private final WristbandManager mWristbandManager = WristbandApplication.getWristbandManager();
 
-    private Disposable mStateDisposable;
-    private Disposable mErrorDisposable;
+
     private ConnectionState mState = ConnectionState.DISCONNECTED;
 
     private String userId;
 
     private int connStauts = 0x00;
 
+    private F18SyncStatus f18SyncStatus;
 
     private F18HomeCountStepListener f18HomeCountStepListener;
 
@@ -154,13 +160,18 @@ public class Watch7018Manager extends BaseManager {
             boolean isListenerNull = mBleReciveListeners == null;
             if (isListenerNull)
                 return;
+            if(mCurrentDevice == null || mCurrentDevice.getDeviceName() == null)
+                return;
             if (whatCode == HandlerContans.mHandlerConnetSuccessState) {  //连接成功
                 sendActionBroad(F18_CONNECT_STATUS,mWristbandManager.getConnectedAddress());
                 Log.e(TAG,"---------第一次连接成功-----");
-                setDeviceLanguage();
-                getDeviceBattery();
-                getCommonSet(); //连接成功获取一下设置相关
-
+                //同步表盘中会断开重连，重连后不同步数据
+                if(f18SyncStatus != F18SyncStatus.SYNC_DIAL_ING){
+                    setDeviceLanguage();
+                    getDeviceBattery();
+                    getCommonSet(); //连接成功获取一下设置相关
+                    syncDeviceData("");  //同步运动数据，计步，睡眠等等
+                }
                 if(mDeviceInformationTable == null)
                     mDeviceInformationTable = new DeviceInformationTable();
                 if(mCurrentDevice.getAddress() != null){
@@ -270,6 +281,14 @@ public class Watch7018Manager extends BaseManager {
 
     }
 
+
+    public F18SyncStatus getF18SyncStatus(){
+        return f18SyncStatus;
+    }
+
+    public void setF18SyncStatus(F18SyncStatus f18SyncStatus) {
+        this.f18SyncStatus = f18SyncStatus;
+    }
 
     public WristbandManager getmWristbandManager(){
         return mWristbandManager;
@@ -619,12 +638,18 @@ public class Watch7018Manager extends BaseManager {
     }
 
 
-    //同步设备数据
+    //同步设备数据 isUnBind = "0 解绑
     @SuppressLint("CheckResult")
-    public void syncDeviceData() {
+    public void syncDeviceData(String isUnBind) {
         if(!mWristbandManager.isConnected())
             return;
+        //开始同步数据，发个广播
+        //正在同步中就不要再同步了
+        if(f18SyncStatus == F18SyncStatus.SYNC_ING)
+            return;
 
+        sendActionBroad(SYNC_DEVICE_DATA_ING,"start");
+        f18SyncStatus = F18SyncStatus.SYNC_ING;
         getDeviceLastHealthMeasure();
 
         setSyncStatusListener();
@@ -691,10 +716,11 @@ public class Watch7018Manager extends BaseManager {
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        sendActionBroad(SYNC_DATA_COMPLETE,"");
-                        sendActionBroad(SYNC_UNBIND_DATA_COMPLETE,"");
+                        //上传锻炼数据
+                        sendActionBroad(F18_EXERCISE_SYNC_COMPLETE,"");
+                        operateF18Sleep(isUnBind);
                     }
-                },1000);
+                },500);
                 Log.e(TAG,"-----数据同步完成---");
 
             }
@@ -708,10 +734,13 @@ public class Watch7018Manager extends BaseManager {
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
+                f18SyncStatus = F18SyncStatus.SYNC_COMPLETE;
                 Log.e(TAG,"-----Throwable---="+throwable.getMessage());
             }
         });
     }
+
+
 
 
     //处理详细的计步数据 key = yyyy-MM-dd HH 格式日期
@@ -794,13 +823,13 @@ public class Watch7018Manager extends BaseManager {
             for(int i = 0;i<hourList.size();i++){
                 F18StepBean collStep = hour24Map.get(hourList.get(i));
                 String[] stArr = new String[]{hourList.get(i),
-                        String.valueOf(collStep.getStep()),String.valueOf(collStep.getDistance()),String.valueOf(collStep.getKcal())};
+                        String.valueOf(collStep.getStep()),String.valueOf(collStep.getDistance() * 1000 ),String.valueOf(collStep.getKcal())};
                 stepArray.add(stArr);
             }
             Log.e(TAG,"------详细计步数据保存数据库="+new Gson().toJson(stepArray));
 
          //   F18DeviceSetAction.deleteF18DetailStepBean(userId,deviceId,DateUtil.getCurrDay());
-            new W81DeviceDataAction().saveDeviceStepArrayData("0",mCurrentDevice.getDeviceName(),BaseManager.mUserId,null,DateUtil.getCurrDay(),new Gson().toJson(stepArray));
+            new W81DeviceDataAction().saveDeviceStepArrayData("0",mCurrentDevice.getDeviceName(),BaseManager.mUserId,"0",DateUtil.getCurrDay(),new Gson().toJson(stepArray));
 
             F18DeviceSetAction.updateF18DetailStep(userId,deviceId,DateUtil.getCurrDay());
 
@@ -860,12 +889,12 @@ public class Watch7018Manager extends BaseManager {
             w81De.setStepArray(new Gson().toJson(stepList));
             w81De.setDistanceArray(new Gson().toJson(distanceList));
             w81De.setCalorieArray(new Gson().toJson(caloriesList));
-            w81De.setAvgHr(avgHeart == 0 ? "--":avgHeart+"");
+            w81De.setAvgHr(avgHeart == 0 ? null : avgHeart+"");
             W81DeviceEexerciseAction action = new W81DeviceEexerciseAction();
             action.saveDefExerciseData(w81De);
         }
 
-        sendActionBroad(F18_EXERCISE_SYNC_COMPLETE,"");
+     //   sendActionBroad(F18_EXERCISE_SYNC_COMPLETE,"");
 
     }
 
@@ -902,20 +931,6 @@ public class Watch7018Manager extends BaseManager {
         this.currDistance = todayTotalData.getDistance();
         if(f18HomeCountStepListener != null)
             f18HomeCountStepListener.backHomeCountData(todayTotalData.getStep(),todayTotalData.getDistance(),todayTotalData.getCalorie());
-//
-//        //保存到数据库
-//        ThreadPoolUtils.getInstance().addTask(new Runnable() {
-//            @Override
-//            public void run() {
-//                long currentTime = System.currentTimeMillis();
-//                W81DeviceDataAction w81DeviceDataAction = new W81DeviceDataAction();
-//                int kcal = todayTotalData.getCalorie() ==0 ? 0 : todayTotalData.getCalorie();
-//
-//                kcal = kcal == 0 ? 0 : kcal / 1000;
-//                w81DeviceDataAction.saveW81DeviceStepData(mCurrentDevice.getDeviceName(), String.valueOf(BaseManager.mUserId),
-//                        "0", TimeUtils.getTimeByyyyyMMdd(currentTime), currentTime, todayTotalData.getStep(), todayTotalData.getDistance(), kcal, false);
-//            }
-//        });
     }
 
     //解析心率数据
@@ -928,21 +943,75 @@ public class Watch7018Manager extends BaseManager {
 
     }
 
-    //解析睡眠数据
-    private void analysisSleepData(List<SleepData> sleepDataList) {
-        if(sleepDataList == null)
+
+    private void syncComplete(String isUnBind){
+        f18SyncStatus = F18SyncStatus.SYNC_COMPLETE;
+        sendActionBroad(SYNC_DATA_COMPLETE,"");
+        //同步后解绑
+        if(!TextUtils.isEmpty(isUnBind) && isUnBind.equals("0")){
+            sendActionBroad(SYNC_UNBIND_DATA_COMPLETE,isUnBind);
+        }
+    }
+
+    private void operateF18Sleep(String isUnBind){
+        try {
+        ArrayList<F18CommonDbBean> f18CommonDbBeanLt = F18DeviceSetAction.queryListBean(userId,mCurrentDevice.getDeviceName(), "",F18DbType.F18_DEVICE_SLEEP_TYPE);
+        if(f18CommonDbBeanLt == null || f18CommonDbBeanLt.isEmpty()){
+            syncComplete(isUnBind);
             return;
-        Log.e(TAG,"-----详细睡眠数据="+new Gson().toJson(sleepDataList));
+        }
 
-        //F18DeviceSetAction.saveF18DeviceDetailStep(userId,mCurrentDevice.getDeviceName(),DateUtil.getCurrDay(),System.currentTimeMillis(),);
+        Log.e(TAG,"-----睡眠原始数据="+new Gson().toJson(f18CommonDbBeanLt));
+        //最后一个保存的时间
+        String lastDay;
+        F18CommonDbBean lastTimeB = f18CommonDbBeanLt.get(f18CommonDbBeanLt.size()-1);
+        List<SleepData> lastT = new Gson().fromJson(lastTimeB.getTypeDataStr(),new TypeToken<List<SleepData>>(){}.getType());
+        if(lastT == null || lastT.isEmpty()){
+            syncComplete(isUnBind);
+            return;
+        }
+
+        lastDay = DateUtil.getFormatTime(lastT.get(lastT.size()-1).getTimeStamp(),"yyyy-MM-dd");
+        if(lastT.isEmpty()){
+            lastDay = DateUtil.getCurrDay();
+        }
+
+        List<SleepItemData> f18SleepList = new ArrayList<>();
+        for(F18CommonDbBean f18CommonDbBean : f18CommonDbBeanLt){
+            String tmpStr = f18CommonDbBean.getTypeDataStr();
+            if(tmpStr == null)
+                continue;
+            List<SleepData> sleepDataList = new Gson().fromJson(tmpStr,new TypeToken<List<SleepData>>(){}.getType());
+
+            if(sleepDataList != null && !sleepDataList.isEmpty()){
+                for(SleepData sleepData : sleepDataList){
+                    if(DateUtil.getFormatTime(sleepData.getTimeStamp(),"yyyy-MM-dd").equals(lastDay)){
+                        f18SleepList.addAll(sleepData.getItems());
+                    }
+                }
+            }
+        }
+
+        if(f18SleepList.isEmpty()){
+            syncComplete(isUnBind);
+            return;
+        }
+
+        analysSleep(f18SleepList,isUnBind,lastDay);
+        }catch (Exception e){
+            e.printStackTrace();
+            syncComplete(isUnBind);
+        }
+    }
 
 
-        List<SleepItemData> f18SleepList = sleepDataList.get(sleepDataList.size()-1).getItems();
+    private void analysSleep(List<SleepItemData> lt,String isUnBind,String day){
+        List<SleepItemData> f18SleepList = lt;
 
         final ArrayList<ArrayList<String>> sleepDetail = new ArrayList<>();
 
         //总的睡眠时间
-        long countSleep = sleepDataList.get(sleepDataList.size()-1).getTimeStamp();
+        // long countSleep = f18SleepList.get(f18SleepList.size()-1).g.getTimeStamp();
 
         int len = f18SleepList.size();
 
@@ -965,7 +1034,7 @@ public class Watch7018Manager extends BaseManager {
             int intervalMinute = (int) (intervalTime / 1000 /60);
 
             if(changeSleepStatus(sleepStatus) == 1){   //深睡  传后台是清醒
-               // deepSleepTime +=intervalMinute;
+                // deepSleepTime +=intervalMinute;
                 soberTime += intervalMinute;
             }
 
@@ -974,7 +1043,7 @@ public class Watch7018Manager extends BaseManager {
             }
 
             if(changeSleepStatus(sleepStatus) == 3){   //清醒 传后台是深睡
-               // soberTime += intervalMinute;
+                // soberTime += intervalMinute;
                 deepSleepTime +=intervalMinute;
             }
 
@@ -989,14 +1058,26 @@ public class Watch7018Manager extends BaseManager {
             sleepDetail.add(itemSleeep);
         }
 
-        Log.e(TAG,"-----保存睡眠="+deepSleepTime +" "+ lightSleepTime + " "+soberTime);
-
         Gson gson = new Gson();
         W81DeviceDataAction w81DeviceDataAction = new W81DeviceDataAction();
         w81DeviceDataAction.saveW81DeviceSleepData(mCurrentDevice.getDeviceName(), String.valueOf(BaseManager.mUserId),
-                "0", TimeUtils.getTimeByyyyyMMdd(sleepDataList.get(sleepDataList.size()-1).getTimeStamp()), System.currentTimeMillis(), deepSleepTime+ lightSleepTime+soberTime, deepSleepTime, lightSleepTime, soberTime, gson.toJson(sleepDetail));
+                "0", day, System.currentTimeMillis(), deepSleepTime+ lightSleepTime, deepSleepTime, lightSleepTime, soberTime, gson.toJson(sleepDetail));
 
 
+        syncComplete(isUnBind);
+
+        Log.e(TAG,"-----保存睡眠="+deepSleepTime +" "+ lightSleepTime + " "+soberTime+" "+new Gson().toJson(sleepDetail));
+    }
+
+
+    //解析睡眠数据
+    private void analysisSleepData(List<SleepData> sleepDataList) {
+        if(sleepDataList == null)
+            return;
+        Log.e(TAG,"-----详细睡眠数据="+new Gson().toJson(sleepDataList));
+
+        F18DeviceSetAction.saveOrUpdateF18DeviceSet(userId,mCurrentDevice.getDeviceName(),mCurrentDevice.getDeviceName(),F18DbType.F18_DEVICE_SLEEP_TYPE,DateUtil.getCurrDay(),new Gson().toJson(sleepDataList));
+        //F18DeviceSetAction.saveF18DeviceDetailStep(userId,mCurrentDevice.getDeviceName(),DateUtil.getCurrDay(),System.currentTimeMillis(),);
     }
 
 
@@ -1184,8 +1265,6 @@ public class Watch7018Manager extends BaseManager {
             boolean isStrength = functionConfig.isFlagEnable(FunctionConfig.FLAG_STRENGTHEN_TEST);
 
 
-            ///勿扰
-
             //步数目标
             f18DeviceSetData.setStepGoal(f18DeviceSetData.getStepGoal() == 0 ? 6000 : f18DeviceSetData.getStepGoal());
             //距离目标
@@ -1198,21 +1277,31 @@ public class Watch7018Manager extends BaseManager {
             //定时检测
             f18DeviceSetData.setContinuMonitor(f18DeviceSetData.getContinuMonitor()==null ? "" : f18DeviceSetData.getContinuMonitor());
             //喝水提醒
-            f18DeviceSetData.setDrinkAlert(f18DeviceSetData.getDrinkAlert() == null ? "未开启" : f18DeviceSetData.getDrinkAlert());
+            f18DeviceSetData.setDrinkAlert(f18DeviceSetData.getDrinkAlert() == null ? noOpen(): f18DeviceSetData.getDrinkAlert());
             //闹钟
             f18DeviceSetData.setAlarmCount(f18DeviceSetData.getAlarmCount());
             //久坐
-            f18DeviceSetData.setLongSitStr(f18DeviceSetData.getLongSitStr() == null ? "未开启" : f18DeviceSetData.getLongSitStr());
+            f18DeviceSetData.setLongSitStr(f18DeviceSetData.getLongSitStr() == null ? noOpen() : f18DeviceSetData.getLongSitStr());
             //抬腕亮屏
-            f18DeviceSetData.setTurnWrist(f18DeviceSetData.getTurnWrist() == null ? "未开启" : f18DeviceSetData.getTurnWrist());
-//            //勿扰模式
-//            f18DeviceSetData.setDNT(f18DeviceSetData.getDNT() == null ? "未开启" : f18DeviceSetData.getDNT());
+            f18DeviceSetData.setTurnWrist(f18DeviceSetData.getTurnWrist() == null ? noOpen() : f18DeviceSetData.getTurnWrist());
             f18DeviceSetData.setIs24Heart(isHeart);
             f18DeviceSetData.setTimeStyle(is24Hour ? 0 : 1);
             f18DeviceSetData.setTempStyle(isTemp ? 1 : 0);
             f18DeviceSetData.setIsKmUnit(isKmUnit ? 1 : 0);
-            f18DeviceSetData.setCityName(!isWeather ? "未开启" : "已开启");
+            f18DeviceSetData.setCityName(!isWeather ? noOpen() : "已开启");
             f18DeviceSetData.setStrengthMeasure(isStrength);
+
+            //喝水提醒
+            f18DeviceSetData.setDrinkAlert(getDrinkData());
+            //久坐提醒
+            f18DeviceSetData.setLongSitStr(getSedentaryConfig());
+            //转腕亮屏
+            f18DeviceSetData.setTurnWrist(getTurnWristLightingConfig());
+            //勿扰
+            f18DeviceSetData.setDNT(getNotDisturbConfig());
+            //连续监测
+            f18DeviceSetData.setContinuMonitor(getHealthyConfig());
+
             F18DeviceSetAction.saveOrUpdateF18DeviceSet(mUserId, mCurrentDevice.getDeviceName(),  F18DbType.F18_DEVICE_SET_TYPE, new Gson().toJson(f18DeviceSetData));
 
 
@@ -1222,6 +1311,9 @@ public class Watch7018Manager extends BaseManager {
     }
 
 
+    private String noOpen(){
+        return "未开启";
+    }
 
     //设置加强测量
     @SuppressLint("CheckResult")
@@ -1382,7 +1474,9 @@ public class Watch7018Manager extends BaseManager {
 
 
     //获取喝水提醒
-    public void getDrinkData() {
+    private String getDrinkData() {
+        if (!mWristbandManager.isConnected())
+            return noOpen();
         DrinkWaterConfig drinkWaterConfig = Objects.requireNonNull(mWristbandManager.getWristbandConfig()).getDrinkWaterConfig();
         //开关
         boolean isOpen = drinkWaterConfig.isEnable();
@@ -1399,11 +1493,12 @@ public class Watch7018Manager extends BaseManager {
         //结束小时
         int endHour = endTime / 60;
         int endMinute = endTime % 60;
-        //间隔
-        int intervalTime = drinkWaterConfig.getInterval();
 
-        Log.e(TAG, "------喝水提醒=" + isOpen + " " + startTime + " " + endTime);
+        if(!isOpen){
+            return noOpen(); //为开启
+        }
 
+        return CommonDateUtil.formatHourMinute(startHour,startMinute)+"~"+CommonDateUtil.formatHourMinute(endHour,endMinute);
     }
 
 
@@ -1508,10 +1603,10 @@ public class Watch7018Manager extends BaseManager {
 
 
     //获取久坐提醒
-    public void getSedentaryConfig() {
+    private String getSedentaryConfig() {
         try {
             if (!mWristbandManager.isConnected())
-                return;
+                return noOpen();
             SedentaryConfig sedentaryConfig = Objects.requireNonNull(mWristbandManager.getWristbandConfig()).getSedentaryConfig();
             //开关
             boolean isOpen = sedentaryConfig.isEnable();
@@ -1528,11 +1623,14 @@ public class Watch7018Manager extends BaseManager {
             //结束小时
             int endHour = endTime / 60;
             int endMinute = endTime % 60;
+            if(!isOpen){
+                return noOpen();
+            }
 
-            //间隔
-            int intervalTime = sedentaryConfig.getInterval();
+            return CommonDateUtil.formatHourMinute(startHour,startMinute)+"~"+CommonDateUtil.formatHourMinute(endHour,endMinute);
         } catch (Exception e) {
             e.printStackTrace();
+            return noOpen();
         }
     }
 
@@ -1569,9 +1667,9 @@ public class Watch7018Manager extends BaseManager {
     }
 
     //获取转腕亮屏
-    public void getTurnWristLightingConfig() {
+    private String getTurnWristLightingConfig() {
         if (!mWristbandManager.isConnected())
-            return;
+            return noOpen();
         TurnWristLightingConfig turnWristLightingConfig = Objects.requireNonNull(mWristbandManager.getWristbandConfig()).getTurnWristLightingConfig();
         //开关
         boolean isOpen = turnWristLightingConfig.isEnable();
@@ -1588,7 +1686,10 @@ public class Watch7018Manager extends BaseManager {
         //结束小时
         int endHour = endTime / 60;
         int endMinute = endTime % 60;
-
+        if(!isOpen){
+            return noOpen();
+        }
+        return  CommonDateUtil.formatHourMinute(startHour,startMinute)+"~"+CommonDateUtil.formatHourMinute(endHour,endMinute);
     }
 
 
@@ -1657,9 +1758,9 @@ public class Watch7018Manager extends BaseManager {
     }
 
     //获取连续监测
-    public void getHealthyConfig() {
+    public String getHealthyConfig() {
         if (!mWristbandManager.isConnected())
-            return;
+            return noOpen();
         HealthyConfig healthyConfig = Objects.requireNonNull(mWristbandManager.getWristbandConfig()).getHealthyConfig();
         //开关
         boolean isOpen = healthyConfig.isEnable();
@@ -1676,7 +1777,10 @@ public class Watch7018Manager extends BaseManager {
         //结束小时
         int endHour = endTime / 60;
         int endMinute = endTime % 60;
-
+        if(!isOpen){
+            return  noOpen();
+        }
+        return CommonDateUtil.formatHourMinute(startHour,startMinute)+"~"+CommonDateUtil.formatHourMinute(endHour,endMinute);
     }
 
 
@@ -1744,10 +1848,10 @@ public class Watch7018Manager extends BaseManager {
     }
 
     //获取勿扰设置
-    public void getNotDisturbConfig() {
+    private String getNotDisturbConfig() {
         try {
             if (!mWristbandManager.isConnected())
-                return;
+                return noOpen();
             NotDisturbConfig notDisturbConfig = Objects.requireNonNull(mWristbandManager.getWristbandConfig()).getNotDisturbConfig();
             boolean isOpen = notDisturbConfig.isEnablePeriodTime();
             //开始时间
@@ -1763,10 +1867,18 @@ public class Watch7018Manager extends BaseManager {
             //结束小时
             int endHour = endTime / 60;
             int endMinute = endTime % 60;
+
+            if(!isOpen){
+                return noOpen();
+            }
+
+            return  CommonDateUtil.formatHourMinute(startHour,startMinute)+"~"+CommonDateUtil.formatHourMinute(endHour,endMinute);
         } catch (Exception e) {
             e.printStackTrace();
+            return noOpen();
         }
     }
+
 
 
     //获取勿扰设置
@@ -2148,6 +2260,7 @@ public class Watch7018Manager extends BaseManager {
 
     //发送表盘
     public void setF18DialToDevice(File dialFile, Byte bt, OnF18DialStatusListener onF18DialStatusListener){
+        setF18SyncStatus(F18SyncStatus.SYNC_DIAL_ING);
         DfuManager dfuManager = new DfuManager(mContext);
         dfuManager.setDfuCallback(new DfuCallback() {
             @Override
@@ -2155,6 +2268,7 @@ public class Watch7018Manager extends BaseManager {
                 Log.e(TAG,"--表盘升级----onError-------="+errorType +" "+errorCode);
                 if(onF18DialStatusListener != null)
                     onF18DialStatusListener.onError(errorType,errorCode);
+                setF18SyncStatus(F18SyncStatus.SYNC_DIAL_FAIL);
             }
 
             @Override
@@ -2176,6 +2290,7 @@ public class Watch7018Manager extends BaseManager {
                 Log.e(TAG,"--表盘升级-----onSuccess------");
                 if(onF18DialStatusListener != null)
                     onF18DialStatusListener.onSuccess();
+                setF18SyncStatus(F18SyncStatus.SYNC_DIAL_COMPLETE);
             }
         });
         dfuManager.init();

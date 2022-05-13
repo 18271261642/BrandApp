@@ -117,10 +117,18 @@ public class SingleBpView extends View {
 
 
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon_move_bottom);
+
+        //中心点
+        float mid = (signalInterval/2)+signalWidth;
+
         //图片的宽高
         float imgWidth = bitmap.getWidth();
         float imgHeight = bitmap.getHeight();
-        RectF rectF = new RectF(-3f,-mHeight,imgWidth,-mHeight+imgHeight);
+        RectF rectF = new RectF(mid-(imgWidth/2),-mHeight,mid +(imgWidth/2),-mHeight+imgHeight);
+
+
+
+
         if(bpInfo.isClick())
         canvas.drawBitmap(bitmap,null,rectF,imgPaint);
 

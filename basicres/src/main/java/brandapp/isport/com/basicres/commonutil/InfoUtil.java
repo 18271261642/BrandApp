@@ -19,6 +19,9 @@ public class InfoUtil {
         CharSequence inputStr = phoneNumber;
         //^((13[0-9])|(14[5,7,9])|(15[^4,\\D])|(18[0-9])|(19[8,9])|(17[0,1,3,5-9]))\\d{8}$
         String phone = "^1[345789]\\d{9}$";
+
+        String tmpP = "^((13[0-9])|(14[5,7,9])|(15[^4,\\\\D])|(18[0-9])|(19[0-9])|(17[0,1,3,5-9]))\\\\d{8}$";
+
         // String phone = "^((13[0-9])|(14[5,7,9])|(15[^4,\\\\D])|(18[0-9])|(19[8,9])|(17[0,1,3,5-9]))\\\\d{8}$";
         Pattern pattern = Pattern.compile(phone);
         Matcher matcher = pattern.matcher(inputStr);

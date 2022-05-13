@@ -42,6 +42,8 @@ import com.isport.brandapp.device.publicpage.ActivityDeviceUnbindGuide;
 import com.isport.brandapp.device.publicpage.GoActivityUtil;
 import com.isport.brandapp.dialog.UnBindDeviceDialog;
 import com.isport.brandapp.dialog.UnbindStateCallBack;
+import com.isport.brandapp.home.OperateGuidActivity;
+import com.isport.brandapp.login.ActivityWebView;
 import com.isport.brandapp.util.ActivitySwitcher;
 import com.isport.brandapp.util.AppSP;
 import com.isport.brandapp.util.ClickUtils;
@@ -141,7 +143,11 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
     //解绑
     private TextView f18DeviceUnbindItem;
 
+    //操作指引
+    private ItemDeviceSettingView f18DeviceOperateItem;
 
+
+    private String guidUrl;
 
     private final Handler handler = new Handler(Looper.getMainLooper()){
         @Override
@@ -180,8 +186,11 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
 
     @Override
     protected void initData() {
+        guidUrl = getIntent().getStringExtra("device_guid_url");
+
         ISportAgent.getInstance().requestBle(BleRequest.Common_GetBattery);
         Watch7018Manager.getWatch7018Manager().getCommonSet();
+
     }
 
     @Override
@@ -229,6 +238,8 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
     }
 
     private void findViews(){
+
+        f18DeviceOperateItem = findViewById(R.id.f18DeviceOperateItem);
         batteryView = findViewById(R.id.iv_battery);
         f18Bettery_count = findViewById(R.id.f18Bettery_count);
         f18Watch_state = findViewById(R.id.f18Watch_state);
@@ -321,6 +332,7 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
         f18ContinueItem.setOnClickListener(this);
         f18DeviceDistanceGoalItem.setOnClickListener(this);
         f18DeviceKcalGoalItem.setOnClickListener(this);
+        f18DeviceOperateItem.setOnClickListener(this);
 
 
         f18DeviceWatchFaceItem.setOnLongClickListener(new View.OnLongClickListener() {
@@ -347,6 +359,11 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
         if(vId == R.id.f18DeviceUnbindItem){    //解绑
             unBindF18Device();
             return;
+        }
+
+        //操作指引
+        if(vId == R.id.f18DeviceOperateItem){
+            startActivity(new String[]{"url","title"},new String[]{guidUrl,getResources().getString(R.string.string_operate_guide_desc)}, ActivityWebView.class);
         }
 
         if(!AppConfiguration.isConnected){
@@ -530,7 +547,7 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
                     if (device != null) {
                         int currentDevice = device.deviceType;
                         handler.sendEmptyMessageDelayed(0x00,80 * 1000);
-                         Watch7018Manager.getWatch7018Manager().syncDeviceData();
+                         Watch7018Manager.getWatch7018Manager().syncDeviceData("0");
                         SyncProgressObservable.getInstance().sync(DeviceTimesUtil.getTime(1, 1), false);
                     }
                 } else {
@@ -622,7 +639,7 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
         //时间格式
         f18DeviceTimeStyleItem.setContentText(f18DeviceSetData.getTimeStyle() == 0 ? getResources().getString(R.string.time_format_12) : getResources().getString(R.string.time_format_24));
         //天气设置
-        f18DeviceWeatherItem.setContentText(f18DeviceSetData.getCityName().equals("已开启")?getResources().getString(R.string.setting_start) : getResources().getString(R.string.display_no_count));
+       // f18DeviceWeatherItem.setContentText(f18DeviceSetData.getCityName().equals("已开启")?getResources().getString(R.string.setting_start) : getResources().getString(R.string.display_no_count));
         //温度单位
         f18DeviceTempItem.setContentText(f18DeviceSetData.getTempStyle() == 0 ?  "℃" : "℉");
 
@@ -733,6 +750,9 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
 //                }
 
 //            }
+            if(null != AppConfiguration.deviceMainBeanList){
+                AppConfiguration.deviceMainBeanList.remove(JkConfiguration.DeviceType.Watch_F18);
+            }
             AppSP.putString(context, AppSP.F18_SAVE_MAC, null);
             EventBus.getDefault().post(new MessageEvent(MessageEvent.UNBIND_DEVICE_SUCCESS));
             Intent intent = new Intent(context, ActivityDeviceUnbindGuide.class);
@@ -753,7 +773,8 @@ public class F18WatchManagerActivity extends BaseMVPTitleActivity<F18SetView, F1
                 if(ActivitySwitcher.isForeground(F18WatchManagerActivity.this)){
                     handler.removeMessages(0x00);
 
-                    mActPresenter.getNoUpgradeW81DevcieDetailData(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), AppConfiguration.braceletID, "0", true);
+                    //同步解绑，当天数据也上传
+                    mActPresenter.getNoUpgradeW81DevcieDetailData(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), AppConfiguration.braceletID, "0", false);
 
 
                     DeviceBean device = AppConfiguration.deviceMainBeanList.get(IDeviceType.TYPE_WATCH_7018);

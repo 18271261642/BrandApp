@@ -738,7 +738,8 @@ public class FragmentCommunity extends BaseMVPFragment<AddDynamView, AddDynamPre
     public void onDestroy() {
         super.onDestroy();
         GSYVideoManager.releaseAllVideos();
-
+        if(disposableTimer != null)
+            disposableTimer.dispose();
         EventBus.getDefault().unregister(this);
         getActivity().unregisterReceiver(networkChang);
     }

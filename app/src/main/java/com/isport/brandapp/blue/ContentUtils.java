@@ -41,19 +41,20 @@ public class ContentUtils {
                 return;
             }
 
-
             String devcieName = device.getDeviceName();
             int deviceType = device.getDeviceType();
 
 
-            if(DeviceTypeUtil.isContainF18(deviceType)){
+            if (DeviceTypeUtil.isConnectF18(deviceType)) {
                 String name = ContentUtils.contactNameByNumber(context, incomingNumber);
+
+
                 if (TextUtils.isEmpty(name)) {
                     name = incomingNumber;
                 }
-                int phoneStatusCode = AppSP.getInt(context,AppSP.F18_PHONE_ALERT,0);
-                if(phoneStatusCode == 1){
-                    Watch7018Manager.getWatch7018Manager().sendNoticeToDevice((byte) 0x01,name,UIUtils.getString(R.string.incomingNumber));
+                int phoneStatusCode = AppSP.getInt(context, AppSP.F18_PHONE_ALERT, 0);
+                if (phoneStatusCode == 1) {
+                    Watch7018Manager.getWatch7018Manager().sendNoticeToDevice((byte) 0x01, name, UIUtils.getString(R.string.incomingNumber));
                 }
 
                 return;
@@ -74,20 +75,20 @@ public class ContentUtils {
                 if (TextUtils.isEmpty(name)) {
                     name = incomingNumber;
                 }
-                if(device.getDeviceType() == IDeviceType.TYPE_WATCH_W560 ){
+                if (device.getDeviceType() == IDeviceType.TYPE_WATCH_W560) {
                     ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, name, UIUtils.getString(R.string.incomingNumber), 29);
                     return;
                 }
 
-                if(device.getDeviceType() == IDeviceType.TYPE_WATCH_W560B){
+                if (device.getDeviceType() == IDeviceType.TYPE_WATCH_W560B) {
                     Watch_W516_SleepAndNoDisturbModel watchDNDBean = Watch_W516_SleepAndNoDisturbModelAction.findWatch_W516_SleepAndNoDisturbModelyDeviceId(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), device.getDeviceName());
                     //没有设置勿扰模式
-                    if(watchDNDBean ==null){
+                    if (watchDNDBean == null) {
                         ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, name, UIUtils.getString(R.string.incomingNumber), 1);
                         return;
                     }
                     //勿扰模式未打开
-                    if(!watchDNDBean.getOpenNoDisturb()){
+                    if (!watchDNDBean.getOpenNoDisturb()) {
                         ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, name, UIUtils.getString(R.string.incomingNumber), 1);
                         return;
                     }
@@ -96,7 +97,7 @@ public class ContentUtils {
                     String endTime = watchDNDBean.getNoDisturbEndTime();
 
                     //判断是否在区间内
-                    if(DateTimeUtils.isComparisonWith(startTime,endTime))
+                    if (DateTimeUtils.isComparisonWith(startTime, endTime))
                         return;
                     ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, name, UIUtils.getString(R.string.incomingNumber), 1);
                     return;
@@ -105,11 +106,25 @@ public class ContentUtils {
 
                 ISportAgent.getInstance().requestBle(BleRequest.w526_send_message, name, UIUtils.getString(R.string.incomingNumber), 1);
                 // ISportAgent.getInstance().requestBle(BleRequest.bracelet_send_phone, incomingNumber, ContentUtils.contactNameByNumber(context, incomingNumber));
-            } else if (DeviceTypeUtil.isContainWatch(deviceType)) {
+
+                return;
+            }
+
+
+            if (DeviceTypeUtil.isContainWatch(deviceType)) {
                 ISportAgent.getInstance().requestBle(BleRequest.Watch_W516_SEND_NOTIFICATION, 0);
-            } else if (DeviceTypeUtil.isContainWrishBrand(deviceType)) {
+                return;
+            }
+
+
+            if (DeviceTypeUtil.isContainWrishBrand(deviceType)) {
                 ISportAgent.getInstance().requestBle(BleRequest.bracelet_send_phone, incomingNumber, ContentUtils.contactNameByNumber(context, incomingNumber));
-            } else if (DeviceTypeUtil.isContaintW81(deviceType)) {
+
+                return;
+            }
+
+
+            if (DeviceTypeUtil.isContaintW81(deviceType)) {
                 String name = ContentUtils.contactNameByNumber(context, incomingNumber);
                 if (TextUtils.isEmpty(name)) {
                     name = incomingNumber;
@@ -117,8 +132,6 @@ public class ContentUtils {
                 ISportAgent.getInstance().requestBle(BleRequest.w81_send_message, name, CRPBleMessageType.MESSAGE_PHONE);
 
             }
-        } else {
-            Log.e(TAG, "999999999999999");
         }
 
 

@@ -65,7 +65,7 @@ public class FragmentList extends Fragment {
                         Calendar cal = Calendar.getInstance();
                         cal.add(Calendar.DATE, -(getCount() - (position + 1)));
                         int date = (int) (cal.getTimeInMillis() / 1000);
-                        Logger.myLog("FragmentList------(position + 1)" + (position + 1) + "cal:" + TimeUtils.getTimeByyyyyMMddhhmmss(cal.getTimeInMillis()));
+                        Logger.myLog("---history--FragmentList------(position + 1)" + (position + 1) + "cal:" + TimeUtils.getTimeByyyyyMMddhhmmss(cal.getTimeInMillis()));
                         Fragment fragment = new RopeDayFragment();
                         Bundle bundle = new Bundle();
                         bundle.putInt("date", date);
@@ -190,7 +190,7 @@ public class FragmentList extends Fragment {
                     selectCalendar.set(Calendar.MONTH, Integer.parseInt(strings[1]) - 1);
                     selectCalendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(strings[2]));
                 } catch (Exception e) {
-
+                    e.printStackTrace();
                 } finally {
                     Logger.myLog("FragmentList------calendar:" + TimeUtils.getTimeByyyyyMMdd(calendar) + ",,selectCalendar:" + TimeUtils.getTimeByyyyyMMdd(selectCalendar));
                     int days = daysBetween(calendar, selectCalendar);

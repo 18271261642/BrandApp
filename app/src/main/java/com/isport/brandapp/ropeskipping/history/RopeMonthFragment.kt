@@ -42,7 +42,7 @@ import org.greenrobot.eventbus.ThreadMode
 import phone.gym.jkcq.com.commonres.common.JkConfiguration
 import java.text.SimpleDateFormat
 import java.util.*
-
+//月柱状图
 class RopeMonthFragment : Fragment(), RopeSkippingView {
     //柱状图的变量初始化
     var strDate = mutableListOf<String>()

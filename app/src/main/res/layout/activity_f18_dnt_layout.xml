@@ -79,7 +79,7 @@
 
 
 
-        <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/f18DntStartLayout"
             android:layout_width="match_parent"
             android:background="@drawable/common_item_bg_selector"

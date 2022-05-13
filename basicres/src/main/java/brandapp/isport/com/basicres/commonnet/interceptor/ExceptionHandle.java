@@ -96,7 +96,7 @@ public class ExceptionHandle {
                     ToastUtils.showToast(UIUtils.getContext(), ex.message);
                 }
             } catch (Exception exception) {
-
+                e.printStackTrace();
             } finally {
                 return ex;
             }
@@ -111,10 +111,10 @@ public class ExceptionHandle {
             try {
                 if (!TextUtils.isEmpty(ex.message)) {
                     NetProgressObservable.getInstance().hide();
-                    ToastUtils.showToast(UIUtils.getContext(), ex.message);
+                  //  ToastUtils.showToast(UIUtils.getContext(), ex.message);
                 }
             } catch (Exception exception) {
-
+                e.printStackTrace();
             } finally {
                 return ex;
             }
@@ -129,7 +129,7 @@ public class ExceptionHandle {
                     ToastUtils.showToast(UIUtils.getContext(), ex.message);
                 }
             } catch (Exception exception) {
-
+                e.printStackTrace();
             } finally {
                 return ex;
             }

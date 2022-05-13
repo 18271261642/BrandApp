@@ -19,6 +19,7 @@ import com.isport.blelibrary.deviceEntry.impl.BaseDevice;
 import com.isport.blelibrary.deviceEntry.interfaces.IDeviceType;
 import com.isport.blelibrary.interfaces.BleReciveListener;
 import com.isport.blelibrary.managers.F18HomeCountStepListener;
+import com.isport.blelibrary.managers.F18SyncStatus;
 import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.blelibrary.result.IResult;
 import com.isport.blelibrary.utils.Constants;
@@ -157,6 +158,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
         intentFilter.addAction(Watch7018Manager.F18_CONNECT_STATUS);
         intentFilter.addAction(Watch7018Manager.F18_DIS_CONNECTED_STATUS);
         intentFilter.addAction(Watch7018Manager.F18_CONNECT_ING);
+        intentFilter.addAction(Watch7018Manager.SYNC_DEVICE_DATA_ING);  //开始同步数据
         Objects.requireNonNull(getActivity()).registerReceiver(broadcastReceiver,intentFilter);
 
         initHomeMenu();
@@ -166,8 +168,8 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
             public void backHomeCountData(int step, float distance, float kcal) {
                 WatchSportMainData wD = new WatchSportMainData();
                 wD.setStep(step+"");
-                wD.setCal(decimalFormat.format(Float.valueOf(distance/1000)));
-                wD.setDistance(decimalFormat.format(Float.valueOf(kcal/1000)));
+                wD.setCal(decimalFormat.format(Float.valueOf(kcal/1000)));
+                wD.setDistance(decimalFormat.format(Float.valueOf(distance/1000)));
                 new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -214,9 +216,15 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
                   home_refresh.finishRefresh();
                   return;
               }
+
+              if(Watch7018Manager.getWatch7018Manager().getF18SyncStatus() == F18SyncStatus.SYNC_ING){
+                  home_refresh.finishRefresh();
+                  return;
+              }
+
               handler.sendEmptyMessageDelayed(0x00,30 * 1000);
                 SyncCacheUtils.saveStartSync(BaseApp.getApp());
-                Watch7018Manager.getWatch7018Manager().syncDeviceData();
+                Watch7018Manager.getWatch7018Manager().syncDeviceData("");
                 startSyncDevice();
 
             }
@@ -298,6 +306,11 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
             mainHeadLayout.showOptionButton(true, UIUtils.getString(R.string.fragment_main_click_connect), MainHeadLayout.TAG_CONNECT, UIUtils.getString(R.string.disConnect));
         }
 
+
+        //判断是否正常同步数据
+        if(Watch7018Manager.getWatch7018Manager().getF18SyncStatus() == F18SyncStatus.SYNC_ING){
+            startSyncDevice();
+        }
     }
 
 
@@ -421,19 +434,14 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
         String userId = TokenUtil.getInstance().getPeopleIdInt(getActivity());
         if(deviceId == null)
             return;
-//        mCurrentDevice = ISportAgent.getInstance().getCurrnetDevice();
-//        //从网络获取血压
-//        mFragPresenter.getBloodPressure();
-//        mFragPresenter.getNumOxyGen();
-//        mFragPresenter.getNetTempData();
-//        mFragPresenter.getNumNetOnceHr();
-//
-//        mFragPresenter.getAllDeviceDetailData();
-//
-//        mFragPresenter.uploadOxyData(deviceId,userId);
-//        mFragPresenter.uploadF18BloodData(deviceId,userId);
-//        mFragPresenter.upgradeOnceHrData(deviceId,userId);
-//        mFragPresenter.updateTempData(deviceId,userId);
+
+        if(Watch7018Manager.getWatch7018Manager().getF18SyncStatus() == F18SyncStatus.SYNC_ING){
+            startSyncDevice();
+            return;
+        }
+
+        //每次进来都同步数据
+        Watch7018Manager.getWatch7018Manager().syncDeviceData("");
 
     }
 
@@ -654,7 +662,7 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
         if(ClickUtils.isFastDoubleClick())
             return;
         Intent intent = new Intent(context, F18SleepActivity.class);
-        intent.putExtra(JkConfiguration.CURRENTDEVICETPE, JkConfiguration.DeviceType.Watch_F18);
+       // intent.putExtra(JkConfiguration.CURRENTDEVICETPE, JkConfiguration.DeviceType.Watch_F18);
         intent.putExtra(JkConfiguration.DEVICE, AppConfiguration.deviceBeanList.get(IDeviceType.TYPE_WATCH_7018));
         startActivity(intent);
     }
@@ -711,16 +719,36 @@ public class F18HomeFragment extends BaseMVPFragment<F18HomeView,F18HomePresente
                 showMainHeadLayoutStatus();
             }
 
+
+            if(action.equals(Watch7018Manager.SYNC_DEVICE_DATA_ING)){   //开始同步数据
+                startSyncDevice();
+            }
+
             if(action.equals(Watch7018Manager.SYNC_DATA_COMPLETE)){ //同步完成
                 handler.removeMessages(0x00);
                 endSyncDevice();
                 //mFragPresenter.getDeviceStepLastTwoData(IDeviceType.TYPE_WATCH_7018);
 
                // mFragPresenter.dealWithYesDayStep(TokenUtil.getInstance().getPeopleIdStr(getContext()),AppConfiguration.braceletID);
-                mFragPresenter.dealHistoryStep(TokenUtil.getInstance().getPeopleIdStr(getContext()),AppConfiguration.braceletID);
-                if (!Constants.isSyncData) {
-                    mFragPresenter.getNoUpgradeW81DevcieDetailData(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), AppConfiguration.braceletID, "0", false);
+
+                int syncCode = AppSP.getInt(getActivity(),"is_f18_once_sync",0);
+                if(syncCode == 0){
+                    mFragPresenter.dealHistoryAllStep(TokenUtil.getInstance().getPeopleIdStr(getContext()),AppConfiguration.braceletID);
+                }else{
+                    mFragPresenter.dealHistoryStep(TokenUtil.getInstance().getPeopleIdStr(getContext()),AppConfiguration.braceletID);
                 }
+
+
+                mFragPresenter.operateYesF18Sleep(TokenUtil.getInstance().getPeopleIdStr(getContext()),AppConfiguration.braceletID);
+
+//                mFragPresenter.dealHistoryAllStep(TokenUtil.getInstance().getPeopleIdStr(getContext()),AppConfiguration.braceletID);
+                if (!Constants.isSyncData) {
+                    mFragPresenter.getNoUpgradeW81DevcieDetailData(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), AppConfiguration.braceletID, "0", true);
+
+                    AppSP.putInt(getActivity(),"is_f18_once_sync",-1);
+                }
+
+//                mFragPresenter.getNoUpgradeW81DevcieDetailData(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), AppConfiguration.braceletID, "0", true);
             }
 
             if(action.equals(Watch7018Manager.F18_EXERCISE_SYNC_COMPLETE)){

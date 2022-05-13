@@ -10,4 +10,7 @@ public class F18DbType {
     //设置相关type；com.isport.blelibrary.db.table.f18.F18DeviceSetData 转换成json字符串
     public static final String F18_DEVICE_SET_TYPE = "f18_device_set";
 
+    //睡眠
+    public static final String F18_DEVICE_SLEEP_TYPE = "f18_device_sleep";
+
 }

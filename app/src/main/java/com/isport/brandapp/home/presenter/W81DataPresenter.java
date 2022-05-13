@@ -1,7 +1,9 @@
 package com.isport.brandapp.home.presenter;
 
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.google.gson.Gson;
 import com.isport.blelibrary.db.action.W81Device.W81DeviceDataAction;
 import com.isport.blelibrary.db.action.s002.S002_DetailDataModelAction;
 import com.isport.blelibrary.utils.Constants;
@@ -109,6 +111,13 @@ public class W81DataPresenter {
 
             @Override
             public void onNext(WatchHistoryNList watchHistoryNBean) {
+
+
+                if(watchHistoryNBean.getList() != null && watchHistoryNBean.getList().size()>0){
+                    for(WatchHistoryNBean wb : watchHistoryNBean.getList()){
+                        Log.e("网络","----wbbb="+wb.toString());
+                    }
+                }
 
                 saveStepData(watchHistoryNBean, true);
 
@@ -297,6 +306,9 @@ public class W81DataPresenter {
                 WatchHistoryNBean bean;
                 for (int i = 0; i < list.size(); i++) {
                     bean = list.get(i);
+
+                    Log.e("保存网络获取睡眠","---睡眠="+bean.toString());
+
                     //String deviceId, String userId, String wristbandSportDetailId, String dateStr, long timestamp, int totalTime,
                     //                              int restfulTime,
                     //                              int lightTime,
@@ -312,7 +324,7 @@ public class W81DataPresenter {
                         totallightTime = 0;
                         totalsoberTime = 0;
                     }
-                    iw81DeviceDataModel.saveSleepData(bean.getDeviceId(), bean.getUserId(), bean.getWristbandSportDetailId(), bean.getDateStr(), System.currentTimeMillis(), totalSleepTime, totalrestfulTime, totallightTime, totalsoberTime, bean.getSleepDetailArray());
+                    iw81DeviceDataModel.saveSleepData(bean.getDeviceId(), bean.getUserId(), bean.getWristbandSportDetailId(), bean.getDateStr(),  System.currentTimeMillis(), totalSleepTime, totalrestfulTime, totallightTime, totalsoberTime, bean.getSleepDetailArray());
                 }
                 if (!isMonth) {
                     EventBus.getDefault().post(new MessageEvent(MessageEvent.update_sleep));
@@ -320,6 +332,7 @@ public class W81DataPresenter {
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             Logger.myLog(e.toString());
         }
 
@@ -329,10 +342,10 @@ public class W81DataPresenter {
         try {
             if (watchHistoryNBean != null && watchHistoryNBean.getList() != null) {
                 List<WatchHistoryNBean> list = watchHistoryNBean.getList();
-                WatchHistoryNBean bean;
+
                 for (int i = 0; i < list.size(); i++) {
-                    bean = list.get(i);
-                    Logger.myLog("saveStepData:-------" + bean);
+                    WatchHistoryNBean bean = list.get(i);
+                    Log.e("网络获取","saveStepData:-------" + new Gson().toJson(bean));
                     if (bean.getTotalSteps() == 0) {
                         continue;
                     }
@@ -340,6 +353,8 @@ public class W81DataPresenter {
                     iw81DeviceDataModel.saveStepData(bean.getDeviceId(), bean.getUserId(), bean.getWristbandSportDetailId(), bean.getDateStr(), System.currentTimeMillis(), bean.getTotalSteps(), (int) Float.parseFloat(bean.getTotalDistance()), (int) Float.parseFloat(bean.getTotalCalories()), true);
                     if(isMonth){
                         new W81DeviceDataAction().saveDeviceStepArrayData("网络获取保存",bean.getDeviceId(), bean.getUserId(),bean.getWristbandSportDetailId(), bean.getDateStr(),bean.getStepDetailArray());
+
+//                        new W81DeviceDataAction().saveDeviceStepArrayData("网络获取保存",bean.getDeviceId(), bean.getUserId(),"0", bean.getDateStr(),bean.getStepDetailArray());
                     }
 
                 }

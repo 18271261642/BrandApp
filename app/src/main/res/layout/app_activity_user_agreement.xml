@@ -18,6 +18,13 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <FrameLayout
+            android:id="@+id/video_fullView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" >
+        </FrameLayout>
+
         <com.isport.brandapp.login.TouchEventWebView
             android:id="@+id/tk_webview"
             android:layout_width="match_parent"

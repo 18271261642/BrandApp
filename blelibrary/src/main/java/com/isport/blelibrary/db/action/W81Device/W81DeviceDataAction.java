@@ -39,7 +39,7 @@ public class W81DeviceDataAction {
         }
 
         W81DeviceDetailData w81DeviceDetailData = getW81DeviceDetialData(deviceId, userId, strDate);
-        Logger.myLog("updateWriId:" + w81DeviceDetailData);
+        //Logger.myLog("updateWriId:" + w81DeviceDetailData);
         if (w81DeviceDetailData != null) {
             w81DeviceDetailData.setWristbandSportDetailId(wristbandSportDetailId);
             saveW81DeviceDetailData(w81DeviceDetailData);
@@ -50,35 +50,44 @@ public class W81DeviceDataAction {
 
     public synchronized void saveDeviceStepArrayData(String tag,String deviceId, String userId,String wrisId, String dateStr,String stepArray){
 
-        Log.e("TAG","-----来源="+tag +" 日期="+dateStr+"\n"+stepArray);
+        //Log.e("TAG","-----来源="+tag +" 日期="+dateStr+"\n"+stepArray);
         String[] newCountStepArray = getDetailCountStep(stepArray);
         int currCountStep = Integer.parseInt(newCountStepArray == null ? String.valueOf(0) : newCountStepArray[0]);
         float currCountDis = Float.parseFloat(newCountStepArray == null ?String.valueOf(0) : newCountStepArray[1]);
         float currKcal = Float.parseFloat(newCountStepArray == null ? String.valueOf(0) : newCountStepArray[2]);
 
+
+        if(dateStr.equals(DateUtil.getCurrDay()))
+            wrisId = "0";
+
         W81DeviceDetailData w81DeviceDetailData = getW81DeviceDetialData(deviceId, userId, dateStr);
         if(w81DeviceDetailData != null){
             String dealStep = analysisStepArray(tag,w81DeviceDetailData.getStep(),stepArray,stepArray);
-            Log.e("TT","-------处理完成后的计步="+dealStep);
+           // Log.e("TT","-------处理完成后的计步="+dealStep);
             w81DeviceDetailData.setStepArray(dealStep);
             w81DeviceDetailData.setDateStr(dateStr);
+
+            if(dateStr.equals(DateUtil.getCurrDay()))
+               w81DeviceDetailData.setWristbandSportDetailId("0");
+            Log.e("TT","------处理完成后的id="+w81DeviceDetailData.getDateStr() +"   "+w81DeviceDetailData.getWristbandSportDetailId());
+            w81DeviceDetailData.setWristbandSportDetailId(wrisId);
 
             if(newCountStepArray != null){
                 w81DeviceDetailData.setStep(Integer.valueOf(newCountStepArray[0]));
                 float countDis = Float.valueOf(newCountStepArray[1]);
                 float countKcal = Float.valueOf(newCountStepArray[2]);
-                w81DeviceDetailData.setDis((int) (countDis*1000));
+                w81DeviceDetailData.setDis((int) (countDis));
                 w81DeviceDetailData.setCal((int) countKcal);
             }
 
-            Log.e("保存计步",w81DeviceDetailData.toString());
+          //  Log.e("保存计步",w81DeviceDetailData.toString());
             saveW81DeviceDetailData(w81DeviceDetailData);
         }else{
             W81DeviceDetailData wb = new W81DeviceDetailData();
             wb.setStep(currCountStep);
             float countDis = currCountDis;
             float countKcal = currKcal;
-            wb.setDis((int) (countDis * 1000));
+            wb.setDis((int) (countDis ));
             wb.setCal((int) countKcal);
 
             wb.setUserId(userId);
@@ -187,7 +196,7 @@ public class W81DeviceDataAction {
            String[] tmpItem = tempStepMap.get(hourList.get(i));
            stepArrayResultList.add(tmpItem);
         }
-        Log.e("TAG","----全部替换后="+tempStepMap.toString()+"\n"+new Gson().toJson(hourList)+"\n"+"最终结果="+new Gson().toJson(stepArrayResultList));
+       // Log.e("TAG","----全部替换后="+tempStepMap.toString()+"\n"+new Gson().toJson(hourList)+"\n"+"最终结果="+new Gson().toJson(stepArrayResultList));
 
 
         return new Gson().toJson(stepArrayResultList);
@@ -203,7 +212,7 @@ public class W81DeviceDataAction {
         W81DeviceDetailData w81DeviceDetailData = getW81DeviceDetialData(deviceId, userId, dateStr);
         if (w81DeviceDetailData != null) {
 
-            Logger.myLog("saveW81DeviceStepData" + w81DeviceDetailData + "cal:" + cal + "dis:" + dis + "step:" + step);
+           // Logger.myLog("saveW81DeviceStepData" + w81DeviceDetailData + "cal:" + cal + "dis:" + dis + "step:" + step);
             if (w81DeviceDetailData.getStep() >= step && isNet) {
                 return;
             }
@@ -232,11 +241,11 @@ public class W81DeviceDataAction {
         W81DeviceDetailData w81DeviceDetailData = getW81DeviceDetialData(deviceId, userId, dateStr);
 
 
-        Logger.myLog("saveW81DeviceSleepData:deviceId " + deviceId + "userId:" + userId + "dateStr:" + dateStr);
-        Logger.myLog("w81DeviceDetailData" + w81DeviceDetailData);
+        Logger.myLog("---saveW81DeviceSleepData:deviceId " + deviceId + "userId:" + userId + "dateStr:" + dateStr);
+        Logger.myLog("------w81DeviceDetailData" + w81DeviceDetailData);
 
         int hasSleep;
-        if (totalTime != 0) {
+        if (totalTime != 0 || restfulTime+lightTime != 0) {
             hasSleep = WatchData.HAS_SLEEP;
         } else {
             hasSleep = WatchData.NO_SLEEP;
@@ -274,7 +283,7 @@ public class W81DeviceDataAction {
         }
 
 
-        Logger.myLog(" saveW81DeviceHrData hasHr:" + hasHr + "avgHr:" + avg + "hrList:" + hrList);
+      //  Logger.myLog(" saveW81DeviceHrData hasHr:" + hasHr + "avgHr:" + avg + "hrList:" + hrList);
 
 
         W81DeviceDetailData w81DeviceDetailData = getW81DeviceDetialData(deviceId, userId, dateStr);
@@ -330,7 +339,7 @@ public class W81DeviceDataAction {
     }
 
 
-    public synchronized List<W81DeviceDetailData> getUnUpgradeW81DeviceDetialData(String deviceId, String userId) {
+    public synchronized List<W81DeviceDetailData> getUnUpgradeW81DeviceDetialData(String deviceId, String userId,boolean isToday) {
         if (TextUtils.isEmpty(deviceId) || TextUtils.isEmpty(userId) ) {
             return null;
         }
@@ -477,6 +486,9 @@ public class W81DeviceDataAction {
      * @param findType 查找心率数据还是睡眠数据
      * @return
      */
+
+    private final Gson gson = new Gson();
+
     public synchronized List<String> findCurrentMonthHrOrSleepDateStr(String dateStr, String userId, String deviceId, int findType) {
         //查询某一字段中不重复的字段内容
         if (TextUtils.isEmpty(deviceId) || TextUtils.isEmpty(userId)) {
@@ -492,7 +504,9 @@ public class W81DeviceDataAction {
             queryBuilder.where(W81DeviceDetailDataDao.Properties.UserId.eq(userId), W81DeviceDetailDataDao.Properties.DeviceId.eq(deviceId), W81DeviceDetailDataDao.Properties.DateStr.like("%" + dateStr + "%"), W81DeviceDetailDataDao.Properties.HasHR.eq(WatchData.HAS_HR)).orderAsc(W81DeviceDetailDataDao.Properties.DateStr);
 
         } else if (findType == WatchData.HAS_SLEEP) {
-            queryBuilder.where(W81DeviceDetailDataDao.Properties.UserId.eq(userId), W81DeviceDetailDataDao.Properties.DeviceId.eq(deviceId), W81DeviceDetailDataDao.Properties.DateStr.like("%" + dateStr + "%"), W81DeviceDetailDataDao.Properties.HasSleep.eq(WatchData.HAS_SLEEP)).orderAsc(W81DeviceDetailDataDao.Properties.DateStr);
+           // queryBuilder.where(W81DeviceDetailDataDao.Properties.UserId.eq(userId), W81DeviceDetailDataDao.Properties.DeviceId.eq(deviceId), W81DeviceDetailDataDao.Properties.DateStr.like("%" + dateStr + "%"), W81DeviceDetailDataDao.Properties.HasSleep.eq(WatchData.HAS_SLEEP)).orderAsc(W81DeviceDetailDataDao.Properties.DateStr);
+
+            queryBuilder.where(W81DeviceDetailDataDao.Properties.UserId.eq(userId), W81DeviceDetailDataDao.Properties.DeviceId.eq(deviceId), W81DeviceDetailDataDao.Properties.DateStr.like("%" + dateStr + "%")).orderAsc(W81DeviceDetailDataDao.Properties.DateStr);
 
         }
 
@@ -501,13 +515,64 @@ public class W81DeviceDataAction {
 
         List<W81DeviceDetailData> models = queryBuilder.list();
 
+        Log.e("心率和睡眠","----models="+new Gson().toJson(models));
+
+
+
         if (models != null) {
-            for (int i = 0; i < models.size(); i++) {
-                W81DeviceDetailData ib = models.get(i);
-                if(ib.getRestfulTime()+ib.getLightTime() != 0){
-                    strings.add(models.get(i).getDateStr());
+            if (findType == WatchData.HAS_HR){  //心率
+             for(int i = 0;i<models.size();i++){
+                 W81DeviceDetailData wb = models.get(i);
+                 if(wb.getHrArray() != null && !wb.getHrArray().equals("[]")){
+                     strings.add(wb.getDateStr());
+                 }
+             }
+            }
+
+            if(findType == WatchData.HAS_SLEEP){    //睡眠
+
+                //深睡和浅睡的累计
+                int deepAndLightTime = 0;
+
+
+                for (int i = 0; i < models.size(); i++) {
+                    deepAndLightTime = 0;
+                    W81DeviceDetailData ib = models.get(i);
+                    if(deviceId.startsWith("W81")){
+                        if(ib.getTotalTime()>0)
+                            strings.add(ib.getDateStr());
+                    }else{
+                        String sleepStr = ib.getSleepArray();
+                        if(sleepStr == null || sleepStr.equals("[]"))
+                            continue;
+                        List<String[]> slList = gson.fromJson(sleepStr,new TypeToken<List<String[]>>(){}.getType());
+                        if(slList != null && slList.size()>0){
+                            for(String[] st : slList){
+                                int status = Integer.parseInt(st[0]);
+                                int sleepTime = Integer.parseInt(st[3]);
+
+                                if(status == 2 || status == 3){
+                                    deepAndLightTime += sleepTime;
+                                }
+                            }
+                            if(deepAndLightTime >0){
+                                strings.add(ib.getDateStr());
+                            }
+                        }
+
+
+
+
+
+
+//                        if(ib.getRestfulTime()+ib.getLightTime() != 0){
+//                            strings.add(models.get(i).getDateStr());
+//                        }
+                    }
+
                 }
             }
+
         }
 
 

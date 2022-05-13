@@ -3,7 +3,10 @@ package com.isport.brandapp.device.bracelet;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -14,7 +17,10 @@ import androidx.annotation.Nullable;
 
 import com.gyf.immersionbar.ImmersionBar;
 import com.isport.blelibrary.utils.CommonDateUtil;
+import com.isport.blelibrary.utils.DateUtil;
+import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.StepArithmeticUtil;
+import com.isport.brandapp.App;
 import com.isport.brandapp.home.bean.http.Wristbandstep;
 import com.isport.brandapp.R;
 import com.isport.brandapp.bean.DeviceBean;
@@ -22,6 +28,9 @@ import com.isport.brandapp.device.bracelet.braceletPresenter.BraceletStepPresent
 import com.isport.brandapp.device.bracelet.view.BraceletStepView;
 import com.isport.brandapp.device.share.NewShareActivity;
 import com.isport.brandapp.device.share.ShareBean;
+import com.isport.brandapp.home.presenter.DeviceHistotyDataPresenter;
+import com.isport.brandapp.home.presenter.W81DataPresenter;
+import com.isport.brandapp.util.DeviceTypeUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -33,6 +42,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import bike.gymproject.viewlibray.SporttemView;
 import bike.gymproject.viewlibray.WeekBarChartView;
@@ -48,7 +58,7 @@ import brandapp.isport.com.basicres.net.userNet.CommonUserAcacheUtil;
 import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 
 public class WeekReportFragment extends BaseMVPFragment<BraceletStepView, BraceletStepPresenter> implements BraceletStepView {
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
     private TextView tv_update_time;
     private Wristbandstep wristbandstep;
     private WeekBarChartView weekBarChartView;
@@ -66,6 +76,7 @@ public class WeekReportFragment extends BaseMVPFragment<BraceletStepView, Bracel
     String avgStep, avgDis, avgCal;
     private ImageView iv_no_data;
 
+    W81DataPresenter w81DataPresenter;
 
     @Override
     protected int getLayoutId() {
@@ -92,8 +103,42 @@ public class WeekReportFragment extends BaseMVPFragment<BraceletStepView, Bracel
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
+
+
+        Log.e(TAG,"------周="+date);
+        Calendar calendar = Calendar.getInstance();
+        //需要判断是不是当前的月
+        calendar.setTime(new Date(date * 1000L));
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        String strDate = DateUtil.dataToString(calendar.getTime(), "yyyy-MM-dd");
+        Logger.myLog("--------isCurrentDay" + strDate);
         //strDate = dateFormat.format(new Date(date * 1000l));
+
+        boolean isFirstDay = DateUtil.isMothFirstDay(strDate);
+
+        if(isFirstDay){
+            //向前移动一个月
+            calendar.add(Calendar.MONTH, -1);
+            getMonthData(calendar);//获取上月的数据
+        }
     }
+
+
+
+
+    private void getMonthData(Calendar instance) {
+        if (!(App.appType() == App.httpType)) {
+            return;
+        }
+        Logger.myLog("getMonthData year:" + instance.get(Calendar.YEAR) + "month:" + instance.get(Calendar.MONTH) + "day:" + instance.get(Calendar.DAY_OF_MONTH) + "currentType:" + currentType);
+        if (DeviceTypeUtil.isContaintW81(currentType) || DeviceTypeUtil.isContainF18(currentType)) {
+            w81DataPresenter.getW81MonthStep(deviceBean.deviceID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), String.valueOf(JkConfiguration.WatchDataType.STEP), instance.getTimeInMillis());
+        } else {
+            DeviceHistotyDataPresenter.getMonthData(instance, JkConfiguration.WatchDataType.STEP, currentType, BaseApp.getApp());
+        }
+
+    }
+
 
     @Override
     protected void initView(View view) {
@@ -240,7 +285,7 @@ public class WeekReportFragment extends BaseMVPFragment<BraceletStepView, Bracel
             avgGoal = (float) (sumDis * 0.0826f);
 
         } catch (Exception e) {
-
+            e.printStackTrace();
         } finally {
             // Logger.myLog("sport :  avgFat:" + avgFat + ",avgGoal:" + avgGoal + "CommonDateUtil.formatTwoPoint(avgGoal):" + CommonDateUtil.formatTwoPoint(avgGoal) + "CommonDateUtil.formatTwoPoint(avgFat):" + CommonDateUtil.formatTwoPoint(avgFat));
 
@@ -303,6 +348,7 @@ public class WeekReportFragment extends BaseMVPFragment<BraceletStepView, Bracel
 
     @Override
     protected BraceletStepPresenter createPersenter() {
+        w81DataPresenter = new W81DataPresenter(this);
         return new BraceletStepPresenter(this);
     }
 
@@ -344,10 +390,29 @@ public class WeekReportFragment extends BaseMVPFragment<BraceletStepView, Bracel
 
             }
         }
+
+        int index = 0;
+        int clickPostion = 0;
+        while (index < stepList.size()) {
+            if (stepList.get(index) > 0) {
+                clickPostion = index;
+            }
+            //println("item at $index is ${items[index]}")
+            index++;
+        }
+
         weekBarChartView.setData(datas, new int[]{Color.parseColor("#6FC5F4")}, "分组", "数量");
         weekBarChartView.setWeekDateList(date);
         weekBarChartView.setCurrentType(currentType);
         weekBarChartView.startAnimation();
+
+        int finalClickPostion = clickPostion;
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                weekBarChartView.setmClickPosition(finalClickPostion);
+            }
+        }, 10);
     }
 
     /**

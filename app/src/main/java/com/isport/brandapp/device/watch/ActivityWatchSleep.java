@@ -165,6 +165,23 @@ public class ActivityWatchSleep extends BaseMVPActivity<WatchSleepView, WatchSle
         setEarlyLater(58, 54, 2, 47);
         setTotalTime(70, 113, 40, 124);
 
+      //获取当月月初0点时间戳,毫秒值
+        Calendar instance = Calendar.getInstance();
+        instance.set(Calendar.DAY_OF_MONTH, 1);
+        instance.set(Calendar.HOUR_OF_DAY, 0);
+        instance.set(Calendar.MINUTE, 0);
+        instance.set(Calendar.SECOND, 0);
+//        getMonthData(instance);//获取当月的数据,主页已经获取
+
+        //向前移动一个月
+        instance.add(Calendar.MONTH, -1);
+        //首次进入获取上一个月的数据,
+        if (DeviceTypeUtil.isContaintW81(currentDeviceType)) {
+            w81DataPresenter.getW81MothSleep(deviceBean.deviceID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), String.valueOf(JkConfiguration.WatchDataType.SLEEP), instance.getTimeInMillis());
+        } else if (currentDeviceType == JkConfiguration.DeviceType.Brand_W520) {
+            DeviceHistotyDataPresenter.getMonthData(instance, JkConfiguration.WatchDataType.SLEEP, currentDeviceType, BaseApp.getApp());
+        }
+
 
         getCurrentData();
     }

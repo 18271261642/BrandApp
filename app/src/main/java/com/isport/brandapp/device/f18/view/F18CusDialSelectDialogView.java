@@ -11,7 +11,10 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
+import com.isport.blelibrary.managers.F18SyncStatus;
+import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.brandapp.R;
+import com.isport.brandapp.banner.recycleView.utils.ToastUtil;
 import com.isport.brandapp.device.f18.OnF18ItemClickListener;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatDialog;
@@ -47,6 +50,10 @@ public class F18CusDialSelectDialogView extends AppCompatDialog implements View.
         super(context);
     }
 
+
+    public F18CusDialSelectDialogView(Context context, int theme) {
+        super(context, theme);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +147,10 @@ public class F18CusDialSelectDialogView extends AppCompatDialog implements View.
                 onF18ItemClickListener.onChildClick(0,true);
         }
         if(vId == R.id.f18CusDialDialogSureTv){ //关闭
+            if(Watch7018Manager.getWatch7018Manager().getF18SyncStatus() == F18SyncStatus.SYNC_DIAL_ING){
+                ToastUtil.showTextToast(getContext().getString(R.string.string_upgrad_so_on));
+                return;
+            }
            dismiss();
         }
 

@@ -936,7 +936,19 @@ public class RetrofitClient {
         }
         BaseUrl url = (BaseUrl) body.requseturl;
         switch (body.type) {
-            case JkConfiguration.RequstType.GET_F18_DEVICE_DIAL_LIST:
+
+            //操作指引
+            case JkConfiguration.RequstType.APP_OPERATE_GUID:
+                return  getBasicRetrofit().create(APIService.class).getOperateStr((Integer) url.object).compose(RxScheduler.Obs_io_main()).compose(transformer);
+
+            case JkConfiguration.RequstType.APP_VERSION_UPDATE:
+                return getBasicRetrofit().create(APIService.class).getAppVersionInfo((String) url.object).compose(RxScheduler.Obs_io_main()).compose(transformer);
+
+
+            case JkConfiguration.RequstType.ADD_F18_DIAL_DOWN_COUNT:    //表盘下载次数+1
+                return  getBasicRetrofit().create(APIService.class).addDialDownCount((Integer) url.object).compose(RxScheduler.Obs_io_main()).compose(transformer);
+
+            case JkConfiguration.RequstType.GET_F18_DEVICE_DIAL_LIST:  //获取表盘
 
                 return getBasicRetrofit().create(APIService.class).getF18DialListData((Integer) url.object).compose(RxScheduler.Obs_io_main()).compose(transformer);
 

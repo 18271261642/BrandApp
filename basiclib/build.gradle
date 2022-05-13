@@ -55,8 +55,9 @@ dependencies {
     api(name:'libraryDfu_v1.0.4', ext: 'aar')
 
     //图片选择框架
-    api "com.zhihu.android:matisse:0.5.3-beta3"
+    //api "com.zhihu.android:matisse:0.5.3-beta3"
 
+    api 'com.github.yccheok:Matisse:2.3'
 
     //RxAndroidBle
     api 'com.polidea.rxandroidble2:rxandroidble:1.11.1'
@@ -116,7 +117,7 @@ dependencies {
 //    api 'org.greenrobot:greendao:3.0.1'
 //    api 'org.greenrobot:greendao-generator:3.0.0'
 
-    api 'androidx.multidex:multidex:2.0.0'
+    api 'androidx.multidex:multidex:2.0.1'
 
     // AutoDispose
     api 'com.uber.autodispose:autodispose:0.7.0'

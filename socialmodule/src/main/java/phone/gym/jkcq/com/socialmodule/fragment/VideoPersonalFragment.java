@@ -3,6 +3,7 @@ package phone.gym.jkcq.com.socialmodule.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
@@ -16,6 +17,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.gyf.immersionbar.ImmersionBar;
+import com.shuyu.gsyvideoplayer.player.PlayerFactory;
+import com.shuyu.gsyvideoplayer.player.SystemPlayerManager;
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoView;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -143,6 +146,11 @@ public class VideoPersonalFragment extends BaseMVPFragment<LikeView, LikePresent
         isNeedShowWifiTip = false
         isLooping = true
         dismissControlTime = 0*/
+
+
+        //设置为系统模式
+        PlayerFactory.setPlayManager(SystemPlayerManager.class);
+
         tv_profile.setMovementMethod(ScrollingMovementMethod.getInstance());
         gsyVideoManager.getBackButton().setVisibility(View.GONE);
 
@@ -210,7 +218,7 @@ public class VideoPersonalFragment extends BaseMVPFragment<LikeView, LikePresent
     }
 
 
-    Handler handler = new Handler() {
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -256,7 +264,7 @@ public class VideoPersonalFragment extends BaseMVPFragment<LikeView, LikePresent
         try {
             mCurrentPosition = gsyVideoManager.getGSYVideoManager().getPlayer().getBufferedPercentage();
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
         //mCurrentPosition = videoPlayer?.getGSYVideoManager()?.currentPosition ?: 0

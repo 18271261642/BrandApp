@@ -987,7 +987,7 @@ public class BraceletW811W814Manager extends BaseManager {
 //                        WatchDeviceInfo.putString(mContext, WatchDeviceInfo.WATCH_DEVICEID, mCurrentDevice
 //                                .getAddress());
                         Logger.myLog(TAG + "W81 startAni1 mBleReciveListeners: mHandlerConnetSuccessState" + mBleReciveListeners.size() + "true" + mCurrentDevice);
-                        if (mCurrentDevice != null) {
+                        if (mCurrentDevice != null && mBleConnection != null) {
                             mBleConnection.queryFrimwareVersion(crpDeviceFirmwareVersionCallback);
                             mBleConnection.queryDeviceBattery();
                             if (mDeviceInformationTable == null) {
@@ -1655,8 +1655,8 @@ public class BraceletW811W814Manager extends BaseManager {
 
         @Override
         public void onOnceMeasureComplete(int rate) {
-            Log.d(TAG, "onOnceMeasureComplete: " + rate);
             Long currentTime = isSameOption(syncOnceHr);
+            Log.e(TAG, "----------onOnceMeasureComplete: " + rate+"\n"+currentTime+"\n"+syncOnceHr);
             if (currentTime == syncOnceHr) {
                 return;
             } else {
@@ -1748,7 +1748,7 @@ public class BraceletW811W814Manager extends BaseManager {
 
             List<Integer> data = info.getHeartRateList();
             //拉的历史的锻炼心率数据
-            Logger.myLog(TAG + "on24HourMeasureResult" + info.getHeartRateType() + " info.getMeasureData():" + info.getHeartRateList());
+           // Logger.myLog(TAG + "on24HourMeasureResult   " + info.getHeartRateType() + " info.getMeasureData():" + info.getHeartRateList());
             if (info.getHeartRateType() == CRPHeartRateInfo.HeartRateType.PART_HEART_RATE) {
                 Long currentTime = isSameOption(syncHrHistory);
                 if (currentTime == syncHrHistory) {
@@ -1816,15 +1816,25 @@ public class BraceletW811W814Manager extends BaseManager {
                     if (info.getStartTime() <= 0 || info.getEndTime() <= 0 || info.getValidTime() == 0 || info.getType() < 0) {
                         continue;
                     }
+//
+//                    Calendar calendar = Calendar.getInstance();
+//                    calendar.set(Calendar.YEAR, 2020);
+//                    calendar.set(Calendar.MONTH, 0);
+//                    calendar.set(Calendar.DAY_OF_MONTH, 1);
+//                    long times = calendar.getTimeInMillis();
+//                    if (info.getStartTime() < times) {
+//                        continue;
+//                    }
 
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.set(Calendar.YEAR, 2020);
-                    calendar.set(Calendar.MONTH, 0);
-                    calendar.set(Calendar.DAY_OF_MONTH, 1);
-                    long times = calendar.getTimeInMillis();
-                    if (info.getStartTime() < times) {
-                        continue;
-                    }
+
+//                    if(info.getSteps()<0)
+//                        return;
+//                    if(info.getStartTime() < info.getEndTime())
+//                        return;
+//                    if(info.getSteps() > 100000)
+//                        return;
+
+
                     W81DeviceEexerciseAction action = new W81DeviceEexerciseAction();
                     //返回的是毫秒
                     Logger.myLog(TAG + "onMovementMeasureResult: " + info.getStartTime() + "-------" + info.getEndTime() + "--" + info.getType() + "--" + info.getValidTime() + "info.getSteps()" + info.getSteps() + "info.getDistance()" + info.getDistance() + "info.getCalories()" + info.getCalories());
@@ -1926,12 +1936,12 @@ public class BraceletW811W814Manager extends BaseManager {
 
         @Override
         public void onTimingMeasure(int i) {
-
+            Log.e(TAG,"--------测量血氧onTimingMeasure="+i);
         }
 
         @Override
         public void onBloodOxygen(int i) {
-
+            Log.e(TAG,"--------测量血氧返回="+i);
             Long currentTime = isSameOption(bloodOxygenChange);
             if (currentTime == bloodOxygenChange) {
                 return;
@@ -2469,6 +2479,7 @@ public class BraceletW811W814Manager extends BaseManager {
 
 
     public void sendMeasureOnceHrdataState(boolean isStart) {
+        Log.e("测量","-----开始测量-="+isStart);
         if (isStart) {
             startMeasureOnceHeartRate();
         } else {

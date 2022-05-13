@@ -212,7 +212,7 @@ public class SettingActivity extends BaseTitleActivity implements View.OnClickLi
                 break;
             case R.id.logoutItemView:       //注销账号，实际上为退出登录
                 PublicAlertDialog.getInstance().cancelshowDialogWithContentAndTitledialog();
-                PublicAlertDialog.getInstance().showDialog("提醒", "是否注销账号?", context, getResources().getString(R.string.common_dialog_cancel), getResources().getString(R.string.common_dialog_ok), new AlertDialogStateCallBack() {
+                PublicAlertDialog.getInstance().showDialog(getResources().getString(R.string.tips), getResources().getString(R.string.string_logout_tips), context, getResources().getString(R.string.common_dialog_cancel), getResources().getString(R.string.common_dialog_ok), new AlertDialogStateCallBack() {
                     @Override
                     public void determine() {
                         ISportAgent.getInstance().disConDevice(false);

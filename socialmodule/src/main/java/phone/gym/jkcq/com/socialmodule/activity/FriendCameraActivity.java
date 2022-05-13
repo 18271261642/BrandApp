@@ -249,7 +249,8 @@ public class FriendCameraActivity extends BaseActivity implements OptionView.Cal
 //        message("Recording snapshot for 15 seconds...", true);
         Log.e(TAG, "takeVideoSnapshot");
 
-        camera.takeVideoSnapshot(new File(getFilesDir(), "video.mp4"), 15000);
+        //设置最大录制时长
+        camera.takeVideoSnapshot(new File(getFilesDir(), "video.mp4"), 15 * 1000);
 //        camera.stopVideo();
     }
 
@@ -465,7 +466,7 @@ public class FriendCameraActivity extends BaseActivity implements OptionView.Cal
                 }
             });
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
 

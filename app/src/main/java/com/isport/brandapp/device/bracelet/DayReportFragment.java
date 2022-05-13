@@ -4,12 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.gyf.immersionbar.ImmersionBar;
 import com.isport.blelibrary.utils.CommonDateUtil;
 import com.isport.blelibrary.utils.DateUtil;
@@ -30,6 +33,7 @@ import com.isport.brandapp.device.sleep.calendar.WatchPopCalendarView;
 import com.isport.brandapp.home.bean.http.Wristbandstep;
 import com.isport.brandapp.home.presenter.DeviceHistotyDataPresenter;
 import com.isport.brandapp.home.presenter.W81DataPresenter;
+import com.isport.brandapp.util.ClickUtils;
 import com.isport.brandapp.util.DeviceTypeUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -61,6 +65,9 @@ import brandapp.isport.com.basicres.net.userNet.CommonUserAcacheUtil;
 import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 
 public class DayReportFragment extends BaseMVPFragment<BraceletStepView, BraceletStepPresenter> implements BraceletStepView, WatchPopCalendarView.MonthDataListen {
+
+    private static final String TAG = "DayReportFragment";
+
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
     private SimpleDateFormat dateFormatMMDD = new SimpleDateFormat("yyyy-MM",Locale.CHINA);
     private TextView tv_update_time;
@@ -103,6 +110,22 @@ public class DayReportFragment extends BaseMVPFragment<BraceletStepView, Bracele
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
+
+
+
+        boolean isFirstDay = DateUtil.isMothFirstDay(strDate);
+
+        if(isFirstDay){
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            //向前移动一个月
+            calendar.add(Calendar.MONTH, -1);
+            getMonthData(calendar);//获取上月的数据
+        }
+
     }
 
     @Override
@@ -204,7 +227,7 @@ public class DayReportFragment extends BaseMVPFragment<BraceletStepView, Bracele
 
     @Override
     public void successLastSportsummary(Wristbandstep wristbandstep) {
-       // Log.e(TAG,"------查询图表数据="+wristbandstep.toString());
+        // Log.e(TAG,"------查询图表数据="+wristbandstep.toString());
 
         if (wristbandstep == null) {
             todayStep = "0";
@@ -375,15 +398,39 @@ public class DayReportFragment extends BaseMVPFragment<BraceletStepView, Bracele
 
             }
         }
+
+        int index = 0;
+        int clickPostion = 0;
+        while (index < stepList.size()) {
+            if (stepList.get(index) > 0) {
+                clickPostion = index;
+            }
+            //println("item at $index is ${items[index]}")
+            index++;
+        }
         /*barChartView.setOnItemBarClickListener(new BarChartView.OnItemBarClickListener() {
             @Override
             public void onClick(int position) {
                 Log.e("TAG", "点击了：" + position);
             }
         });*/
+
+        List<String> xList = new ArrayList<>();
+        for(int i = 0;i<=24;i++)
+            xList.add(i+"");
+
         barChartView.setData(datas, new int[]{Color.parseColor("#6FC5F4")}, "分组", "数量");
         barChartView.setCurrentType(currentType);
+        barChartView.setWeekDateList(xList);
         barChartView.startAnimation();
+
+        int finalClickPostion = clickPostion;
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                barChartView.setmClickPosition(finalClickPostion);
+            }
+        }, 10);
     }
 
 

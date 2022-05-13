@@ -3,6 +3,7 @@ package com.isport.brandapp.login;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -13,6 +14,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -20,6 +22,7 @@ import android.webkit.WebSettings.LayoutAlgorithm;
 import android.webkit.WebSettings.ZoomDensity;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -27,6 +30,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.sdk.android.feedback.impl.FeedbackAPI;
+import com.alibaba.sdk.android.feedback.util.ErrorCode;
+import com.alibaba.sdk.android.feedback.util.FeedbackErrorCallback;
 import com.google.gson.Gson;
 import com.isport.brandapp.App;
 import com.isport.brandapp.R;
@@ -44,6 +50,7 @@ import com.umeng.socialize.media.UMImage;
 import com.umeng.socialize.media.UMWeb;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import androidx.annotation.Nullable;
 import brandapp.isport.com.basicres.BaseTitleActivity;
@@ -78,6 +85,9 @@ public class ActivityWebView extends BaseTitleActivity implements UMShareListene
     private ImageView ivQQ, ivWechat, ivWebo, ivFriend, ivFacebook, ivShareMore;
 
 
+    private FrameLayout video_fullView;
+
+    View xCustomView;
 
     @Override
     protected int getLayoutId() {
@@ -88,6 +98,7 @@ public class ActivityWebView extends BaseTitleActivity implements UMShareListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         Logger.e("WB","------onCreate-----");
     }
 
@@ -95,6 +106,8 @@ public class ActivityWebView extends BaseTitleActivity implements UMShareListene
     protected void initView(View view) {
         tk_webview = view.findViewById(R.id.tk_webview);
         load_pro = view.findViewById(R.id.load_pro);
+
+        video_fullView = view.findViewById(R.id.video_fullView);
 
         ivQQ = view.findViewById(R.id.iv_qq);
         ivWebo = view.findViewById(R.id.iv_weibo);
@@ -204,6 +217,7 @@ public class ActivityWebView extends BaseTitleActivity implements UMShareListene
     protected void onDestroy() {
         // TODO Auto-generated method stub
         super.onDestroy();
+        video_fullView.removeAllViews();
         tk_webview.removeAllViews();
         destroyWebview();
     }
@@ -244,6 +258,7 @@ public class ActivityWebView extends BaseTitleActivity implements UMShareListene
         // 启用localStorage 和 essionStorage
         webSettings.setDomStorageEnabled(true);
 
+        webSettings.setLoadWithOverviewMode(true);
         // 开启应用程序缓存
         webSettings.setAppCacheEnabled(false);
         webSettings.setSupportZoom(true);
@@ -259,13 +274,13 @@ public class ActivityWebView extends BaseTitleActivity implements UMShareListene
         DisplayMetrics dm = getResources().getDisplayMetrics();
         int scale = dm.densityDpi;
         WebSettings set = mWebView.getSettings();
-        if (scale == 240) { //
-            set.setDefaultZoom(ZoomDensity.FAR);
-        } else if (scale == 160) {
-            set.setDefaultZoom(ZoomDensity.MEDIUM);
-        } else {
-            set.setDefaultZoom(ZoomDensity.CLOSE);
-        }
+//        if (scale == 240) { //
+//            set.setDefaultZoom(ZoomDensity.FAR);
+//        } else if (scale == 160) {
+//            set.setDefaultZoom(ZoomDensity.MEDIUM);
+//        } else {
+//            set.setDefaultZoom(ZoomDensity.CLOSE);
+//        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         }
@@ -321,6 +336,28 @@ public class ActivityWebView extends BaseTitleActivity implements UMShareListene
         Logger.e(TAG,"postMessage webData=" + webData);
         //Logger.e("data", "" + webData);
         if (webData != null) {
+
+            if (webData.getType().equals("toRecallback")) {
+
+                FeedbackAPI.addErrorCallback(new FeedbackErrorCallback() {
+                    @Override
+                    public void onError(Context context, String errorMessage, ErrorCode code) {
+                        Toast.makeText(context, "ErrMsg is: " + errorMessage, Toast.LENGTH_SHORT).show();
+                    }
+                });
+                FeedbackAPI.addLeaveCallback(new Callable() {
+                    @Override
+                    public Object call() throws Exception {
+                        Logger.d("DemoApplication", "custom leave callback");
+                        return null;
+                    }
+                });
+
+                FeedbackAPI.openFeedbackActivity();
+
+                return;
+            }
+
             if (webData.getType().equals("onlineCourse")) {
                 Intent intent = new Intent(ActivityWebView.this, ActivityWebView.class);
                 intent.putExtra("title", "线上课程");
@@ -397,6 +434,45 @@ public class ActivityWebView extends BaseTitleActivity implements UMShareListene
         }
     };
     WebChromeClient wvcc = new WebChromeClient() {
+
+
+        @Override
+        public void onShowCustomView(View view, CustomViewCallback callback) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+            tk_webview.setVisibility(View.INVISIBLE);
+
+
+            // 如果一个视图已经存在，那么立刻终止并新建一个
+            if (xCustomView != null) {
+                callback.onCustomViewHidden();
+                return;
+            }
+            video_fullView.addView(view);
+            xCustomView = view;
+         //   xCustomViewCallback = callback;
+            video_fullView.setVisibility(View.VISIBLE);
+
+
+            //super.onShowCustomView(view, callback);
+        }
+
+
+        @Override
+        public void onHideCustomView() {
+            if (xCustomView == null)// 不是全屏播放状态
+                return;
+
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            xCustomView.setVisibility(View.GONE);
+            video_fullView.removeView(xCustomView);
+            xCustomView = null;
+            video_fullView.setVisibility(View.GONE);
+           // xCustomViewCallback.onCustomViewHidden();
+            tk_webview.setVisibility(View.VISIBLE);
+
+
+        }
+
         @Override
         public void onReceivedTitle(WebView view, String titlet) {
             super.onReceivedTitle(view, titlet);
@@ -438,6 +514,24 @@ public class ActivityWebView extends BaseTitleActivity implements UMShareListene
     private void initview() {
 
 //		title.setText(getString(R.string.dayhr_tk));
+    }
+
+
+    /**
+     * 判断是否是全屏
+     *
+     * @return
+     */
+    public boolean inCustomView() {
+        return (xCustomView != null);
+    }
+
+    /**
+     * 全屏时按返加键执行退出全屏方法
+     */
+    public void hideCustomView() {
+        wvcc.onHideCustomView();
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
 
@@ -602,6 +696,12 @@ public class ActivityWebView extends BaseTitleActivity implements UMShareListene
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK){
+
+//            if(inCustomView()){
+//                hideCustomView();
+//                return true;
+//            }
+
             if(tk_webview.canGoBack()){
                 tk_webview.goBack();
                 return true;

@@ -44,7 +44,7 @@ public class F18DeviceSetAction {
         f18DetailStepBean.setKcal(f18StepBean.getKcal());
         f18DetailStepBean.setStatus(0);
         Log.e(TAG,"-------保存详细计步到数据库="+f18DetailStepBean.toString());
-        f18DetailStepBeanDao.insert(f18DetailStepBean);
+        f18DetailStepBeanDao.insertOrReplace(f18DetailStepBean);
 
     }
 
@@ -123,11 +123,12 @@ public class F18DeviceSetAction {
             F18CommonDbBean f18CommonDbBean = new F18CommonDbBean();
             f18CommonDbBean.setUserId(userId);
             f18CommonDbBean.setDeviceMac(deviceId);
+            f18CommonDbBean.setDateStr(day);
             f18CommonDbBean.setDeviceName(deviceName);
             f18CommonDbBean.setDbType(type);
             f18CommonDbBean.setTypeDataStr(contentData);
             Log.e(TAG,"-----F18保存数据="+f18CommonDbBean.toString());
-            f18CommonDbBeanDao.insertOrReplace(f18CommonDbBean);
+            f18CommonDbBeanDao.insert(f18CommonDbBean);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -183,6 +184,19 @@ public class F18DeviceSetAction {
         if(f18CommonDbBeanQueryBuilder.list().size()>0){
             ArrayList<F18CommonDbBean> dbList = (ArrayList<F18CommonDbBean>) f18CommonDbBeanQueryBuilder.list();
            return dbList;
+        }
+        return null;
+
+    }
+
+
+    //查询数据,是否已经保存过
+    public static ArrayList<F18CommonDbBean> queryListBean(String userId,String deviceMac,String deviceName,String type,String day){
+        QueryBuilder<F18CommonDbBean> f18CommonDbBeanQueryBuilder = BleAction.getDaoSession().queryBuilder(F18CommonDbBean.class);
+        f18CommonDbBeanQueryBuilder.where(F18CommonDbBeanDao.Properties.UserId.eq(userId),F18CommonDbBeanDao.Properties.DeviceMac.eq(deviceMac),F18CommonDbBeanDao.Properties.DbType.eq(type),F18CommonDbBeanDao.Properties.DateStr.eq(day));
+        if(f18CommonDbBeanQueryBuilder.list().size()>0){
+            ArrayList<F18CommonDbBean> dbList = (ArrayList<F18CommonDbBean>) f18CommonDbBeanQueryBuilder.list();
+            return dbList;
         }
         return null;
 

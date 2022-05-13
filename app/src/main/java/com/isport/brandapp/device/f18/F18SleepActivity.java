@@ -115,7 +115,6 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
 
             //无数据
             //深睡和浅睡都为0时，可表示无正常睡眠
-            if(deepSleepTime+lightSleepTime == 0){
 
                 //遍历睡眠数组，判断是否有睡眠
                 String sleepStr = watchSleepDayData.getSporadicNapSleepTimeStr();
@@ -159,6 +158,7 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
                     lightSleepTime = ligTime;
                     awakeSleepTime = awakeTime;
 
+                    allSleepTime = dpTime+ligTime+awakeTime;
                 }
 
                 if(deepSleepTime+lightSleepTime == 0){
@@ -168,16 +168,17 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
                     return;
                 }
 
-            }
+
 
             watchSleepDayData.setDeepSleepTime(deepSleepTime);
-            watchSleepDayData.setAwakeSleepTime(allSleepTime);
+            watchSleepDayData.setAwakeSleepTime(awakeSleepTime);
             watchSleepDayData.setLightLV1SleepTime(lightSleepTime);
-
+            watchSleepDayData.setTotalSleepTime(allSleepTime);
             //展示时间
             tv_update_time.setText(watchSleepDayData.getDateStr());
             setHourMinute(0xFFADADBB,(deepSleepTime+lightSleepTime)/60,(deepSleepTime+lightSleepTime)%60);
-            setPieData(allSleepTime-(deepSleepTime+lightSleepTime),0,(allSleepTime-awakeSleepTime),deepSleepTime,false);
+            //allSleepTime-awakeSleepTime
+            setPieData(allSleepTime-(deepSleepTime+lightSleepTime),0,lightSleepTime,deepSleepTime,false);
             setSleepSummary((allSleepTime-(deepSleepTime+lightSleepTime)),0,watchSleepDayData.getLightLV1SleepTime(),deepSleepTime);
 
 
@@ -185,7 +186,7 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
 
             deepTime = deepSleepTime;
             fallAsleepTime = lightSleepTime;
-            awakeTime = (allSleepTime-(deepSleepTime+lightSleepTime));
+            awakeTime = awakeSleepTime;//(allSleepTime-(deepSleepTime+lightSleepTime));
             sleepTime = allSleepTime;
 
             tv_sum_hour.setText((allSleepTime)/60+"");
@@ -328,7 +329,23 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
     @Override
     protected void initData() {
         deviceBean = (DeviceBean) getIntent().getSerializableExtra(JkConfiguration.DEVICE);
+        showEmptyView("");
+        if(deviceBean == null){
+
+            showEmptyView("");
+            return;
+        }
+
         getCurrentData();
+
+        Calendar calendar =Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Log.e(TAG,"--------获取当月="+calendar.getTimeInMillis()+" "+DateUtil.getFormatTime(calendar.getTimeInMillis(),"yyyy-MM-dd HH:mm:ss"));
+        w81DataPresenter.getW81MothSleep(deviceBean.deviceID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), String.valueOf(JkConfiguration.WatchDataType.SLEEP), calendar.getTimeInMillis());
+
     }
 
     @Override
@@ -565,14 +582,14 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
                 }
 
                 mMenuViewBirth.dismiss();
-                if (dateStr.equals(mCurrentStr)) {
+                if (dateStr.equals(DateUtil.getCurrDay())) {
                     getCurrentData();
                 } else {
-                    mCurrentStr = dateStr;
+                   // mCurrentStr = dateStr;
                     mActPresenter.getWatchDayData(dateStr,deviceBean.getDeviceID(), deviceBean.getCurrentType(), TokenUtil.getInstance().getPeopleIdInt(F18SleepActivity.this));
                 }
-
-                tv_update_time.setText(mCurrentStr);
+                mCurrentStr = dateStr;
+                tv_update_time.setText(dateStr);
                 Logger.myLog("mCurrentStr:" + mCurrentStr + "dateStr:" + dateStr);
 
             }
@@ -626,6 +643,7 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
 
         //向前移动一个月
         instance.add(Calendar.MONTH, -1);
+
         //首次进入获取上一个月的数据,
         w81DataPresenter.getW81MothSleep(deviceBean.getDeviceID(), TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), String.valueOf(JkConfiguration.WatchDataType.SLEEP), instance.getTimeInMillis());
     }
@@ -640,8 +658,12 @@ public class F18SleepActivity  extends BaseMVPActivity<WatchSleepView, WatchSlee
         //向前移动一个月
         calendar.add(Calendar.MONTH, -1);
         //getMonthData(calendar);
+
+        Log.e(TAG,"--------向前移动一个月="+calendar.getTimeInMillis()+" "+DateUtil.getFormatTime(calendar.getTimeInMillis(),"yyyy-MM-dd HH:mm:ss"));
         w81DataPresenter.getW81MothSleep(deviceBean.deviceID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), String.valueOf(JkConfiguration.WatchDataType.SLEEP), calendar.getTimeInMillis());
         calendar.add(Calendar.MONTH, 1);
+
+
 
 
     }

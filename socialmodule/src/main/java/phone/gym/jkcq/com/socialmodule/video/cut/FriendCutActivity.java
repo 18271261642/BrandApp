@@ -21,6 +21,7 @@ import phone.gym.jkcq.com.socialmodule.R;
 import phone.gym.jkcq.com.socialmodule.community.ActivitySendDynamic;
 import phone.gym.jkcq.com.socialmodule.util.UriUtil;
 
+//视频裁剪页面
 public class FriendCutActivity extends BaseActivity implements VideoTrimListener {
 
     private VideoTrimmerView trimmer_view;

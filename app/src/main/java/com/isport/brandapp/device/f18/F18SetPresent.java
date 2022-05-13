@@ -17,7 +17,9 @@ import com.isport.blelibrary.db.table.f18.F18DeviceSetData;
 import com.isport.blelibrary.utils.Constants;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.SyncCacheUtils;
+import com.isport.brandapp.App;
 import com.isport.brandapp.R;
+import com.isport.brandapp.bean.AppVersionInfoBean;
 import com.isport.brandapp.bean.DeviceBean;
 import com.isport.brandapp.bind.bean.BindInsertOrUpdateBean;
 import com.isport.brandapp.device.UpdateSuccessBean;
@@ -27,10 +29,12 @@ import com.isport.brandapp.device.dialog.BaseDialog;
 import com.isport.brandapp.device.history.util.HistoryParmUtil;
 import com.isport.brandapp.device.watch.bean.WatchInsertBean;
 import com.isport.brandapp.home.presenter.W81DataPresenter;
+import com.isport.brandapp.net.RetrofitClient;
 import com.isport.brandapp.parm.db.DeviceTypeParms;
 import com.isport.brandapp.repository.UpdateResposition;
 import com.isport.brandapp.repository.W81DeviceDataRepository;
 import com.isport.brandapp.util.AppSP;
+import com.isport.brandapp.util.InitCommonParms;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,18 +45,23 @@ import bike.gymproject.viewlibray.pickerview.ArrayPickerView;
 import bike.gymproject.viewlibray.pickerview.DatePickerView;
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.action.BaseAction;
+import brandapp.isport.com.basicres.commonbean.BaseDbPar;
 import brandapp.isport.com.basicres.commonbean.BaseUrl;
 import brandapp.isport.com.basicres.commonnet.interceptor.BaseObserver;
 import brandapp.isport.com.basicres.commonnet.interceptor.ExceptionHandle;
 import brandapp.isport.com.basicres.commonutil.TokenUtil;
 import brandapp.isport.com.basicres.commonutil.ViewMultiClickUtil;
 import brandapp.isport.com.basicres.mvp.BasePresenter;
+import brandapp.isport.com.basicres.mvp.NetworkBoundResource;
 import brandapp.isport.com.basicres.service.observe.NetProgressObservable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 
 /**
  * Created by Admin
@@ -436,5 +445,6 @@ public class F18SetPresent extends BasePresenter<F18SetView> {
         }
 
     }
+
 
 }

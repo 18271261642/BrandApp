@@ -425,8 +425,8 @@ public class BleAction {
                 sOneceHrModeDao.deleteAll();
                 sDeviceTempTableDao.deleteAll();
 
-                f18DetailStepBeanDao.deleteAll();
-                f18CommonDbBeanDao.deleteAll();
+//                f18DetailStepBeanDao.deleteAll();
+//                f18CommonDbBeanDao.deleteAll();
                 Logger.myLog("deletAll table");
             }
         });

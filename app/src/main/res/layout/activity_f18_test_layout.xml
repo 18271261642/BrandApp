@@ -8,7 +8,7 @@
         android:id="@+id/f18TestTodayBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="查询所有数据"/>
+        android:text="计步原始数据"/>
 
 
     <Button
@@ -16,6 +16,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="处理数据"/>
+
+
+
+    <Button
+        android:id="@+id/findF18SourceSleepBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="查询睡眠原始数据"/>
+
+
+    <Button
+        android:id="@+id/allNoUpdateBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="所有未上传数据"/>
+
+    <Button
+        android:id="@+id/findDbBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="查询数据库数据"/>
 
 
     <androidx.core.widget.NestedScrollView

@@ -191,7 +191,7 @@ public class W7018Device extends BaseDevice implements IDeviceType, ITarget, IBr
 
     @Override
     public void get_not_disturb() {
-        Watch7018Manager.getWatch7018Manager().getNotDisturbConfig();
+//        Watch7018Manager.getWatch7018Manager().getNotDisturbConfig();
     }
 
     @Override
@@ -256,7 +256,7 @@ public class W7018Device extends BaseDevice implements IDeviceType, ITarget, IBr
 
     @Override
     public void sync_data() {
-        Watch7018Manager.getWatch7018Manager().syncDeviceData();
+        Watch7018Manager.getWatch7018Manager().syncDeviceData("");
     }
 
     @Override

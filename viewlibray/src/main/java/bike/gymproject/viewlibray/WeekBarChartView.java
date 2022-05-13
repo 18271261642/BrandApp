@@ -544,10 +544,12 @@ public class WeekBarChartView extends View {
         hitTextPaint.setColor(Color.parseColor("#4DDA64"));
         hitTextPaint.setTextSize(DisplayUtils.dip2px(mContext, 12));
         canvas.drawText(text, rect.centerX(), baseLineY, hitTextPaint);
-       /* hitTextPaint.setColor(Color.parseColor("#6E6E77"));
+
+
+        hitTextPaint.setColor(Color.parseColor("#6E6E77"));
         hitTextPaint.setTypeface(Typeface.DEFAULT);
         hitTextPaint.setTextSize(DisplayUtils.dip2px(mContext, 8));
-        canvas.drawText(dateList.get(mClickPosition), rect.centerX(), rect.bottom, hitTextPaint);*/
+        canvas.drawText(dateList.get(mClickPosition), rect.centerX(), rect.bottom, hitTextPaint);
     }
 
     /**

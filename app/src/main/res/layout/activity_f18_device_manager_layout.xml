@@ -138,6 +138,58 @@
 
             </LinearLayout>
 
+            <!--操作指引-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceOperateItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                android:onClick="onClick"
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="@string/string_operate_guide_desc"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+            <!--玩转设备-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceGuidDeviceItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="@string/bracelet_play"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+
+            <!--音频模式指引-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceAudioGuidItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                android:onClick="onClick"
+                app:contentSize="@dimen/sp14"
+                app:contentText=""
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="@string/string_audio_guid"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
             <!--表盘设置-->
             <bike.gymproject.viewlibray.ItemDeviceSettingView
                 android:id="@+id/f18DeviceWatchFaceItem"
@@ -149,6 +201,24 @@
                 app:contentSize="@dimen/sp14"
                 app:contentTextColor="@color/common_gray_color"
                 app:itemText="@string/watch_dial_is_set"
+                app:itemviewTitleSize="@dimen/sp15"
+                app:showArrow="true"
+                app:showBottomLine="true"
+                app:showCheckModel="false"
+                app:showRemind="false" />
+
+
+            <!--查找手表-->
+            <bike.gymproject.viewlibray.ItemDeviceSettingView
+                android:id="@+id/f18DeviceFindWatchItem"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dp60"
+                android:layout_marginBottom="@dimen/dp15"
+                android:background="@drawable/item_comm_main_layout"
+                app:contentSize="@dimen/sp14"
+                android:onClick="onClick"
+                app:contentTextColor="@color/common_gray_color"
+                app:itemText="@string/bracelet_find"
                 app:itemviewTitleSize="@dimen/sp15"
                 app:showArrow="true"
                 app:showBottomLine="true"
@@ -330,7 +400,7 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="60dp"/>
+                android:layout_height="20dp"/>
 
 
             <!--时间格式-->
@@ -369,7 +439,7 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="60dp"/>
+                android:layout_height="20dp"/>
 
 
             <!--加强测量-->
@@ -411,27 +481,8 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="60dp"/>
+                android:layout_height="20dp"/>
 
-
-
-
-            <!--查找手表-->
-            <bike.gymproject.viewlibray.ItemDeviceSettingView
-                android:id="@+id/f18DeviceFindWatchItem"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/dp60"
-                android:layout_marginBottom="@dimen/dp15"
-                android:background="@drawable/item_comm_main_layout"
-                app:contentSize="@dimen/sp14"
-                android:onClick="onClick"
-                app:contentTextColor="@color/common_gray_color"
-                app:itemText="@string/bracelet_find"
-                app:itemviewTitleSize="@dimen/sp15"
-                app:showArrow="true"
-                app:showBottomLine="true"
-                app:showCheckModel="false"
-                app:showRemind="false" />
 
 
 
@@ -470,39 +521,6 @@
                 app:showCheckModel="false"
                 app:showRemind="false" />
 
-            <!--音频模式指引-->
-            <bike.gymproject.viewlibray.ItemDeviceSettingView
-                android:id="@+id/f18DeviceAudioGuidItem"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/dp60"
-                android:layout_marginBottom="@dimen/dp15"
-                android:background="@drawable/item_comm_main_layout"
-                android:onClick="onClick"
-                app:contentSize="@dimen/sp14"
-                app:contentText=""
-                app:contentTextColor="@color/common_gray_color"
-                app:itemText="@string/string_audio_guid"
-                app:itemviewTitleSize="@dimen/sp15"
-                app:showArrow="true"
-                app:showBottomLine="true"
-                app:showCheckModel="false"
-                app:showRemind="false" />
-
-            <!--玩转设备-->
-            <bike.gymproject.viewlibray.ItemDeviceSettingView
-                android:id="@+id/f18DeviceGuidDeviceItem"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/dp60"
-                android:layout_marginBottom="@dimen/dp15"
-                android:background="@drawable/item_comm_main_layout"
-                app:contentSize="@dimen/sp14"
-                app:contentTextColor="@color/common_gray_color"
-                app:itemText="@string/bracelet_play"
-                app:itemviewTitleSize="@dimen/sp15"
-                app:showArrow="true"
-                app:showBottomLine="true"
-                app:showCheckModel="false"
-                app:showRemind="false" />
 
 
 
@@ -547,7 +565,7 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/dp40" />
+                android:layout_height="@dimen/dp20" />
 
 
 

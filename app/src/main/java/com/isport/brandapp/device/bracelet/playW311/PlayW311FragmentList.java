@@ -87,7 +87,7 @@ public class PlayW311FragmentList extends Fragment {
                         strBottom0 = playBeans.get(position).getTitleEn1Content2();
                     }
 
-                    if (currentType == JkConfiguration.DeviceType.WATCH_W516 || currentType == 70180) {
+                    if (currentType == JkConfiguration.DeviceType.WATCH_W516 || currentType == 7018) {
                         if (AppUtil.isZh(getActivity())) {
                             bundle.putString("strRes", playBeans.get(position).getUrl1());
                         } else {

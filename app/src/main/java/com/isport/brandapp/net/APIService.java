@@ -4,6 +4,7 @@ package com.isport.brandapp.net;
 import com.isport.blelibrary.entry.WristbandData;
 import com.isport.blelibrary.entry.WristbandForecast;
 import com.isport.blelibrary.entry.WristbandWeather;
+import com.isport.brandapp.bean.AppVersionInfoBean;
 import com.isport.brandapp.device.f18.dial.F18DialBean;
 import com.isport.brandapp.home.bean.AdviceBean;
 import com.isport.brandapp.home.bean.http.BindDeviceList;
@@ -410,4 +411,24 @@ public interface APIService {
     //获取F18表盘市场图片
     @GET("dialPlate/queryAllDialPlate")
     Observable<BaseResponse<List<F18DialBean>>> getF18DialListData(@Query("type") int type);
+
+    //表盘下次数+1 ，下载一次调用一次
+    @GET("dialPlate/downCount/{id}")
+    Observable<BaseResponse<String>> addDialDownCount(@Path("id") int type);
+
+
+
+    //APP版本更新
+    @GET("basic/appNewVersion")
+    Observable<BaseResponse<AppVersionInfoBean>> getAppVersionInfo(@Query("type") String type);
+
+
+    //获取操作指引
+    @GET("deviceGuide/guideConfigUrl/{deviceTypeId}")
+    Observable<BaseResponse<String>> getOperateStr(@Path("deviceTypeId") int id);
+
+    //指引类型类别
+    @GET("deviceGuide/guideConfigUrl")
+    Observable<BaseResponse<DeviceGuidBean>> getDeviceGuidUrl();
+
 }

@@ -15,4 +15,12 @@ public class ClickUtils {
         lastClickTime = time;
         return timeD <= 500;
     }
+
+
+    public static boolean isFastDoubleClick(long showTime) {
+        long time = System.currentTimeMillis();
+        long timeD = time - lastClickTime;
+        lastClickTime = time;
+        return timeD <= showTime;
+    }
 }

@@ -2,7 +2,9 @@ package com.isport.blelibrary.db.table;
 
 import com.isport.blelibrary.db.table.f18.F18StepBean;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,6 +19,16 @@ public class F18StepHourMap {
             map.put(String.format("%02d",i),new F18StepBean());
         }
         return map;
+    }
+
+
+
+    public static List<String> get24HourList(){
+        List<String> list = new ArrayList<>();
+        for(int i = 0;i<24;i++){
+            list.add(String.format("%02d",i));
+        }
+        return list;
     }
 
 

@@ -148,6 +148,8 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
                 htGuidImg.setVisibility(View.GONE);
             }
         });
+
+
     }
 
     @Override
@@ -343,10 +345,10 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
         Logger.myLog("mCurrentInfo:" + mCurrentInfo + "lastSingleId:" + lastTimestamp);
         trendview_oxy.setDeviceType(JkConfiguration.BODY_ONCE_HR);
 
-        if (lastTimestamp == mCurrentInfo.getTimestamp().longValue()) {
-            return;
-        }
-        lastTimestamp = mCurrentInfo.getTimestamp();
+//        if (lastTimestamp == mCurrentInfo.getTimestamp().longValue()) {
+//            return;
+//        }
+//        lastTimestamp = mCurrentInfo.getTimestamp();
         if (mCurrentInfo != null) {
             setData();
             Integer value = 0;
@@ -479,6 +481,16 @@ public class OnceHrDataResultActivity extends BaseMVPActivity<OnceHrHistoryView,
                                 mCurrentInfo = info.get(0);
                 trendview_oxy.setdata(list, JkConfiguration.BODY_ONCE_HR);
                 setData();
+
+                if(singleList.size()>=7){
+                    mhandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            htGuidImg.setVisibility(View.GONE);
+                        }
+                    },2 * 1000);
+                }
+
             } else {
                 htGuidImg.setVisibility(View.GONE);
                 trendview_oxy.setDeviceType(JkConfiguration.BODY_ONCE_HR);

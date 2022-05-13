@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -11,6 +12,8 @@ import android.widget.TextView;
 
 import com.gyf.immersionbar.ImmersionBar;
 import com.isport.blelibrary.utils.CommonDateUtil;
+import com.isport.blelibrary.utils.DateUtil;
+import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.StepArithmeticUtil;
 import com.isport.brandapp.App;
 import com.isport.brandapp.R;
@@ -23,9 +26,12 @@ import com.isport.brandapp.device.share.ShareBean;
 import com.isport.brandapp.device.watch.bean.WatchHistoryNBean;
 import com.isport.brandapp.device.watch.bean.WatchHistoryNList;
 import com.isport.brandapp.home.bean.http.Wristbandstep;
+import com.isport.brandapp.home.presenter.DeviceHistotyDataPresenter;
+import com.isport.brandapp.home.presenter.W81DataPresenter;
 import com.isport.brandapp.parm.http.WatchHistoryParms;
 import com.isport.brandapp.repository.CustomRepository;
 import com.isport.brandapp.util.DeviceDataUtil;
+import com.isport.brandapp.util.DeviceTypeUtil;
 import com.isport.brandapp.util.W311DeviceDataUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -38,6 +44,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -61,7 +68,7 @@ import brandapp.isport.com.basicres.service.observe.NetProgressObservable;
 import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 
 public class MonthReportFragment extends BaseMVPFragment<BraceletStepView, BraceletStepPresenter> implements BraceletStepView {
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM", Locale.CHINA);
     private TextView tv_update_time;
     private RopeBarChartView barChartView;
     private String strDate;
@@ -77,6 +84,8 @@ public class MonthReportFragment extends BaseMVPFragment<BraceletStepView, Brace
     private DeviceBean deviceBean;
     private UserInfoBean userInfoBean;
 
+    W81DataPresenter w81DataPresenter;
+
 
     @Override
     protected int getLayoutId() {
@@ -86,6 +95,7 @@ public class MonthReportFragment extends BaseMVPFragment<BraceletStepView, Brace
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        assert getArguments() != null;
         date = getArguments().getInt("date");
         deviceId = getArguments().getString("deviceId");
         deviceBean = (DeviceBean) getArguments().getSerializable(JkConfiguration.DEVICE);
@@ -98,13 +108,19 @@ public class MonthReportFragment extends BaseMVPFragment<BraceletStepView, Brace
         }
         userInfoBean = CommonUserAcacheUtil.getUserInfo(TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date(date * 1000l));
-        strDate = dateFormat.format(new Date(date * 1000l));
+        calendar.setTime(new Date(date * 1000L));
+        strDate = dateFormat.format(new Date(date * 1000L));
         userId = TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp());
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
         getMonthData(calendar);
+
+
+        Log.e(TAG,"-----月--strDate="+strDate+" "+ DateUtil.getFormatTime(calendar.getTimeInMillis(),"yyyy-MM-dd"));
+
+
+
     }
 
     @Override
@@ -342,6 +358,7 @@ public class MonthReportFragment extends BaseMVPFragment<BraceletStepView, Brace
 
     @Override
     protected BraceletStepPresenter createPersenter() {
+        w81DataPresenter = new W81DataPresenter(this);
         return new BraceletStepPresenter(this);
     }
 
@@ -396,6 +413,15 @@ public class MonthReportFragment extends BaseMVPFragment<BraceletStepView, Brace
         if (!(App.appType() == App.httpType)) {
             return;
         }
+
+
+        if (DeviceTypeUtil.isContaintW81(currentType) || DeviceTypeUtil.isContainF18(currentType)) {
+            Log.e(TAG,"-------正月获取="+instance.getTimeInMillis()+" "+DateUtil.getFormatTime(instance.getTimeInMillis(),"yyyy-MM-dd HH:mm:ss"));
+            w81DataPresenter.getW81MonthStep(deviceBean.deviceID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()), String.valueOf(JkConfiguration.WatchDataType.STEP), instance.getTimeInMillis());
+        } else {
+            DeviceHistotyDataPresenter.getMonthData(instance, JkConfiguration.WatchDataType.STEP, currentType, BaseApp.getApp());
+        }
+
 
         /**
          * 获取步数，当月的数据，同步到本地

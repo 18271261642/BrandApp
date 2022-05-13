@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.ProxyFileDescriptorCallback;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -19,6 +20,12 @@ import androidx.annotation.Nullable;
 import com.gyf.immersionbar.ImmersionBar;
 import com.polidea.rxandroidble2.exceptions.BleGattOperationType;
 import com.shuyu.gsyvideoplayer.GSYVideoManager;
+import com.shuyu.gsyvideoplayer.cache.CacheFactory;
+import com.shuyu.gsyvideoplayer.cache.ProxyCacheManager;
+import com.shuyu.gsyvideoplayer.model.VideoOptionModel;
+import com.shuyu.gsyvideoplayer.player.IjkPlayerManager;
+import com.shuyu.gsyvideoplayer.player.PlayerFactory;
+import com.shuyu.gsyvideoplayer.player.SystemPlayerManager;
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoView;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -27,6 +34,8 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonpermissionmanage.PermissionGroup;
@@ -60,6 +69,7 @@ import phone.gym.jkcq.com.socialmodule.mvp.view.FriendView;
 import phone.gym.jkcq.com.socialmodule.report.FriendMainReportActivity;
 import phone.gym.jkcq.com.socialmodule.report.bean.UpdateDynicBean;
 import phone.gym.jkcq.com.socialmodule.util.TimeUtil;
+import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 public class VideoAllFragment extends BaseMVPFragment<LikeView, LikePresent> implements LikeView, FriendView, ReportView, CommonAliView {
 
@@ -107,10 +117,6 @@ public class VideoAllFragment extends BaseMVPFragment<LikeView, LikePresent> imp
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Log.e(TAG,"-------播放页面-------");
-
-
         if (getArguments() != null) {
             currentBean = (DynamBean) getArguments().getParcelable(FROMBEAN);
             userId = TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp());
@@ -143,6 +149,9 @@ public class VideoAllFragment extends BaseMVPFragment<LikeView, LikePresent> imp
         video_bottom_progressbar = view.findViewById(R.id.video_bottom_progressbar);
         tv_profile.setMovementMethod(ScrollingMovementMethod.getInstance());
 
+        //设置为系统模式
+        PlayerFactory.setPlayManager(SystemPlayerManager.class);
+        CacheFactory.setCacheManager(ProxyCacheManager.class);
         try {
             if (currentBean != null) {
                 gsyVideoManager.loadCoverImage(currentBean.getCoverUrl(), R.drawable.icon_def_video);
@@ -152,7 +161,29 @@ public class VideoAllFragment extends BaseMVPFragment<LikeView, LikePresent> imp
             gsyVideoManager.setLooping(true);
             gsyVideoManager.setNeedShowWifiTip(false);
             gsyVideoManager.setShowFullAnimation(true);
-            gsyVideoManager.setDismissControlTime(1000);
+          //  gsyVideoManager.setDismissControlTime(1000);
+
+            IjkPlayerManager.setLogLevel(IjkMediaPlayer.IJK_LOG_DEFAULT);
+
+            List<VideoOptionModel> list = new ArrayList<>();
+            VideoOptionModel videoOptionModel = new VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_FORMAT,"dns_cache_clear",1);
+            VideoOptionModel videoOptionModel1 = new VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_FORMAT,"dns_cache_timeout",-1);
+            VideoOptionModel videoOptionModel2 = new VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_PLAYER,"max_cached_duration",50);
+            VideoOptionModel videoOptionModel3 = new VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_FORMAT,"infbuf",1);
+            VideoOptionModel videoOptionModel4 = new VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_PLAYER,"packet-buffering",0); //是否开启缓存
+
+            VideoOptionModel videoOptionModel5 = new VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "timeout", 20 *1000);
+           // VideoOptionModel videoOptionMode5 = new VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "packet-buffering", 0);//是否开启缓冲
+
+            list.add(videoOptionModel);
+            list.add(videoOptionModel1);
+            list.add(videoOptionModel2);
+            list.add(videoOptionModel3);
+            list.add(videoOptionModel4);
+            list.add(videoOptionModel5);
+
+            GSYVideoManager.instance().setOptionModelList(list);
+            GSYVideoManager.instance().setTimeOut(20 * 1000,true);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -550,8 +581,10 @@ public class VideoAllFragment extends BaseMVPFragment<LikeView, LikePresent> imp
                 }
                 break;
             case MessageEvent.update_progress:
+                if(getActivity() == null || getActivity().isFinishing())
+                    return;
                 if (isStart && gsyVideoManager != null && video_bottom_progressbar != null) {
-                    if (gsyVideoManager != null && gsyVideoManager.getGSYVideoManager().isPlaying()) {
+                    if (gsyVideoManager.getGSYVideoManager() != null && gsyVideoManager.getGSYVideoManager().isPlaying()) {
                         if (video_bottom_progressbar.getMax() != gsyVideoManager.getDuration()) {
                             video_bottom_progressbar.setMax(gsyVideoManager.getDuration());
                         }

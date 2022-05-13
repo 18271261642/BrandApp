@@ -63,7 +63,7 @@ public class DeviceSettingAction {
             return 0l;
         }
         long id = screenLuminanceModelDao.insertOrReplace(deviceDetailData);
-        Logger.myLog("saveW81DeviceDetailData：" + deviceDetailData + " save id:" + id);
+       // Logger.myLog("saveW81DeviceDetailData：" + deviceDetailData + " save id:" + id);
         return id;
 
 

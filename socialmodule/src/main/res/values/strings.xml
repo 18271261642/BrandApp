@@ -2,7 +2,7 @@
     <string name="friend_cancel">Cancel</string>
 
     <string name="rope_avg_unit_lower">bpm</string>
-    
+    <string name="string_open">Open</string>
     <string name="pull_to_refresh">Pull to refresh</string>//下拉刷新
     <string name="xlistview_header_hint_ready">Release immediate refresh</string>//释放立即刷新
     <string name="xlistview_header_hint_loading">Refreshing&#8230;</string>//正在刷新

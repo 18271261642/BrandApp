@@ -2,6 +2,8 @@
     <string name="friend_cancel">取消</string>
 
 
+    <string name="string_open">开启</string>
+
     <string name="rope_avg_unit_lower">bpm</string>
     <string name="pull_to_refresh">下拉刷新</string>//下拉刷新
     <string name="xlistview_header_hint_ready">释放立即刷新</string>//释放立即刷新

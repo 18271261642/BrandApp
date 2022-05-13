@@ -45,7 +45,7 @@ public class WatchSleepPresenter extends BasePresenter<WatchSleepView> {
     }
 
     public void getWatchDayData(String dateStr, String deviceId, int deviceType, String userId) {
-        Logger.myLog("getWatchDayData");
+        Logger.myLog("--getWatchDayData="+dateStr+" "+deviceId+" "+deviceType+" "+userId);
         Observable.create(new ObservableOnSubscribe<WatchSleepDayData>() {
             @Override
             public void subscribe(ObservableEmitter<WatchSleepDayData> emitter) throws Exception {

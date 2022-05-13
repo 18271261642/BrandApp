@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
@@ -12,9 +13,11 @@ import android.widget.Button;
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.XXPermissions;
 import com.isport.blelibrary.interfaces.OnF18DialStatusListener;
+import com.isport.blelibrary.managers.F18SyncStatus;
 import com.isport.blelibrary.managers.Watch7018Manager;
 import com.isport.brandapp.App;
 import com.isport.brandapp.R;
+import com.isport.brandapp.banner.recycleView.utils.ToastUtil;
 import com.isport.brandapp.device.f18.OnF18ItemClickListener;
 import com.isport.brandapp.net.RetrofitClient;
 import com.isport.brandapp.util.DownloadUtils;
@@ -26,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import brandapp.isport.com.basicres.BaseFragment;
@@ -129,7 +133,9 @@ public class F18DialCenterFragment extends BaseFragment {
 
 
     private void showPreviewDial(int index){
-        dialBottomDialogView = new DialBottomDialogView(getContext());
+        if(getActivity() == null)
+            return;
+        dialBottomDialogView = new DialBottomDialogView(getActivity(),R.style.myDialog);
         dialBottomDialogView.show();
         dialBottomDialogView.setCancelable(false);
         dialBottomDialogView.setPreviewUrl(dialList.get(index).getPreviewImgUrl());
@@ -137,6 +143,10 @@ public class F18DialCenterFragment extends BaseFragment {
         dialBottomDialogView.setOnF18DialViewClickListener(new DialBottomDialogView.OnF18DialViewClickListener() {
             @Override
             public void onSureClick(int position) {
+                if(Watch7018Manager.getWatch7018Manager().getF18SyncStatus() == F18SyncStatus.SYNC_DIAL_ING){
+                    ToastUtil.showTextToast(getResources().getString(R.string.string_upgrad_so_on));
+                    return;
+                }
                 dialBottomDialogView.dismiss();
             }
 
@@ -147,13 +157,18 @@ public class F18DialCenterFragment extends BaseFragment {
 
             @Override
             public void onOperateClick(int position) {
-                downloadBinFile(dialList.get(index).getBinUrl(),dialList.get(index).getDialNum());
+
+                if(Watch7018Manager.getWatch7018Manager().getF18SyncStatus() == F18SyncStatus.SYNC_DIAL_ING){
+                    ToastUtil.showTextToast(getResources().getString(R.string.string_upgrad_so_on));
+                    return;
+                }
+                downloadBinFile(dialList.get(index).getBinUrl(),dialList.get(index).getDialNum(),dialList.get(index).getId());
             }
         });
     }
 
 
-    private void downloadBinFile(String url,String fileName){
+    private void downloadBinFile(String url,String fileName,int dialId){
 
        boolean isW = XXPermissions.isGranted(getActivity(),Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
@@ -168,7 +183,6 @@ public class F18DialCenterFragment extends BaseFragment {
                 public void onDenied(List<String> permissions, boolean never) {
                     if(never){
                         showPermissDialog();
-
                     }
                 }
             }   );
@@ -176,6 +190,10 @@ public class F18DialCenterFragment extends BaseFragment {
             return;
         }
         dialBottomDialogView.setDialogBtnStatus(getResources().getString(R.string.string_download_so));
+
+
+        Watch7018Manager.getWatch7018Manager().setF18SyncStatus(F18SyncStatus.SYNC_DIAL_ING);
+
      DownloadUtils.getInstance().downBin(url, DOWN_BIN_FILE_PATH, fileName+".bin", new onDownloadListener() {
             @Override
             public void onStart(float length) {
@@ -193,53 +211,69 @@ public class F18DialCenterFragment extends BaseFragment {
                 Log.e(TAG,"----onComplete--");
                 dialBottomDialogView.setDialogBtnStatus(getResources().getString(R.string.string_download_complete));
                 setDialToDevice(DOWN_BIN_FILE_PATH+fileName+".bin");
-
+                addDialDownCount(dialId);
             }
 
             @Override
             public void onFail() {
                 Log.e(TAG,"----onFail--");
                 dialBottomDialogView.setDialogBtnStatus("下载失败，请重新下载");
+                Watch7018Manager.getWatch7018Manager().setF18SyncStatus(F18SyncStatus.SYNC_DIAL_FAIL);
             }
         });
     }
 
 
     private void setDialToDevice(String dialFile){
-        if(dialFile == null)
-            return;
-        Log.e(TAG,"-----表盘路径="+dialFile);
-        Watch7018Manager.getWatch7018Manager(getActivity()).setF18DialToDevice(new File(dialFile), (byte) 0, new OnF18DialStatusListener() {
-            @Override
-            public void startDial() {
-                if(dialBottomDialogView != null)
-                    dialBottomDialogView.setDialogBtnStatus(getResources().getString(R.string.string_upgrad_so_on));
+        try {
+            if(dialFile == null){
+                Watch7018Manager.getWatch7018Manager().setF18SyncStatus(F18SyncStatus.SYNC_DIAL_COMPLETE);
+                return;
             }
 
-            @Override
-            public void onError(int errorType, int errorCode) {
-                if(dialBottomDialogView != null)
-                    dialBottomDialogView.setDialogBtnStatus(getResources().getString(R.string.device_upgrade_fail)+errorCode+" "+errorType);
-            }
+            if(getActivity() == null || getActivity().isFinishing())
+                return;
 
-            @Override
-            public void onStateChanged(int state, boolean cancelable) {
-                if(dialBottomDialogView != null)
-                    dialBottomDialogView.setDialogBtnStatus(getResources().getString(R.string.string_upgrad_so_on));
-            }
+            Watch7018Manager.getWatch7018Manager(getActivity()).setF18DialToDevice(new File(dialFile), (byte) 0, new OnF18DialStatusListener() {
+                @Override
+                public void startDial() {
+                    if(dialBottomDialogView != null)
+                        dialBottomDialogView.setDialogBtnStatus(getResources().getString(R.string.string_upgrad_so_on));
+                }
 
-            @Override
-            public void onProgressChanged(int progress) {
-                if(dialBottomDialogView != null)
-                    dialBottomDialogView.setDialogBtnStatus(String.format(getResources().getString(R.string.device_upgrade_present),progress+""));
-            }
+                @Override
+                public void onError(int errorType, int errorCode) {
+                    if(dialBottomDialogView != null)
+                        dialBottomDialogView.setDialogBtnStatus(getResources().getString(R.string.device_upgrade_fail)+errorCode+" "+errorType);
+                }
 
-            @Override
-            public void onSuccess() {
-                if(dialBottomDialogView != null)
-                    dialBottomDialogView.setDialogBtnStatus(getResources().getString(R.string.device_upgrade_success));
-            }
-        });
+                @Override
+                public void onStateChanged(int state, boolean cancelable) {
+                    if(dialBottomDialogView != null)
+                        dialBottomDialogView.setDialogBtnStatus(getResources().getString(R.string.string_upgrad_so_on));
+                }
+
+                @Override
+                public void onProgressChanged(int progress) {
+                    if(dialBottomDialogView != null)
+                        dialBottomDialogView.setDialogBtnStatus(String.format(getResources().getString(R.string.device_upgrade_present),progress+""));
+                }
+
+                @Override
+                public void onSuccess() {
+                    if(dialBottomDialogView != null){
+                        dialBottomDialogView.setDialogBtnStatus(getResources().getString(R.string.device_upgrade_success));
+                        dialBottomDialogView.dismiss();
+                        ToastUtil.init(getActivity());
+                        ToastUtil.showTextToast(getResources().getString(R.string.app_setsuccess));
+                    }
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+            Watch7018Manager.getWatch7018Manager().setF18SyncStatus(F18SyncStatus.SYNC_DIAL_FAIL);
+        }
+
     }
 
 
@@ -348,6 +382,9 @@ public class F18DialCenterFragment extends BaseFragment {
             public void onFail() {
                 Log.e("TAG","----onFail--");
 
+                //https://api.mini-banana.com/isport/concumer-basic/dialPlate/queryAllDialPlate?type=7018
+
+                //https://api.mini-banana.com/isport/concumer-basic/dialPlate/downCount?id=86
             }
         });
     }
@@ -378,5 +415,70 @@ public class F18DialCenterFragment extends BaseFragment {
 
         sureBtn.setTextColor(Color.BLACK);
         cancelBtn.setTextColor(Color.BLACK);
+    }
+
+
+
+
+    //下载次数+1
+    private void addDialDownCount(int dialId){
+        new NetworkBoundResource<String>(){
+
+            @Override
+            public Observable<String> getFromDb() {
+                return null;
+            }
+
+            @Override
+            public Observable<String> getNoCacheData() {
+                return null;
+            }
+
+            @Override
+            public boolean shouldFetchRemoteSource() {
+                return false;
+            }
+
+            @Override
+            public boolean shouldStandAlone() {
+                return false;
+            }
+
+            @Override
+            public Observable<String> getRemoteSource() {
+                InitCommonParms<List<F18DialBean>, BaseUrl, BaseDbPar> initCommonParms = new InitCommonParms<>();
+                BaseUrl baseUrl = new BaseUrl();
+                baseUrl.object =dialId;
+                return (Observable<String>) RetrofitClient.getInstance().post(initCommonParms
+                        .setPostBody
+                                (!(App.appType() == App.httpType)).setBaseUrl(baseUrl).setType(JkConfiguration.RequstType.ADD_F18_DIAL_DOWN_COUNT).getPostBody());
+
+            }
+
+            @Override
+            public void saveRemoteSource(String remoteSource) {
+
+            }
+        }.getAsObservable().subscribe(new Observer<String>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable disposable) {
+
+            }
+
+            @Override
+            public void onNext(@NonNull String st) {
+
+            }
+
+            @Override
+            public void onError(@NonNull Throwable throwable) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
     }
 }

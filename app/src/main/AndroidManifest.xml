@@ -82,14 +82,14 @@
         android:icon="@drawable/ic_t_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:usesCleartextTraffic="true"
         android:networkSecurityConfig="@xml/network_security_config"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@drawable/ic_t_launcher"
         android:supportsRtl="true"
+        android:hardwareAccelerated="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup"
-        tools:targetApi="n">
+        tools:targetApi="p" >
 
         <uses-library android:name="org.apache.http.legacy" android:required="false" />
 
@@ -164,7 +164,8 @@
         <activity android:name=".sport.InDoorSportActivity" />
         <activity android:name=".sport.OutSportActivity" />
         <activity android:name=".sport.run.RunningActivity" />
-        <activity android:name=".login.ActivityWebView" />
+        <activity android:name=".login.ActivityWebView"
+            android:configChanges="orientation|screenSize"/>
 
         <service
             android:name="com.isport.brandapp.sport.OutSportService"
@@ -337,6 +338,9 @@
         <!--F18固件升级-->
         <activity android:name=".device.f18.F18DufActivity"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".home.OperateGuidActivity"
             android:screenOrientation="portrait"/>
 
         <!-- 表示当前项目已经适配了分区存储特性 -->

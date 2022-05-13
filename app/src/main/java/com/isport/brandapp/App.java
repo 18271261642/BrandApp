@@ -13,6 +13,14 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.blankj.utilcode.util.ApiUtils;
+import com.hjq.gson.factory.GsonFactory;
+import com.hjq.http.EasyConfig;
+import com.hjq.http.config.IRequestInterceptor;
+import com.hjq.http.config.RequestServer;
+import com.hjq.http.model.HttpHeaders;
+import com.hjq.http.model.HttpParams;
+import com.hjq.http.request.HttpRequest;
 import com.iflytek.cloud.SpeechUtility;
 import com.isport.blelibrary.BleConstance;
 import com.isport.blelibrary.ISportAgent;
@@ -41,6 +49,7 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.Locale;
 
+import androidx.annotation.NonNull;
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.commonnet.interceptor.BaseObserver;
 import brandapp.isport.com.basicres.commonnet.interceptor.ExceptionHandle;
@@ -51,6 +60,7 @@ import brandapp.isport.com.basicres.commonutil.SystemUtils;
 import brandapp.isport.com.basicres.commonutil.ToastUtils;
 import brandapp.isport.com.basicres.commonutil.UIUtils;
 import brandapp.isport.com.basicres.mvp.NetworkBoundResource;
+import brandapp.isport.com.basicres.net.CommonRetrofitClient;
 import brandapp.isport.com.basicres.service.observe.NetProgressObservable;
 import iknow.android.utils.BaseUtils;
 import io.reactivex.Observable;
@@ -58,6 +68,7 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
+import okhttp3.OkHttpClient;
 import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 
 public class App extends BaseApp {
@@ -86,6 +97,7 @@ public class App extends BaseApp {
 
 
     private void init(){
+
 
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks);
 
@@ -141,6 +153,40 @@ public class App extends BaseApp {
 //        //绑定通知服务
 //        Intent intent = new Intent(this, AlertService.class);
 //        bindService(intent,serviceConnection,Context.BIND_AUTO_CREATE);
+
+
+
+        // 网络请求框架初始化
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .build();
+
+        EasyConfig.with(okHttpClient)
+                // 是否打印日志
+                .setLogEnabled(true)
+                // 设置服务器配置
+                .setServer(new RequestServer(CommonRetrofitClient.baseUrl))
+                // 设置请求处理策略
+                .setHandler(new RequestHandler(this))
+                // 设置请求重试次数
+                .setRetryCount(1)
+                .setInterceptor(new IRequestInterceptor() {
+                    @Override
+                    public void interceptArguments(@NonNull HttpRequest<?> httpRequest,
+                                                   @NonNull HttpParams params,
+                                                   @NonNull HttpHeaders headers) {
+                        headers.put("timestamp", String.valueOf(System.currentTimeMillis()));
+                    }
+                })
+                .into();
+
+        // 设置 Json 解析容错监听
+        GsonFactory.setJsonCallback((typeToken, fieldName, jsonToken) -> {
+            // 上报到 Bugly 错误列表
+            CrashReport.postCatchedException(new IllegalArgumentException(
+                    "类型解析异常：" + typeToken + "#" + fieldName + "，后台返回的类型为：" + jsonToken));
+        });
+
+
     }
 
 

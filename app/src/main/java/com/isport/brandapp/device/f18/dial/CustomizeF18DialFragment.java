@@ -3,6 +3,7 @@ package com.isport.brandapp.device.f18.dial;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -21,7 +22,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.blankj.utilcode.util.ScreenUtils;
 import com.google.gson.Gson;
 import com.hjq.permissions.OnPermissionCallback;
@@ -29,7 +29,9 @@ import com.hjq.permissions.XXPermissions;
 import com.htsmart.wristband2.dial.DialDrawer;
 import com.htsmart.wristband2.dial.DialWriter;
 import com.isport.blelibrary.interfaces.OnF18DialStatusListener;
+import com.isport.blelibrary.managers.F18SyncStatus;
 import com.isport.blelibrary.managers.Watch7018Manager;
+import com.isport.blelibrary.utils.Logger;
 import com.isport.brandapp.R;
 import com.isport.brandapp.banner.recycleView.utils.ToastUtil;
 import com.isport.brandapp.device.f18.OnF18ItemClickListener;
@@ -39,12 +41,9 @@ import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
 import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -108,8 +107,6 @@ public class CustomizeF18DialFragment extends BaseFragment {
             super.handleMessage(msg);
             if(msg.what == -1){
                 String delePath = (String) msg.obj;
-                boolean isDelete = FileUtil.deleteFileLast(delePath);
-                Log.e("TAG","------删除图片="+isDelete);
                 readLocalFile();
             }
 
@@ -138,39 +135,44 @@ public class CustomizeF18DialFragment extends BaseFragment {
             }
 
             if(msg.what == 0x08){
-                File ft = (File) msg.obj;
+                if(getActivity() == null || getActivity().isFinishing())
+                    return;
+                try {
+                    File ft = (File) msg.obj;
+                    Log.e("TAG","-----生成的bin="+ft.getName()+" "+ft.getAbsolutePath());
 
-                Log.e("TAG","-----生成的bin="+ft.getName()+" "+ft.getAbsolutePath());
+                    Watch7018Manager.getWatch7018Manager().setF18DialToDevice(ft, (byte) 0x00, new OnF18DialStatusListener() {
+                        @Override
+                        public void startDial() {
 
-                Watch7018Manager.getWatch7018Manager().setF18DialToDevice(ft, (byte) 0x00, new OnF18DialStatusListener() {
-                    @Override
-                    public void startDial() {
+                        }
 
-                    }
+                        @Override
+                        public void onError(int errorType, int errorCode) {
+                            if(f18CusDialSelectDialogView != null)
+                                f18CusDialSelectDialogView.setSyncStatus(getResources().getString(R.string.device_upgrade_fail));
+                        }
 
-                    @Override
-                    public void onError(int errorType, int errorCode) {
-                        if(f18CusDialSelectDialogView != null)
-                            f18CusDialSelectDialogView.setSyncStatus(getResources().getString(R.string.device_upgrade_fail));
-                    }
+                        @Override
+                        public void onStateChanged(int state, boolean cancelable) {
 
-                    @Override
-                    public void onStateChanged(int state, boolean cancelable) {
+                        }
 
-                    }
+                        @Override
+                        public void onProgressChanged(int progress) {
+                            if(f18CusDialSelectDialogView != null)
+                                f18CusDialSelectDialogView.setSyncStatus(String.format(getResources().getString(R.string.device_upgrade_present),progress+""));
+                        }
 
-                    @Override
-                    public void onProgressChanged(int progress) {
-                        if(f18CusDialSelectDialogView != null)
-                            f18CusDialSelectDialogView.setSyncStatus(String.format(getResources().getString(R.string.device_upgrade_present),progress+""));
-                    }
-
-                    @Override
-                    public void onSuccess() {
-                        if(f18CusDialSelectDialogView != null)
-                            f18CusDialSelectDialogView.setSyncStatus(getResources().getString(R.string.device_upgrade_success));
-                    }
-                });
+                        @Override
+                        public void onSuccess() {
+                            if(f18CusDialSelectDialogView != null)
+                                f18CusDialSelectDialogView.setSyncStatus(getResources().getString(R.string.device_upgrade_success));
+                        }
+                    });
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
 
             }
         }
@@ -244,9 +246,12 @@ public class CustomizeF18DialFragment extends BaseFragment {
 
     //位置选择的弹框
     private void showChooseDialog(F18DialBean f18DialBean,int position){
+        if(getActivity() == null)
+            return;
         if(f18CusDialSelectDialogView == null)
-            f18CusDialSelectDialogView = new F18CusDialSelectDialogView(getContext());
+            f18CusDialSelectDialogView = new F18CusDialSelectDialogView(getContext(),R.style.myDialog);
         f18CusDialSelectDialogView.show();
+        f18CusDialSelectDialogView.setSyncStatus(getResources().getString(R.string.string_set_dial));
         f18CusDialSelectDialogView.setSrcResources(f18DialBean.getPreviewImgUrl());
         f18CusDialSelectDialogView.setStyleSmallBg(txtStylePosition);
         f18CusDialSelectDialogView.setCancelable(false);
@@ -260,12 +265,20 @@ public class CustomizeF18DialFragment extends BaseFragment {
             //删除
             @Override
             public void onChildClick(int position, boolean isCheck) {
+                if(Watch7018Manager.getWatch7018Manager().getF18SyncStatus() == F18SyncStatus.SYNC_DIAL_ING){
+                    ToastUtil.showTextToast(getResources().getString(R.string.string_upgrad_so_on));
+                    return;
+                }
                 alertDelete(f18DialBean);
             }
 
             //开始设置表盘
             @Override
             public void onLongClick(int position) {
+                if(Watch7018Manager.getWatch7018Manager().getF18SyncStatus() == F18SyncStatus.SYNC_DIAL_ING){
+                    ToastUtil.showTextToast(getResources().getString(R.string.string_upgrad_so_on));
+                    return;
+                }
                 startSetCusDial(f18DialBean.getPreviewImgUrl(),position);
             }
         });
@@ -370,6 +383,7 @@ public class CustomizeF18DialFragment extends BaseFragment {
                         e.printStackTrace();
                         if(f18CusDialSelectDialogView != null)
                             f18CusDialSelectDialogView.setSyncStatus(getResources().getString(R.string.device_upgrade_fail));
+                        Watch7018Manager.getWatch7018Manager().setF18SyncStatus(F18SyncStatus.SYNC_DIAL_FAIL);
                     }
                 }
             }).start();
@@ -428,8 +442,10 @@ public class CustomizeF18DialFragment extends BaseFragment {
 
     //选择样式
     private void showTxtStyle(){
+        if(getActivity() == null)
+            return;
         if(f18DialStyleDialogView == null)
-            f18DialStyleDialogView = new F18DialStyleDialogView(getContext());
+            f18DialStyleDialogView = new F18DialStyleDialogView(getActivity(),R.style.myDialog);
         f18DialStyleDialogView.show();
         f18DialStyleDialogView.setOnStyleTxtListener(new OnF18ItemClickListener() {
             @Override
@@ -458,7 +474,7 @@ public class CustomizeF18DialFragment extends BaseFragment {
         if(getActivity() == null)
             return;
         photoChoosePopUtil.show(getActivity().getWindow().getDecorView());
-        photoChoosePopUtil.setTvCameraVisiable(false);
+      //  photoChoosePopUtil.setTvCameraVisiable(false);
         photoChoosePopUtil.setPhotoTxt(getResources().getString(R.string.string_choose_pick));
         photoChoosePopUtil.setOnPhotoChooseListener(new PhotoChoosePopUtil.OnPhotoChooseListener() {
             @Override
@@ -486,6 +502,8 @@ public class CustomizeF18DialFragment extends BaseFragment {
                 }
             });
         }else{
+            openCamera();
+
 //            ISCameraConfig config = new ISCameraConfig.Builder()
 //                    .needCrop(true) // 裁剪
 //                    .cropSize(1, 1, 360, 360)
@@ -522,14 +540,46 @@ public class CustomizeF18DialFragment extends BaseFragment {
         chooseAlbumFile();
     }
 
+    private File tempFile;
+
+    /*
+     * 从相机获取
+     */
+    public void openCamera() {
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        if (FileUtil.isSDExists()) {
+            String date = String.valueOf(System.currentTimeMillis());
+            tempFile = new File(Environment.getExternalStorageDirectory().getPath()+"/DCIM/", date + ".jpg");
+            if (!tempFile.exists()) {
+                FileUtil.createFile(tempFile.getAbsolutePath());
+            }
+
+            Uri uri;
+            if (Build.VERSION.SDK_INT >= 24) {
+                uri = FileProvider.getUriForFile(context.getApplicationContext(),  "com.isport.brandapp.fileprovider", tempFile);
+            } else {
+                uri = Uri.fromFile(tempFile);
+            }
+            Logger.myLog(TAG, "uri=" + uri.getPath());
+            Log.e("TAG", "----tempFile=" + tempFile.getName()+" "+tempFile.getPath());
+            String path = BitmapUtils.getRealFilePath(context, uri);
+            Logger.myLog(TAG, "tempFileRealFilePath" + path);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+            startActivityForResult(intent, 88);
+        }
+    }
+
+
+
 
     private void chooseAlbumFile(){
+        String savePath = Environment.getExternalStorageDirectory().getPath()+"/DCIM/";
         Matisse.from(CustomizeF18DialFragment.this)
                 .choose(MimeType.ofImage())
                 .countable(true)
-                .capture(true)
                 .maxSelectable(1)
-                .captureStrategy(new CaptureStrategy(true, Objects.requireNonNull(getContext()).getPackageName() + ".fileprovider"))
+                .captureStrategy(new CaptureStrategy(false,  "com.isport.brandapp.fileprovider",savePath))
                 .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
                 .thumbnailScale(0.85f)
                 .imageEngine(new GlideEngine())
@@ -539,11 +589,39 @@ public class CustomizeF18DialFragment extends BaseFragment {
 
 
 
+    /**
+     * 获取uri
+     *
+     * @param context
+     * @param file
+     * @return
+     */
+    public Uri getUriForFile(Context context, File file) {
+        Uri fileUri = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            fileUri = FileProvider.getUriForFile(context, "com.isport.brandapp" + ".fileprovider", file);
+        } else {
+            fileUri = Uri.fromFile(file);
+        }
+        return fileUri;
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
          Log.e("TAG","---requestCode="+requestCode+"---resultCode="+resultCode);
+
+         if(requestCode == 88 && resultCode == Activity.RESULT_OK){ //系统相机拍照
+             Uri uri = getUriForFile(getActivity(), tempFile);
+             String path = BitmapUtils.getRealFilePath(context, uri);
+
+             Log.e("TAG","--------相机拍照="+path+" "+uri);
+
+             startPhotoZoom(uri);
+         }
+
+
+
         if (requestCode == CHOOSE_ALBUM_RESULT_CODE && resultCode == Activity.RESULT_OK) {  //相册选择
             List<Uri> mSelected = Matisse.obtainResult(data);
             List<String> strList = Matisse.obtainPathResult(data);

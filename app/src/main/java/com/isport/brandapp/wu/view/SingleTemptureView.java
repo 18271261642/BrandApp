@@ -68,7 +68,7 @@ public class SingleTemptureView extends View {
         //txtPaint.setColor(Color.parseColor("#F7F7F9"));
         txtPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         txtPaint.setAntiAlias(true);
-        txtPaint.setTextSize(DimenUtil.dp2px(getContext(),14f));
+        txtPaint.setTextSize(DimenUtil.dp2px(getContext(),13f));
 
 
         topImgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -115,8 +115,9 @@ public class SingleTemptureView extends View {
         //绘制底部的数值
         String txt = String.valueOf(tempInfo.getTempUnitl().equals("0") ? tempInfo.getCentigrade() : tempInfo.getFahrenheit());
 
+        Log.e("TMP","-----数值宽度="+DimenUtil.getTextWidth(txtPaint,txt));
         //mRightPoint- DimenUtil.getTextWidth(txtPaint,txt)/2
-        canvas.drawText(txt,0,-DimenUtil.measureTextHeight(txtPaint),txtPaint);
+        canvas.drawText(txt,mWidth/2 - (DimenUtil.getTextWidth(txtPaint,txt)/2),-DimenUtil.measureTextHeight(txtPaint),txtPaint);
 
         // currPaint.setColor(drawRecDataBean.getColors());
 

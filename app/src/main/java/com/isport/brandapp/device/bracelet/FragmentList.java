@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
@@ -25,12 +26,22 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 import brandapp.isport.com.basicres.commonutil.MessageEvent;
 import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 
+import static androidx.fragment.app.FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT;
+
 
 public class FragmentList extends Fragment {
+
+    private static final String TAG = "FragmentList";
+
+
+    public static FragmentList getInstance(){
+        return new FragmentList();
+    }
 
     public static final int TYPE_DAY = 1;
     public static final int TYPE_WEEK = 2;
@@ -41,7 +52,9 @@ public class FragmentList extends Fragment {
     private ViewPager viewPager;
 
     private FragmentStatePagerAdapter pagerAdapter;
+
     private DeviceBean deviceBean;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,7 +73,9 @@ public class FragmentList extends Fragment {
         viewPager = (ViewPager) view;
 
         EventBus.getDefault().register(this);
-        pagerAdapter = new FragmentStatePagerAdapter(getChildFragmentManager()) {
+
+
+        pagerAdapter = new FragmentStatePagerAdapter(getChildFragmentManager() ) {
             @Override
             public Fragment getItem(int position) {
                 Log.e("TAG","---------滑动type="+type+"--position="+position);
@@ -70,7 +85,7 @@ public class FragmentList extends Fragment {
                         Calendar cal = Calendar.getInstance();
                         cal.add(Calendar.DATE, -(getCount() - (position + 1)));
                         int date = (int) (cal.getTimeInMillis() / 1000);
-                        Logger.myLog("FragmentList------(position + 1)" + (position + 1) + "cal:" + TimeUtils.getTimeByyyyyMMddhhmmss(cal.getTimeInMillis()));
+
                         Fragment fragment = new DayReportFragment();
                         Bundle bundle = new Bundle();
                         bundle.putInt("date", date);
@@ -116,6 +131,7 @@ public class FragmentList extends Fragment {
 
             @Override
             public int getItemPosition(Object object) {
+               //POSITION_NONE
                 return POSITION_NONE;
             }
 
@@ -131,7 +147,7 @@ public class FragmentList extends Fragment {
             @Override
             public void onPageSelected(int position) {
 
-                Logger.myLog("onPageSelected:" + position + "viewPager.getAdapter().getCount()" + viewPager.getAdapter().getCount());
+                Logger.myLog("----onPageSelected:" + position + "viewPager.getAdapter().getCount()" + viewPager.getAdapter().getCount());
                 if (position == 0) {
                     int temp = viewPager.getAdapter().getCount();
                     int pagesize = viewPager.getAdapter().getCount() / 100;
@@ -150,7 +166,11 @@ public class FragmentList extends Fragment {
 
             }
         });
+
+        Log.e(TAG,"-----当前viewPager="+count);
+
         viewPager.setCurrentItem(count);
+       // viewPager.setOffscreenPageLimit(3);
         return view;
     }
 
@@ -161,6 +181,9 @@ public class FragmentList extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(MessageEvent messageEvent) {
+
+        Log.e(TAG,"----msg="+messageEvent.getMsg());
+
         switch (messageEvent.getMsg()) {
             case MessageEvent.viewPageChage:
                 //如果有翻页，需要把count变大
@@ -181,6 +204,7 @@ public class FragmentList extends Fragment {
                 } finally {
                     Logger.myLog("FragmentList------calendar:" + TimeUtils.getTimeByyyyyMMdd(calendar) + ",,selectCalendar:" + TimeUtils.getTimeByyyyyMMdd(selectCalendar));
                     int days = daysBetween(calendar, selectCalendar);
+                    Log.e(TAG,"---切换选择count="+count+" days="+days+" viewPagerCount="+pagerAdapter.getCount());
                     int page = days / 31;
                     int pageYu = days % 31;
                     if (pageYu > 0) {
@@ -189,12 +213,13 @@ public class FragmentList extends Fragment {
                     if (page == 0) {
                         page = 1;
                     }
+                    count = 30 * page;
 
+                    Log.e(TAG,"----xuanz COunt="+count);
                     count = 30 * page;
                     viewPager.getAdapter().notifyDataSetChanged();
                     viewPager.setCurrentItem(viewPager.getAdapter().getCount() - days - 1);
                     Logger.myLog("FragmentList------ days:" + days + "position:" + (viewPager.getAdapter().getCount() - days - 1) + "----count:" + count + "page:" + page);
-
 
                 }
                 break;

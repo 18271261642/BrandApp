@@ -44,6 +44,9 @@ public class F18DialStyleDialogView extends AppCompatDialog
         super(context);
     }
 
+    public F18DialStyleDialogView(Context context, int theme) {
+        super(context, theme);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

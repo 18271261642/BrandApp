@@ -3,6 +3,9 @@
     /**app**/
     <string name="app_name">Bonlala</string>//iSport健康管家
 
+    <string name="string_logout_tips">Whether to cancel the account ?</string>
+    <string name="string_logout_txt">Logout</string>
+    <string name="string_operate_guide_desc">Func guide</string>
     <string name="string_download_so">downloading</string>
     <string name="string_download_complete">Download completed</string>
     <string name="string_f18_device_per">equipment exercise</string>

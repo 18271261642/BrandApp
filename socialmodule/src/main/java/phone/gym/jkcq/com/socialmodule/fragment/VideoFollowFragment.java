@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gyf.immersionbar.ImmersionBar;
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoView;
@@ -258,6 +259,11 @@ public class VideoFollowFragment extends BaseMVPFragment<LikeView, LikePresent> 
         handler.removeCallbacks(null);
 
         try {
+            if(getActivity() == null || getActivity().isFinishing())
+                return;
+            if(gsyVideoManager == null || gsyVideoManager.getGSYVideoManager() == null)
+                return;
+
             mCurrentPosition = gsyVideoManager.getGSYVideoManager().getPlayer().getBufferedPercentage();
             Log.e("onPause", " VideoFollowFragment onPause mCurrentPosition="+mCurrentPosition);
             gsyVideoManager.onVideoPause();
@@ -556,9 +562,11 @@ public class VideoFollowFragment extends BaseMVPFragment<LikeView, LikePresent> 
                 }
                 break;
             case MessageEvent.update_progress:
+                if(getActivity() == null || getActivity().isFinishing())
+                    return;
                 if (isStart && gsyVideoManager != null && video_bottom_progressbar != null) {
 
-                    if(gsyVideoManager!=null&&gsyVideoManager.getGSYVideoManager().isPlaying()) {
+                    if(gsyVideoManager.getGSYVideoManager() != null && gsyVideoManager.getGSYVideoManager().isPlaying()) {
 
                         if (video_bottom_progressbar.getMax() != gsyVideoManager.getDuration()) {
                             video_bottom_progressbar.setMax(gsyVideoManager.getDuration());
@@ -631,6 +639,10 @@ public class VideoFollowFragment extends BaseMVPFragment<LikeView, LikePresent> 
             }
         }
 
+        if(getActivity() == null){
+            Toast.makeText(getContext(),"有异常",Toast.LENGTH_SHORT).show();
+            return;
+        }
         photoChoosePopUtil.show(getActivity().getWindow().getDecorView());
         photoChoosePopUtil.setOnPhotoChooseListener(new PhotoChoosePopUtil.OnPhotoChooseListener() {
             @Override

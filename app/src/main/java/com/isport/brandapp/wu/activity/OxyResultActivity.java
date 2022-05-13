@@ -2,6 +2,7 @@ package com.isport.brandapp.wu.activity;
 
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -118,6 +119,8 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
                 spo2GuidImg.setVisibility(View.GONE);
             }
         });
+
+
     }
 
     @Override
@@ -255,10 +258,10 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
             if(!ActivitySwitcher.isForeground(OxyResultActivity.this))
                 return;
             mCurrentInfo = mW81DeviceDataModelImp.getOxygenLastData(AppConfiguration.braceletID, TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()));
-            if (lastTimestamp == mCurrentInfo.getTimestamp().longValue()) {
-                return;
-            }
-            lastTimestamp = mCurrentInfo.getTimestamp().longValue();
+//            if (lastTimestamp == mCurrentInfo.getTimestamp().longValue()) {
+//                return;
+//            }
+//            lastTimestamp = mCurrentInfo.getTimestamp().longValue();
             setData();
             if (mCurrentInfo != null) {
                 DrawRecDataBean bean = new DrawRecDataBean();
@@ -316,6 +319,8 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
 
                 }
                 lastTimestamp = info.get(0).getTimestamp();
+            }else{
+                spo2GuidImg.setVisibility(View.GONE);
             }
 
         } catch (Exception e) {
@@ -332,6 +337,16 @@ public class OxyResultActivity extends BaseMVPActivity<OxyHistoryView, OxyHistor
                 trendview_oxy.setdata(list, JkConfiguration.BODY_OXYGEN);
                 mCurrentInfo = info.get(0);
                 setData();
+
+                if(singleList.size()>=7){
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            spo2GuidImg.setVisibility(View.GONE);
+                        }
+                    } ,2 * 1000);
+                }
+
             } else {
                 spo2GuidImg.setVisibility(View.GONE);
                 trendview_oxy.setDeviceType(JkConfiguration.BODY_OXYGEN);

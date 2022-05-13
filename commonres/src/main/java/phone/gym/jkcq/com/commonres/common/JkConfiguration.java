@@ -381,6 +381,14 @@ public class JkConfiguration {
 
 
         int GET_F18_DEVICE_DIAL_LIST = 88;
+        int ADD_F18_DIAL_DOWN_COUNT = 89;
+
+
+        //app版本更新
+        int APP_VERSION_UPDATE = 90;
+        //操作指引
+        int APP_OPERATE_GUID = 91;
+
 
         int ONCE_HR_UPGRADE = 59;
         int ONCE_HR_NUM_DATA = 60;

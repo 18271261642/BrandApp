@@ -20,6 +20,16 @@ public class DateUtil {
     private static SimpleDateFormat dateFormatHHmm = new SimpleDateFormat("HH:mm");
 
 
+
+    //获取yyyy-MM-dd格式的日期是否是当月第一天
+    public static boolean isMothFirstDay(String dayStr){
+        if(!dayStr.contains("-"))
+            return false;
+        String[] spStr = dayStr.split("-");
+        return spStr[2].equals("01");
+    }
+
+
     public static String getdateFormatyyMMdd(long times) {
 
         return dateFormatyyMMdd.format(new Date(times));

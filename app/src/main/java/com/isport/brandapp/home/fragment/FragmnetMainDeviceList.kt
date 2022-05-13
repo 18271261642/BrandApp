@@ -8,12 +8,14 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,7 +27,10 @@ import brandapp.isport.com.basicres.service.observe.BatteryLowObservable
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.listener.OnItemChildClickListener
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.gyf.immersionbar.ImmersionBar
+import com.hjq.http.EasyHttp
+import com.hjq.http.listener.OnHttpListener
 import com.isport.blelibrary.ISportAgent
 import com.isport.blelibrary.db.CommonInterFace.DeviceMessureData
 import com.isport.blelibrary.db.action.DeviceInformationTableAction
@@ -67,20 +72,24 @@ import com.isport.brandapp.device.f18.F18WatchManagerActivity
 import com.isport.brandapp.dialog.CommuniteDeviceAddDialog
 import com.isport.brandapp.dialog.CommuniteDeviceSettingDialog
 import com.isport.brandapp.login.ActivityWebView
+import com.isport.brandapp.net.DeviceGuidBean
 import com.isport.brandapp.ropeskipping.RopeSkippingActivity
 import com.isport.brandapp.ropeskipping.setting.RopeDeviceSettingActivity
 import com.isport.brandapp.ropeskipping.util.Preference
 import com.isport.brandapp.util.ActivitySwitcher
 import com.isport.brandapp.util.AppSP
 import com.isport.brandapp.util.DeviceTypeUtil
+import com.isport.brandapp.util.JSONUtils
 import com.uber.autodispose.AutoDispose
 import com.uber.autodispose.AutoDisposeConverter
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider
 import com.youth.banner.indicator.CircleIndicator
 import kotlinx.android.synthetic.main.app_fragment_device.*
+import no.nordicsemi.android.dfu.internal.manifest.Manifest
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import org.json.JSONObject
 import phone.gym.jkcq.com.commonres.common.JkConfiguration
 import java.util.*
 import kotlin.collections.HashMap
@@ -111,8 +120,20 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
     var mCurrentPosition = 0
     var currentPageNumber = 1
 
+    //设备类型的集合
+    var typeIdList = mutableListOf<Int>()
+
+    var guidUrl : String ?= null
+
     val mFragPresenter: DeviceListPresenter by lazy { DeviceListPresenter(this@FragmnetMainDeviceList) }
     val weatherPresenter: WeatherPresenter by lazy { WeatherPresenter(this@FragmnetMainDeviceList) }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        getDeviceGuidUrlData()
+    }
+
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -324,6 +345,7 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
     }
 
     fun initData() {
+
         /*  locationServiceHelper = LocationServiceHelper(activity)
           locationServiceHelper!!.startLocation()*/
 
@@ -384,12 +406,21 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
                             return
                         }
 
+                        //F18
                         if(DeviceTypeUtil.isConnectF18(deviceType)){
+                            val intent = Intent(context, F18WatchManagerActivity::class.java)
                             var db = AppConfiguration.deviceMainBeanList[deviceType];
                             if (db != null) {
                                 AppConfiguration.braceletID = db.getDeviceID()
                             }
-                        val intent = Intent(context, F18WatchManagerActivity::class.java)
+                            if(typeIdList.isNotEmpty()){
+                                if(typeIdList.contains(deviceType)){
+                                    val webUrl = guidUrl + deviceType
+                                    intent.putExtra("device_guid_url",webUrl)
+                                }
+
+                            }
+
                         intent.putExtra(JkConfiguration.DEVICE, AppConfiguration.deviceMainBeanList.get(deviceType))
                         startActivity(intent)
 
@@ -582,6 +613,9 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
 
     private fun autoConnDevice(f18Mac : String) {
         try {
+
+            activity?.let { ActivityCompat.requestPermissions(it, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),0x88) }
+
             //未连接
             if ( !Watch7018Manager.getWatch7018Manager().isConnected) {
                 val fs = App.getInstance().f18ConnStatusService
@@ -1171,5 +1205,41 @@ class FragmnetMainDeviceList() : Fragment(), DeviceListView, Observer, View.OnTo
         return true
     }
 
+    private fun getDeviceGuidUrlData(){
+        EasyHttp.get(this).api("isport/concumer-basic/deviceGuide/guideConfigUrl").request(object : OnHttpListener<String>{
+            override fun onSucceed(p0: String?) {
+               Log.e("UUU","---="+p0)
+                if (p0 != null) {
+                    analysisDeviceType(p0)
+                }
+            }
 
+            override fun onFail(p0: java.lang.Exception?) {
+                Log.e("UUU","---onFail="+p0?.message)
+            }
+
+        })
+    }
+
+
+    private fun analysisDeviceType(typeStr : String){
+        try {
+            typeIdList.clear()
+            val jsonOb = JSONObject(typeStr);
+            if(jsonOb.has("code") && jsonOb.get("code") == 2000){
+                var obj = jsonOb.getString("obj").toString()
+                val deviceTypeBean  = JSONUtils().fromJson<DeviceGuidBean>(obj )
+                if(deviceTypeBean?.deviceTypeIds != null){
+                    typeIdList.addAll(deviceTypeBean.deviceTypeIds)
+                }
+
+                if(deviceTypeBean?.guideUrl != null){
+                    guidUrl = deviceTypeBean.guideUrl
+                }
+            }
+        }catch (e : Exception){
+            e.printStackTrace()
+        }
+
+    }
 }

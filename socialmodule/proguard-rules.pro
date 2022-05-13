@@ -22,3 +22,4 @@
 
 -keep class me.devilsen.czxing.**
 -keep class me.devilsen.czxing.** { *; }
+-keep class androidx.core.app.CoreComponentFactory { *; }

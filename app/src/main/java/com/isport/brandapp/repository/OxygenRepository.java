@@ -54,7 +54,7 @@ public class OxygenRepository {
                     IDeviceMeasureData deviceMeasureData = new DeviceMeasureDataImp();
 
                     List<OxygenMode> list = deviceMeasureData.uploadingOxyenData(deviceId, userId, "0");
-                    Logger.myLog("measure_oxygen success:no upgrade1" + list + "userId：" + userId + " deviceId：" + deviceId);
+                  //  Logger.myLog("measure_oxygen success:no upgrade1" + list + "userId：" + userId + " deviceId：" + deviceId);
                     if (list == null) {
                         list = new ArrayList<>();
                     }

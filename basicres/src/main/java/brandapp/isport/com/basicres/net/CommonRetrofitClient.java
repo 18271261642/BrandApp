@@ -174,6 +174,50 @@ public class CommonRetrofitClient {
     }
 
 
+
+    private volatile static Retrofit retrofitNoToken;
+    @NonNull
+    public static Retrofit getRetrofitNoToken() {
+        if (retrofitNoToken == null) {
+            synchronized (CommonRetrofitClient.class) {
+                if (retrofitNoToken == null) {
+                    // 指定缓存路径,缓存大小 50Mb
+
+                    // Cookie 持久化
+                    /*ClearableCookieJar cookieJar =
+                            new PersistentCookieJar(new SetCookieCache(), new SharedPrefsCookiePersistor(InitApp
+                            .AppContext));*/
+
+                    OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                            // .cookieJar(cookieJar)
+                            .connectTimeout(timout, TimeUnit.SECONDS)
+                            .readTimeout(timout, TimeUnit.SECONDS)
+                            .writeTimeout(writeTimeout, TimeUnit.SECONDS)
+                            .retryOnConnectionFailure(false)
+                            //设置Header
+                            //设置拦截器
+                            .addInterceptor(getInterceptor());
+
+
+                    retrofitNoToken = new Retrofit.Builder()
+                            .client(builder.build())
+                            //设置网络请求的Url地址
+                            .baseUrl(baseUrl)
+                            //设置数据解析器
+                            .addConverterFactory(GsonConverterFactory.create())
+                            //设置网络请求适配器，使其支持RxJava与RxAndroid
+                            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                            .build();
+
+                }
+            }
+        }
+        return retrofitNoToken;
+    }
+
+
+
+
     /**
      * create you ApiService
      * Create an implementation of the API endpoints defined by the {@code service} interface.

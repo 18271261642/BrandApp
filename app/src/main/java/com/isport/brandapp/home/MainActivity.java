@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -14,6 +15,7 @@ import android.os.PersistableBundle;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,6 +24,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.AppUtils;
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.XXPermissions;
 import com.isport.blelibrary.ISportAgent;
@@ -32,7 +35,10 @@ import com.isport.blelibrary.utils.ThreadPoolUtils;
 import com.isport.brandapp.App;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.R;
+import com.isport.brandapp.banner.recycleView.utils.Apputils;
+import com.isport.brandapp.bean.AppVersionInfoBean;
 import com.isport.brandapp.blue.NotificationService;
+import com.isport.brandapp.device.f18.dial.F18DialBean;
 import com.isport.brandapp.home.fragment.FragmentSport;
 import com.isport.brandapp.home.fragment.FragmnetMainDeviceList;
 import com.isport.brandapp.home.fragment.NewMineFragment;
@@ -44,9 +50,11 @@ import com.isport.brandapp.net.RetrofitClient;
 import com.isport.brandapp.sport.bean.SportSumData;
 import com.isport.brandapp.sport.location.LocationServiceHelper;
 import com.isport.brandapp.sport.present.EndSportPresent;
+import com.isport.brandapp.sport.run.LanguageUtil;
 import com.isport.brandapp.sport.view.EndSportView;
 import com.isport.brandapp.util.AppSP;
 import com.isport.brandapp.util.DeviceTypeUtil;
+import com.isport.brandapp.util.InitCommonParms;
 import com.isport.brandapp.util.UserAcacheUtil;
 import com.shuyu.gsyvideoplayer.GSYVideoManager;
 import com.uber.autodispose.AutoDisposeConverter;
@@ -71,9 +79,12 @@ import brandapp.isport.com.basicres.ActivityManager;
 import brandapp.isport.com.basicres.BaseActivity;
 import brandapp.isport.com.basicres.BaseApp;
 import brandapp.isport.com.basicres.action.SportDataAction;
+import brandapp.isport.com.basicres.commonbean.BaseDbPar;
+import brandapp.isport.com.basicres.commonbean.BaseUrl;
 import brandapp.isport.com.basicres.commonnet.interceptor.BaseObserver;
 import brandapp.isport.com.basicres.commonnet.interceptor.ExceptionHandle;
 import brandapp.isport.com.basicres.commonnet.net.RxScheduler;
+import brandapp.isport.com.basicres.commonutil.AppUtil;
 import brandapp.isport.com.basicres.commonutil.Logger;
 import brandapp.isport.com.basicres.commonutil.MessageEvent;
 import brandapp.isport.com.basicres.commonutil.ToastUtils;
@@ -83,6 +94,8 @@ import brandapp.isport.com.basicres.mvp.NetworkBoundResource;
 import brandapp.isport.com.basicres.service.observe.BleProgressObservable;
 import brandapp.isport.com.basicres.service.observe.LoginOutObservable;
 import brandapp.isport.com.basicres.service.observe.NetProgressObservable;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import phone.gym.jkcq.com.commonres.common.JkConfiguration;
 import phone.gym.jkcq.com.socialmodule.fragment.FragmentCommunity;
 import phone.gym.jkcq.com.socialmodule.util.CacheUtil;
@@ -113,6 +126,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     LocationServiceHelper locationServiceHelper;
 
     private List<Fragment> fragmentList = new ArrayList<>();
+
+    AppUpdateDialogView appUpdateDialogView;
 
 
     private AlertDialog.Builder permissionDialog;
@@ -506,29 +521,44 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 //        } else {
 //            ISportAgent.getInstance().disConDevice(false);
 //            ISportAgent.getInstance().exit();
+//            System.exit(0);
 //            finish();
 //        }
 //    }
 
-
-    @Override
-    public void onBackPressed() {
-        moveTaskToBack(true);
-        super.onBackPressed();
-    }
-
-
+//
+//    @Override
+//    public void onBackPressed() {
+//        moveTaskToBack(true);
+//        super.onBackPressed();
+//    }
+//
+//    private long extTime = 0L;
+//
+//
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // 过滤按键动作
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-            moveTaskToBack(true);
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK ) {
+            if ((System.currentTimeMillis() - mExitTime) > 2000) {
+                mExitTime = System.currentTimeMillis();
+                ToastUtils.showToast(context, R.string.press_again_exit);
+                return true;
+            } else {
+                ISportAgent.getInstance().disConDevice(false);
+                ISportAgent.getInstance().exit();
+                System.exit(0);
+                finish();
+            }
 
-        } else if (keyCode == KeyEvent.KEYCODE_MENU) {
-            moveTaskToBack(true);
-        } else if (keyCode == KeyEvent.KEYCODE_HOME) {
-            moveTaskToBack(true);
+
         }
+
+//        else if (keyCode == KeyEvent.KEYCODE_MENU) {
+//            moveTaskToBack(true);
+//        } else if (keyCode == KeyEvent.KEYCODE_HOME) {
+//            moveTaskToBack(true);
+//        }
         return super.onKeyDown(keyCode, event);
     }
 
@@ -761,6 +791,107 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 }
             });
         }
+
+        getAppVersionData();
     }
+
+
+
+    //获取版本
+    private void getAppVersionData(){
+
+        new NetworkBoundResource<AppVersionInfoBean>(){
+
+            @Override
+            public io.reactivex.Observable<AppVersionInfoBean> getFromDb() {
+                return null;
+            }
+
+            @Override
+            public io.reactivex.Observable<AppVersionInfoBean> getNoCacheData() {
+                return null;
+            }
+
+            @Override
+            public boolean shouldFetchRemoteSource() {
+                return false;
+            }
+
+            @Override
+            public boolean shouldStandAlone() {
+                return false;
+            }
+
+            @Override
+            public io.reactivex.Observable<AppVersionInfoBean> getRemoteSource() {
+                InitCommonParms<AppVersionInfoBean, BaseUrl, BaseDbPar> initCommonParms = new InitCommonParms<>();
+                BaseUrl baseUrl = new BaseUrl();
+                baseUrl.object = "Android";
+                return (io.reactivex.Observable<AppVersionInfoBean>) RetrofitClient.getInstance().post(initCommonParms
+                        .setPostBody
+                                (!(App.appType() == App.httpType)).setBaseUrl(baseUrl).setType(JkConfiguration.RequstType.APP_VERSION_UPDATE).getPostBody());
+
+            }
+
+            @Override
+            public void saveRemoteSource(AppVersionInfoBean remoteSource) {
+
+            }
+        }.getAsObservable().subscribe(new Observer<AppVersionInfoBean>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable disposable) {
+
+            }
+
+            @Override
+            public void onNext(@NonNull AppVersionInfoBean appVersionInfoBean) {
+
+                operateVersionStr(appVersionInfoBean);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable throwable) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+    }
+
+    private void operateVersionStr( AppVersionInfoBean appVersionInfoBean){
+        try {
+           if(appVersionInfoBean == null)
+               return;
+           //当前app的version
+            int currVersionCode = AppUtils.getAppVersionCode();
+            Log.e(TAG,"------获取版本="+appVersionInfoBean.toString()+"\n"+currVersionCode);
+            //判断是否要升级，server版本号大于本地版本号，要升级
+            boolean isUpdate = appVersionInfoBean.getAppVersionCode() > currVersionCode;
+            if(!isUpdate)
+                return;
+            String url = appVersionInfoBean.getUrl();
+            appUpdateDialogView = new AppUpdateDialogView(this,R.style.myDialog);
+            appUpdateDialogView.show();
+            appUpdateDialogView.setLastVersion(getResources().getString(R.string.device_new_version_title)+"V "+appVersionInfoBean.getAppVersionName());
+            appUpdateDialogView.setContentMsg(getResources().getString(R.string.log_update)+(LanguageUtil.isZH() ? appVersionInfoBean.getRemark() : appVersionInfoBean.getRemarkEn()));
+            appUpdateDialogView.isFocusUpdate(appVersionInfoBean.getUpdateAble() == 2);
+            appUpdateDialogView.setCancelable(appVersionInfoBean.getUpdateAble() != 2 );
+            appUpdateDialogView.setDownloadUrl(url,appVersionInfoBean.getAppVersionName()+".apk");
+            appUpdateDialogView.setOnUpdateListener(new AppUpdateDialogView.OnUpdateListener() {
+                @Override
+                public void onCancel() {
+                    appUpdateDialogView.dismiss();
+                }
+            });
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
 
 }

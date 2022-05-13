@@ -47,7 +47,7 @@ public class S002_DetailDataModelAction {
     public static S002_Detail_Data findTempMode(@Nullable String deviceId, @Nullable String userid, long timestamp) {
 
 
-        Logger.myLog("findTempMode: deviceId:" + deviceId + ",userId:" + userid);
+       // Logger.myLog("findTempMode: deviceId:" + deviceId + ",userId:" + userid);
 
         if (TextUtils.isEmpty(deviceId) || TextUtils.isEmpty(userid)) {
             return null;

@@ -113,7 +113,7 @@
             android:padding="3dp"
             android:layout_gravity="center_horizontal"
             android:background="@drawable/rope_bg_shap"
-            android:text="开启"
+            android:text="@string/string_open"
             android:textColor="@color/white"
             android:textSize="@dimen/sp18"/>
 

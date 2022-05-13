@@ -3,6 +3,9 @@
     /**app**/
     <string name="app_name">奔啦啦</string>//iSport健康管家
 
+    <string name="string_logout_tips">是否註銷賬戶？</string>
+    <string name="string_logout_txt">註銷賬號</string>
+    <string name="string_operate_guide_desc">操作指引</string>
     <string name="string_download_so">下載中</string>
     <string name="string_download_complete">下載完成</string>
     <string name="string_f18_device_per">設備鍛煉</string>

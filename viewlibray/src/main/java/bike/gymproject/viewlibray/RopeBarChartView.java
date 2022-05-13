@@ -460,11 +460,21 @@ public class RopeBarChartView extends View {
                 mMaxRect.top = (int) (mStartY - ((maxHeight * (maxValue / maxYDivisionValue)) * percent));
                 mMaxRect.right = (int) (mBarRect.left + width);
                 if (dateList.size() != 0) {
-                    String xAxis = dateList.get(i);
 
-                    if (i == 0 || i == mData.size() - 1) {
-                        canvas.drawText(xAxis, (mBarRect.right - ((mBarRect.right - mBarRect.left) / 2) - (textPaint.measureText(xAxis) / 2)), mStartY + (textPaint.measureText("24")), textPaint);
+                    String xAxis = dateList.get(i);
+//                    if(mData.size() == 25){
+//                        if (i % 4 == 0) {
+//                            canvas.drawText(i + "", (mBarRect.right - ((mBarRect.right - mBarRect.left) / 2) - (textPaint.measureText(i + "") / 2)), mStartY + (textPaint.measureText("24")), textPaint);
+//                        }
+//                    } else{
+//                        if (i == 0 || i == mData.size() - 1) {
+//                            canvas.drawText(xAxis, (mBarRect.right - ((mBarRect.right - mBarRect.left) / 2) - (textPaint.measureText(xAxis) / 2)), mStartY + (textPaint.measureText("24")), textPaint);
+//                        }
+//                    }
+                    if (i % 4 == 0) {
+                        canvas.drawText(xAxis , (mBarRect.right - ((mBarRect.right - mBarRect.left) / 2) - (textPaint.measureText(i + "") / 2)), mStartY + (textPaint.measureText("24")), textPaint);
                     }
+
                 } else {
                     if (i == 0 || i % 4 == 0) {
                         canvas.drawText(i + "", (mBarRect.right - ((mBarRect.right - mBarRect.left) / 2) - (textPaint.measureText(i + "") / 2)), mStartY + (textPaint.measureText("24")), textPaint);

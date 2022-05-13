@@ -45,6 +45,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
+//周的柱状图
 class RopeWeeKFragment : Fragment(), RopeSkippingView {
     //柱状图的变量初始化
     var mDataList = mutableListOf<BarInfo>()

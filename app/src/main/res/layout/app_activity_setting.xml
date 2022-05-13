@@ -65,7 +65,7 @@
         android:background="@drawable/shape_btn_white_20_bg"
         android:onClick="onClick"
         app:contentSize="@dimen/sp16"
-        app:itemText="注销账号"
+        app:itemText="@string/string_logout_txt"
         app:itemviewTitleSize="@dimen/sp16"
         app:showArrow="true"
         app:showBottomLine="true"

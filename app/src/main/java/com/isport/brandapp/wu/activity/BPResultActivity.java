@@ -2,6 +2,7 @@ package com.isport.brandapp.wu.activity;
 
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -114,6 +115,9 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
 
 
         LoadImageUtil.getInstance().loadGifHr(this,R.drawable.icon_spide_guid,bpGuidImg);
+
+
+
         bpGuidImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -295,6 +299,15 @@ public class BPResultActivity extends BaseMVPActivity<BpHistoryView, BpHistoryPr
 
             bpGuidImg.setVisibility(bpInfoList.size()>=7 ? View.VISIBLE : View.GONE);
             setData();
+
+            if(bpInfoList.size()>=7){
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        bpGuidImg.setVisibility(View.GONE);
+                    }
+                },2 * 1000);
+            }
         } else {
             bpGuidImg.setVisibility(View.GONE);
             tv_bp_time.setText("--");

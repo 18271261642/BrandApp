@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.XXPermissions;
 import com.isport.brandapp.R;
+import com.isport.brandapp.banner.recycleView.utils.ToastUtil;
 
 import java.util.List;
 
@@ -56,6 +57,7 @@ public class F18DialActivity extends BaseActivity implements View.OnClickListene
 
     @Override
     protected void initData() {
+        ToastUtil.init(this);
         fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.f18DialHomeLayout,F18DialCenterFragment.getInstance()).commitAllowingStateLoss();

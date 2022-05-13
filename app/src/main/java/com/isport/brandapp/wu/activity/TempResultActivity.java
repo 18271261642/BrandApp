@@ -453,6 +453,12 @@ public class TempResultActivity extends BaseMVPTitleActivity<TempHistoryView, Te
             singleTempAdapter.notifyDataSetChanged();
 
             temperGuidImg.setVisibility(tempInfoList.size()>6 ? View.VISIBLE : View.GONE);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    temperGuidImg.setVisibility( View.GONE);
+                }
+            },2 * 1000);
 
         } else {
             temperGuidImg.setVisibility( View.GONE);

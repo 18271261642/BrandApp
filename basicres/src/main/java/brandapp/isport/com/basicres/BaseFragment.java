@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,6 +67,7 @@ public abstract class BaseFragment extends Fragment implements SimpleImmersionOw
             if (parent != null) {
                 parent.removeView(mView);
             }
+            Log.e("PARENT","---"+(parent == null));
         }
         return mView;
     }

@@ -10,6 +10,7 @@ import com.isport.blelibrary.db.CommonInterFace.WatchData;
 import com.isport.blelibrary.db.action.W81Device.DeviceMeasuredDActionation;
 import com.isport.blelibrary.db.action.W81Device.W81DeviceDataAction;
 import com.isport.blelibrary.db.table.DeviceTempUnitlTable;
+import com.isport.blelibrary.db.table.F18StepHourMap;
 import com.isport.blelibrary.db.table.w526.Device_TempTable;
 import com.isport.blelibrary.db.table.w811w814.BloodPressureMode;
 import com.isport.blelibrary.db.table.w811w814.OneceHrMode;
@@ -41,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import bike.gymproject.viewlibray.SleepFormatUtils;
 import brandapp.isport.com.basicres.BaseApp;
@@ -74,7 +76,7 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
             return wristbandstep;
         }
         //距离是向下取整的
-        float dis = CommonDateUtil.formatFloor(model.getDis(), true);
+        float dis = CommonDateUtil.formatFloor(model.getDis(), false);
         wristbandstep.setStepKm(CommonDateUtil.formatTwoPoint(dis));
         wristbandstep.setCalorie(String.valueOf(model.getCal()));
         wristbandstep.setStepNum(String.valueOf(model.getStep()));
@@ -83,27 +85,47 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
         String stepArray = model.getStepArray();
         ArrayList<Integer> stepList = new ArrayList<>();
 
-        if(stepArray != null && !stepArray.equals("[]")){
-            List<String[]> stepArrList = new Gson().fromJson(stepArray,new TypeToken<List<String[]>>(){}.getType());
-            if(stepArrList != null){
-
-                for(String[] st : stepArrList){
-                    stepList.add(Integer.valueOf(st[1]));
-                }
-
-            }
-        }
-
-        int sumSize = stepList.size();
-        if (stepList.size() < 24) {
-            for (int i = 0; i < 24 - sumSize; i++) {
-                stepList.add(0);
-            }
-        }
+        stepList =  operateConStep(stepArray);
+//        int sumSize = stepList.size();
+//        if (stepList.size() < 24) {
+//                for (int i = 0; i < 24 - sumSize; i++) {
+//                stepList.add(0);
+//            }
+//        }
         wristbandstep.setStepArry(stepList);
 
         return wristbandstep;
     }
+
+
+
+
+    private  ArrayList<Integer> operateConStep(String stepArray){
+        ArrayList<Integer> stepList = new ArrayList<>();
+        List<String[]> stepArrList = new Gson().fromJson(stepArray,new TypeToken<List<String[]>>(){}.getType());
+        if(stepArrList == null || stepArrList.isEmpty()){
+            for(int i = 0;i<24;i++)
+                stepList.add(0);
+            return stepList;
+        }
+
+        List<String> hourList = F18StepHourMap.get24HourList();
+        for(int i = 0;i<hourList.size();i++){
+            String tmpH = String.format("%02d",i);
+            int stP = 0;
+            for(String[] st : stepArrList){
+                //时间
+                String hourStr = st[0];
+                if(hourStr.equals(tmpH)){
+                    stP = Integer.parseInt(st[1]);
+                }
+            }
+        stepList.add(stP);
+        }
+        return stepList;
+    }
+
+
 
 
     @Override
@@ -127,7 +149,7 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
 
 
         W81DeviceDetailData w81DeviceDetailData = w81DeviceDataAction.getW81DeviceDetialData(deviceId, userId, TimeUtils.getTimeByyyyyMMdd(System.currentTimeMillis()));
-        Logger.myLog("getLastStepData:" + w81DeviceDetailData);
+      //  Logger.myLog("getLastStepData:" + w81DeviceDetailData);
 
         WatchSportMainData wristbandstep = new WatchSportMainData();
         if (w81DeviceDetailData != null) {
@@ -149,7 +171,7 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
     @Override
     public WatchSleepDayData getLastSleepData(String userId, String deviceId, boolean main) {
         W81DeviceDetailData w81DeviceDetailData = w81DeviceDataAction.getW81DeviceSleepLastest(deviceId, userId, "");
-        Logger.myLog("getW81DeviceSleepLastest:deviceId:" + deviceId + ",userId:" + userId + "w81DeviceDetailData:" + new Gson().toJson(w81DeviceDetailData));
+       // Logger.myLog("getW81DeviceSleepLastest:deviceId:" + deviceId + ",userId:" + userId + "w81DeviceDetailData:" + new Gson().toJson(w81DeviceDetailData));
         WatchSleepDayData watchSleepDayData = new WatchSleepDayData();
 
 
@@ -321,19 +343,32 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
     public List<WatchInsertBean> getAllNoUpgradeW81DeviceDetailData(String deviceId, String userId, String defWriId, boolean isUpgradeToday) {
 
         List<W81DeviceDetailData> list = w81DeviceDataAction.getUnUpgradeW81DeviceDetialData(deviceId, userId, defWriId);
-
         Logger.myLog("getNoUpgradeW81DevcieDetailData" + list + "---------" + isUpgradeToday);
-        W81DeviceDetailData deviceDetailData;
+
         WatchInsertBean watchInsertBean;
         List<WatchInsertBean> list1 = new ArrayList<>();
         if (list != null && list.size() > 0) {
 
             for (int i = 0; i < list.size(); i++) {
 
-                deviceDetailData = list.get(i);
-               /* if (!isUpgradeToday && deviceDetailData.getDateStr().equals(TimeUtils.getTodayYYYYMMDD())) {
+                W81DeviceDetailData deviceDetailData = list.get(i);
+
+                //是否上传当天数据 true 不上传；false上传
+                if (isUpgradeToday && TimeUtils.isToday(deviceDetailData.getDateStr(),"yyyy-MM-dd")) {
                     continue;
-                }*/
+                }
+
+                //连续心率
+                String continusHeart = deviceDetailData.getHrArray();
+                //睡眠
+                String sleepStr = deviceDetailData.getSleepArray();
+
+
+                //去除步数为0数据
+                if(deviceDetailData.getStep()==0 && (continusHeart == null || continusHeart.equals("[]") && (sleepStr == null || sleepStr.equals("[]"))))
+
+                    continue;
+
                 watchInsertBean = new WatchInsertBean();
                 watchInsertBean.setIsHaveHeartRate((deviceDetailData.getHasHR() == WatchData.HAS_HR) ? "1" : "0");
                 watchInsertBean.setTotalSleepTime(String.valueOf(deviceDetailData.getTotalTime()));
@@ -359,37 +394,46 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
 
 
 
-    public List<WatchInsertBean> getAllNoUpgradeW81DeviceDetailData(String deviceId, String userId,  boolean isUpgradeToday) {
+    public List<WatchInsertBean> getAllNoUpgradeW81DeviceDetailData(String deviceId, String userId,boolean isToday) {
 
-        List<W81DeviceDetailData> list = w81DeviceDataAction.getUnUpgradeW81DeviceDetialData(deviceId, userId);
+        List<W81DeviceDetailData> list = w81DeviceDataAction.getUnUpgradeW81DeviceDetialData(deviceId, userId,false);
+//        Log.e("W81","--上传F18数据="+new Gson().toJson(list));
 
-        Logger.myLog("1111getNoUpgradeW81DevcieDetailData" + list + "---------" + isUpgradeToday);
-        W81DeviceDetailData deviceDetailData;
+
+
+        //Logger.myLog("上传F18的数据=" + new Gson().toJson(list)  );
+     //   W81DeviceDetailData deviceDetailData;
         WatchInsertBean watchInsertBean;
         List<WatchInsertBean> list1 = new ArrayList<>();
         if (list != null && list.size() > 0) {
 
             for (int i = 0; i < list.size(); i++) {
+                W81DeviceDetailData deviceDetailData = list.get(i);
+                Log.e("W81","--上传F18数据="+new Gson().toJson(deviceDetailData));
 
-                deviceDetailData = list.get(i);
+                if(deviceDetailData.getTimestamp() != null && !TimeUtils.getTimeByyyyyMMdd(deviceDetailData.getTimestamp()).equals(TimeUtils.getTodayyyyyMMdd())){
+
                /* if (!isUpgradeToday && deviceDetailData.getDateStr().equals(TimeUtils.getTodayYYYYMMDD())) {
                     continue;
                 }*/
-                watchInsertBean = new WatchInsertBean();
-                watchInsertBean.setIsHaveHeartRate((deviceDetailData.getHasHR() == WatchData.HAS_HR) ? "1" : "0");
-                watchInsertBean.setTotalSleepTime(String.valueOf(deviceDetailData.getTotalTime()));
-                watchInsertBean.setTotalDistance(String.valueOf(deviceDetailData.getDis()));//传输的是米
-                watchInsertBean.setTotalCalories(String.valueOf(deviceDetailData.getCal()));
-                watchInsertBean.setTotalSteps(deviceDetailData.getStep());
-                watchInsertBean.setDateStr(deviceDetailData.getDateStr());
-                watchInsertBean.setDeviceId(deviceDetailData.getDeviceId());
-                watchInsertBean.setUserId(deviceDetailData.getUserId());
-                watchInsertBean.setSleepDetailArray(deviceDetailData.getSleepArray());
-                watchInsertBean.setStepDetailArray(deviceDetailData.getStepArray());
-                watchInsertBean.setHeartRateDetailArray(deviceDetailData.getHrArray());
-                watchInsertBean.setTotalDeep(String.valueOf(deviceDetailData.getRestfulTime()));
-                watchInsertBean.setTotalLight(String.valueOf(deviceDetailData.getLightTime()));
-                list1.add(watchInsertBean);
+                    watchInsertBean = new WatchInsertBean();
+                    watchInsertBean.setIsHaveHeartRate((deviceDetailData.getHasHR() == WatchData.HAS_HR) ? "1" : "0");
+                    watchInsertBean.setTotalSleepTime(String.valueOf(deviceDetailData.getTotalTime()));
+                    watchInsertBean.setTotalDistance(String.valueOf(deviceDetailData.getDis()));//传输的是米
+                    watchInsertBean.setTotalCalories(String.valueOf(deviceDetailData.getCal()));
+                    watchInsertBean.setTotalSteps(deviceDetailData.getStep());
+                    watchInsertBean.setDateStr(deviceDetailData.getDateStr());
+                    watchInsertBean.setDeviceId(deviceDetailData.getDeviceId());
+                    watchInsertBean.setUserId(deviceDetailData.getUserId());
+                    watchInsertBean.setSleepDetailArray(deviceDetailData.getSleepArray());
+                    watchInsertBean.setStepDetailArray(deviceDetailData.getStepArray());
+                    watchInsertBean.setHeartRateDetailArray(deviceDetailData.getHrArray());
+                    watchInsertBean.setTotalDeep(String.valueOf(deviceDetailData.getRestfulTime()));
+                    watchInsertBean.setTotalLight(String.valueOf(deviceDetailData.getLightTime()));
+                    list1.add(watchInsertBean);
+                }
+
+
             }
 
         }
@@ -571,7 +615,7 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
         IW311SettingModel w311ModelSetting = new W311ModelSettingImpl();
         DeviceTempUnitlTable table = w311ModelSetting.getTempUtil(userId, deviceId);
 
-        Logger.myLog("findTempMode: bloodPressureMode:" + deviceId + ",userId:" + userId + "6----" + bloodPressureMode);
+      //  Logger.myLog("findTempMode: bloodPressureMode:" + deviceId + ",userId:" + userId + "6----" + bloodPressureMode);
 
         TempInfo info = new TempInfo();
         if (bloodPressureMode != null) {
@@ -586,7 +630,7 @@ public class W81DeviceDataModelImp implements IW81DeviceDataModel {
             }
             info = setState(info);
         }
-        Logger.myLog("findTempMode: info:" + info);
+        //Logger.myLog("findTempMode: info:" + info);
         return info;
     }
 

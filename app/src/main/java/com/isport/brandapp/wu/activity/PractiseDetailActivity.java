@@ -926,7 +926,7 @@ public class PractiseDetailActivity extends BaseActivity implements View.OnClick
 
 
     List<LineChartEntity> datas = new ArrayList<>();
-    int maxHR = Integer.MIN_VALUE, minHR = Integer.MAX_VALUE;
+    int maxHR = 0, minHR = 1000;
     int sumHr = 0;
     int avgHr = 0;
 
@@ -1063,7 +1063,7 @@ public class PractiseDetailActivity extends BaseActivity implements View.OnClick
     }
 
     private void setHrValue(TextView tvValue, int value) {
-        if (value < 30) {
+        if (value < 30 || minHR == 1000) {
             tvValue.setText(UIUtils.getString(R.string.no_data));
         } else {
             tvValue.setText(value + "");
@@ -1076,7 +1076,7 @@ public class PractiseDetailActivity extends BaseActivity implements View.OnClick
         if (pieChartViewHeart != null) {
             int totalTime = 1;
             List<PieChartData> pieChartDatas = new ArrayList<>();
-            pieChartDatas.add(new PieChartData(getPiePercent(1, totalTime), UIUtils.getColor(R.color.color_nor)));//深黄
+            pieChartDatas.add(new PieChartData(getPiePercent(1, totalTime), Color.RED));//深黄
             pieChartViewHeart.updateData(pieChartDatas);
         }
     }

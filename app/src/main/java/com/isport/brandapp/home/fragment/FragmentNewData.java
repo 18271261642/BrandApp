@@ -246,7 +246,7 @@ public class FragmentNewData extends BaseMVPFragment<FragmentDataView, FragmentD
 
 
     @SuppressLint("HandlerLeak")
-    private final Handler scanHandler = new Handler() {
+    private final Handler scanHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
@@ -265,7 +265,7 @@ public class FragmentNewData extends BaseMVPFragment<FragmentDataView, FragmentD
      * 30s连接超时
      */
     @SuppressLint("HandlerLeak")
-    private final Handler handler = new Handler() {
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -2957,7 +2957,7 @@ public class FragmentNewData extends BaseMVPFragment<FragmentDataView, FragmentD
             public void onRefresh(@NonNull RefreshLayout refreshLayout) {
 
 
-                Logger.myLog(TAG,"------refresh="+AppConfiguration.deviceBeanList.size()+" mCurrentDevice="+mCurrentDevice.toString()+"AppConfiguration.isConnected="+AppConfiguration.isConnected);
+               // Logger.myLog(TAG,"------refresh="+AppConfiguration.deviceBeanList.size()+" mCurrentDevice="+mCurrentDevice.toString()+"AppConfiguration.isConnected="+AppConfiguration.isConnected);
 
                 if (AppConfiguration.deviceBeanList == null || AppConfiguration.deviceBeanList.size() == 0 || mCurrentDevice == null) {
                     refreshLayout.finishRefresh();

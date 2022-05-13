@@ -61,7 +61,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/layout_top"
-        android:layout_marginTop="@dimen/dp20"/>
+        android:layout_marginTop="@dimen/dp20" />
 
     <phone.gym.jkcq.com.socialmodule.shadow.ShadowLayout
         android:id="@+id/mShadowLayout"

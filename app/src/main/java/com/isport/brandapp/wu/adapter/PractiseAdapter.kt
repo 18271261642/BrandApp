@@ -7,11 +7,14 @@ import androidx.recyclerview.widget.RecyclerView
 import brandapp.isport.com.basicres.commonutil.UIUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.isport.brandapp.R
 import com.isport.brandapp.wu.activity.PractiseDetailActivity
 import com.isport.brandapp.wu.adapter.PractiseItemAdapter
 import com.isport.brandapp.wu.bean.ExerciseInfo
 import com.isport.brandapp.wu.bean.PractiseRecordInfo
+import java.util.ArrayList
 
 
 /**
@@ -38,6 +41,9 @@ class PractiseAdapter(data: MutableList<PractiseRecordInfo>) :
         historyDayDetailAdapter = PractiseItemAdapter(context, mExerciseInfos)
         historyDayDetailAdapter.setOnItemClickListener { v, note, position ->
 
+
+            if(note.aveRate == null || note.aveRate == "0" || note.aveRate == "--")
+                return@setOnItemClickListener
 
             val intent = Intent(context, PractiseDetailActivity::class.java)
             intent.putExtra("info", note)

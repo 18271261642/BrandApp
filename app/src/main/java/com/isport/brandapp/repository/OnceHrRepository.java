@@ -55,7 +55,7 @@ public class OnceHrRepository {
                     IDeviceMeasureData deviceMeasureData = new DeviceMeasureDataImp();
 
                     List<OneceHrMode> list = deviceMeasureData.uploadingOnceHrData(deviceId, userId, "0");
-                    Logger.myLog("measure_oxygen success:no upgrade1" + list + "userId：" + userId + " deviceId：" + deviceId);
+                   // Logger.myLog("measure_oxygen success:no upgrade1" + list + "userId：" + userId + " deviceId：" + deviceId);
                     if (list == null) {
                         list = new ArrayList<>();
                     }

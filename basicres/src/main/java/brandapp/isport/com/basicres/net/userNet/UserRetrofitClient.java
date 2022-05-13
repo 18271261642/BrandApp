@@ -42,7 +42,10 @@ public class UserRetrofitClient extends CommonRetrofitClient {
     }
 
     public Observable<?> gettOss() {
-        return getRetrofit().create(UserAPIService.class).getAliToken().compose
+//        return getRetrofit().create(UserAPIService.class).getAliToken().compose
+//                (RxScheduler.Obs_io_main()).compose(transformer);
+
+        return getRetrofitNoToken().create(UserAPIService.class).getAliToken().compose
                 (RxScheduler.Obs_io_main()).compose(transformer);
     }
 

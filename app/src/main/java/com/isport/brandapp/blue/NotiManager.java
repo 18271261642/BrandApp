@@ -445,10 +445,10 @@ public class NotiManager {
 
         try {
             //短信
-            if(w81MapstrPkNames.containsKey(packagename)){
-                ISportAgent.getInstance().requestBle(BleRequest.w81_send_message,tile+":"+contentStr, CRPBleMessageType.MESSAGE_SMS);
-                return;
-            }
+//            if(w81MapstrPkNames.containsKey(packagename)){
+//                ISportAgent.getInstance().requestBle(BleRequest.w81_send_message,tile+":"+contentStr, CRPBleMessageType.MESSAGE_SMS);
+//                return;
+//            }
             Bracelet_W311_ThridMessageModel moySms = Bracelet_W311_SettingModelAction.findBracelet_W311_ThridMessage(deviceId, TokenUtil.getInstance().getPeopleIdInt(BaseApp.getApp()));
             if(moySms == null)
                 return;

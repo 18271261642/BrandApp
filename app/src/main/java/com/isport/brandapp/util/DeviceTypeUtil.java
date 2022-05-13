@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import com.isport.blelibrary.utils.Constants;
 import com.isport.blelibrary.utils.Logger;
 import com.isport.blelibrary.utils.Utils;
+import com.isport.brandapp.App;
 import com.isport.brandapp.AppConfiguration;
 import com.isport.brandapp.bean.DeviceBean;
 
@@ -249,7 +250,7 @@ public class DeviceTypeUtil {
     }
 
     public static boolean isContainF18(int deviceType){
-        return null != AppConfiguration.deviceMainBeanList && AppConfiguration.deviceMainBeanList.size() > 0 && AppConfiguration.deviceMainBeanList.containsKey(deviceType);
+        return null != AppConfiguration.deviceMainBeanList && AppConfiguration.deviceMainBeanList.size() > 0 && AppConfiguration.deviceMainBeanList.containsKey(deviceType) && (AppConfiguration.deviceMainBeanList.get(deviceType).getDeviceType() == JkConfiguration.DeviceType.Watch_F18);
     }
 
 

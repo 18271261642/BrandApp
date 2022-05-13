@@ -150,7 +150,7 @@ public class EditUserInfo extends BaseTitleActivity implements View.OnClickListe
         // LoadImageUtil.getInstance().load(EditUserInfo.this, R.drawable.friend_bg_homepage, ivBg);
         saveImgPath = Environment.getExternalStorageDirectory().getPath()+"/Download/";
 
-        titleBarView.setRightIcon(R.drawable.icon_save_userinfo);
+        titleBarView.setRightIcon(R.drawable.icon_player_press);
         titleBarView.setTitle(UIUtils.getString(R.string.edit_user_info));
 
         dialogSetting = new UserDialogSetting(this);

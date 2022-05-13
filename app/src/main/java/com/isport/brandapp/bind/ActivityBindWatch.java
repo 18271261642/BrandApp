@@ -538,7 +538,7 @@ public class ActivityBindWatch extends BaseMVPTitleActivity<BindBaseView, BindPr
 
                     if(deviceType == JkConfiguration.DeviceType.Watch_F18){
                         handler.sendEmptyMessageDelayed(0x00,80 * 1000);
-                        Watch7018Manager.getWatch7018Manager().syncDeviceData();
+                        Watch7018Manager.getWatch7018Manager().syncDeviceData("0");
                         SyncProgressObservable.getInstance().sync(DeviceTimesUtil.getTime(1, 1), false);
                         return;
                     }

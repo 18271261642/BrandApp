@@ -31,7 +31,7 @@ public class RopeRankAdapter extends BaseQuickAdapter<RankInfo, BaseViewHolder> 
             ranke = Integer.parseInt(rankInfo.getRankingNo());
 
         } catch (Exception e) {
-
+            e.printStackTrace();
         } finally {
 
             if (rankInfo.isWhetherPraise()) {

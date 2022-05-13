@@ -31,6 +31,7 @@ import java.util.Locale;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import brandapp.isport.com.basicres.commonutil.Logger;
+import brandapp.isport.com.basicres.commonutil.ToastUtils;
 import iknow.android.utils.UnitConverter;
 import iknow.android.utils.callback.SingleCallback;
 import iknow.android.utils.thread.BackgroundExecutor;
@@ -53,7 +54,9 @@ public class VideoTrimmerView extends FrameLayout implements IVideoTrimmerView {
     private static final String TAG = VideoTrimmerView.class.getSimpleName();
 
     public long MIN_SHOOT_DURATION = 3000L;// 最小剪辑时间3s
-    public int VIDEO_MAX_TIME = 15;// 10秒
+
+    //最大剪辑时长
+    public int VIDEO_MAX_TIME = 15;// 15秒
     public long MAX_SHOOT_DURATION = VIDEO_MAX_TIME * 1000L;//视频最多剪切多长时间10s
     public int MAX_COUNT_RANGE = 15;  //seekBar的区域内一共有多少张图片
     private int SCREEN_WIDTH_FULL = ScreenUtils.getScreenWidth();
@@ -118,6 +121,11 @@ public class VideoTrimmerView extends FrameLayout implements IVideoTrimmerView {
     }
 
     private void initRangeSeekBarView() {
+
+        if(mDuration == 0 || MAX_SHOOT_DURATION == 0){
+            ToastUtils.showToast(getContext(),"视频市场过短!");
+            return;
+        }
 
         if (mDuration <= MAX_SHOOT_DURATION) {
             MAX_SHOOT_DURATION = mDuration;
@@ -443,7 +451,7 @@ public class VideoTrimmerView extends FrameLayout implements IVideoTrimmerView {
 
     private void updateVideoProgress() {
         long currentPosition = mVideoView.getCurrentPosition();
-        Log.d(TAG, "updateVideoProgress currentPosition = " + currentPosition);
+        Log.i(TAG, "updateVideoProgress currentPosition = " + currentPosition);
         if (currentPosition >= (mRightProgressPos)) {
             mRedProgressBarPos = mLeftProgressPos;
             pauseRedProgressAnimation();

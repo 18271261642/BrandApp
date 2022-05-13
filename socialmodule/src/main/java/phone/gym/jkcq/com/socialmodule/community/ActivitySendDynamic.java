@@ -53,6 +53,7 @@ import phone.gym.jkcq.com.socialmodule.bean.requst.RequestAddDynamicBean;
 import phone.gym.jkcq.com.socialmodule.fragment.ImageVideoFileUtils;
 import phone.gym.jkcq.com.socialmodule.video.cut.ZVideoView;
 
+//发布动态页面
 public class ActivitySendDynamic extends BaseTitleActivity implements CommonAliView {
     public final String NOR = "nor";
     private final String PRESS = "press";
@@ -66,6 +67,12 @@ public class ActivitySendDynamic extends BaseTitleActivity implements CommonAliV
     String videoPath;
     String imagePath;
     boolean isUpdate;
+
+
+    private OssBean tmpOssBen;
+
+    //是否是第一次点击发布按钮
+    private boolean isFirstSend = false;
 
     @Override
     protected int getLayoutId() {
@@ -111,7 +118,8 @@ public class ActivitySendDynamic extends BaseTitleActivity implements CommonAliV
         iv_save_location.setTag(NOR);
         iv_save_location.setImageResource(R.drawable.friend_icon_save_location_nor);
         commonUserPresenter = new CommonUserPresenter(this);
-
+        //进来后先获取token
+        commonUserPresenter.getOssAliToken();
 
     }
 
@@ -193,6 +201,7 @@ public class ActivitySendDynamic extends BaseTitleActivity implements CommonAliV
                 if (!isUpdate) {
                     isUpdate = true;
                     NetProgressObservable.getInstance().show(UIUtils.getString(R.string.data_loading));
+
                     saveDynamic();
                 } else {
 
@@ -248,26 +257,29 @@ public class ActivitySendDynamic extends BaseTitleActivity implements CommonAliV
 
     }
 
+
+
+
+
     private void saveDynamic() {
         //上传图片到阿里云
         //在上传视频到阿里云
         //在把动态保存到自己的服务器
-       /* File file = new File(videoPath);
-        String videoName = "SeedFeed" + TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()) + System.currentTimeMillis() + ".mp4";
-        if (iv_save_location.getTag().equals(PRESS)) {
-            if (file.length() > 0) {
-                // ImageVideoFileUtils.insertVideo(pathUrl, getActivity());
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    ImageVideoFileUtils.insertVideo(videoName, this);
-                } else {
-                    ImageVideoFileUtils.saveVideo(this, file);
-                }
 
+        if(tmpOssBen == null){
+            isFirstSend = true;
+            commonUserPresenter.getOssAliToken();
+            return;
+        }
+
+        String imgName = "coverImg" + TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()) + System.currentTimeMillis() + ".jpg";
+
+        ThreadPoolUtils.getInstance().addTask(new Runnable() {
+            @Override
+            public void run() {
+                commonUserPresenter.upgradeVideoAli(tmpOssBen.getBucketName(), tmpOssBen.getAccessKeyId(), tmpOssBen.getAccessKeySecret(), tmpOssBen.getSecurityToken(), imgName, imagePath);
             }
-        }*/
-
-        commonUserPresenter.getOssAliToken();
-        // successUpgradeImageUrl("");
+        });
     }
 
 
@@ -366,16 +378,22 @@ public class ActivitySendDynamic extends BaseTitleActivity implements CommonAliV
         Log.e("successUpgradeImageUrl", "successUpgradeImageUrl:" + pathUrl);
     }
 
+
+    //获取token成功
     @Override
     public void successGetAliToken(OssBean ossBean) {
-        String imgName = "coverImg" + TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()) + System.currentTimeMillis() + ".jpg";
+        this.tmpOssBen = ossBean;
+        Log.e(TAG,"------------动态发布 获取oss="+ossBean.toString());
+        if(isFirstSend){
+            String imgName = "coverImg" + TokenUtil.getInstance().getPeopleIdStr(BaseApp.getApp()) + System.currentTimeMillis() + ".jpg";
 
-        ThreadPoolUtils.getInstance().addTask(new Runnable() {
-            @Override
-            public void run() {
-                commonUserPresenter.upgradeVideoAli(ossBean.getBucketName(), ossBean.getAccessKeyId(), ossBean.getAccessKeySecret(), ossBean.getSecurityToken(), imgName, imagePath);
-            }
-        });
+            ThreadPoolUtils.getInstance().addTask(new Runnable() {
+                @Override
+                public void run() {
+                    commonUserPresenter.upgradeVideoAli(ossBean.getBucketName(), ossBean.getAccessKeyId(), ossBean.getAccessKeySecret(), ossBean.getSecurityToken(), imgName, imagePath);
+                }
+            });
+        }
     }
 
     @Override

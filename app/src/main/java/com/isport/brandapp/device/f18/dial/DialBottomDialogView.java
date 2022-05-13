@@ -29,13 +29,21 @@ public class DialBottomDialogView extends AlertDialog implements View.OnClickLis
 
     private OnF18DialViewClickListener onF18DialViewClickListener;
 
+    protected DialBottomDialogView(Context context) {
+        super(context);
+    }
+
+    protected DialBottomDialogView(Context context, int themeResId) {
+        super(context, themeResId);
+    }
+
+
     public void setOnF18DialViewClickListener(OnF18DialViewClickListener onF18DialViewClickListener) {
         this.onF18DialViewClickListener = onF18DialViewClickListener;
     }
 
-    public DialBottomDialogView(@NonNull Context context) {
-        super(context);
-    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -26,6 +26,7 @@ import com.facebook.FacebookException;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
+import com.google.gson.Gson;
 import com.isport.blelibrary.ISportAgent;
 import com.isport.blelibrary.db.table.bracelet_w311.Bracelet_W311_24H_hr_SettingModel;
 import com.isport.blelibrary.db.table.bracelet_w311.Bracelet_w311_hrModel;
@@ -1252,6 +1253,8 @@ public class ActivityWatchHeartRate extends BaseMVPTitleActivity<WatchHeartRateV
 
     @Override
     public void successMonthStrDate(ArrayList<String> strDate) {
+
+        Log.e(TAG,"----------连续心率="+new Gson().toJson(strDate));
         calendarview.setSummary(strDate);
     }
 

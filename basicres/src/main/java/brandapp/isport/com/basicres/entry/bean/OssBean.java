@@ -47,4 +47,16 @@ public class OssBean {
     public void setExpiration(String expiration) {
         Expiration = expiration;
     }
+
+
+    @Override
+    public String toString() {
+        return "OssBean{" +
+                "bucketName='" + bucketName + '\'' +
+                ", AccessKeyId='" + AccessKeyId + '\'' +
+                ", AccessKeySecret='" + AccessKeySecret + '\'' +
+                ", SecurityToken='" + SecurityToken + '\'' +
+                ", Expiration='" + Expiration + '\'' +
+                '}';
+    }
 }

@@ -92,6 +92,17 @@ public class PractiseItemAdapter extends RecyclerView.Adapter<PractiseItemAdapte
             if (info == null) {
                 return;
             }
+
+            if (isDetail) {
+                holder.iv_right.setVisibility(View.GONE);
+                holder.iv_type.setVisibility(View.GONE);
+                holder.tv_run.setText(mContext.getString(R.string.practise_sum_time));
+            } else {
+                holder.iv_right.setVisibility(View.VISIBLE);
+                holder.iv_type.setVisibility(View.VISIBLE);
+            }
+
+
             if (isDetail) {
                 holder.tv_run_time.setText(TimeUtils.getTimeByyyyyMMdd(info.getStartTimestamp()) + " " + TimeUtils.getTimeByHHmmssWithOutSpace(info.getStartTimestamp()) + "~" + (TimeUtils.getTimeByHHmmssWithOutSpace(info.getEndTimestamp())));
             } else {
@@ -105,8 +116,10 @@ public class PractiseItemAdapter extends RecyclerView.Adapter<PractiseItemAdapte
 
             if (StringUtils.isNumeric(aveRate) && Integer.valueOf(aveRate) != 0) {
                 holder.tv_average_heart.setText(mContext.getString(R.string.average_heart_value, aveRate));
+                holder.iv_right.setVisibility(View.VISIBLE);
             } else {
                 holder.tv_average_heart.setText("--BPM");
+                holder.iv_right.setVisibility(View.GONE);
             }
 
             holder.tv_consume.setText(mContext.getString(R.string.consume_value,  info.getTotalCalories()));
@@ -143,14 +156,6 @@ public class PractiseItemAdapter extends RecyclerView.Adapter<PractiseItemAdapte
             }
         });
 
-        if (isDetail) {
-            holder.iv_right.setVisibility(View.GONE);
-            holder.iv_type.setVisibility(View.GONE);
-            holder.tv_run.setText(mContext.getString(R.string.practise_sum_time));
-        } else {
-            holder.iv_right.setVisibility(View.VISIBLE);
-            holder.iv_type.setVisibility(View.VISIBLE);
-        }
 
         int type = Integer.parseInt(info.getExerciseType());
 

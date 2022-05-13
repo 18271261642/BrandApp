@@ -49,7 +49,7 @@ public class CallReceiver extends BroadcastReceiver {
             }
             String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
             String incomingNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
-            Log.e(TAG, "999999999999999" + incomingNumber);
+            Log.e(TAG, "---EXTRA_STATE=" + incomingNumber);
             if (state != null) {
                 if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
                     BaseDevice device = ISportAgent.getInstance().getCurrnetDevice();
@@ -65,7 +65,7 @@ public class CallReceiver extends BroadcastReceiver {
                     isCalling = false;
                 } else if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
                     isHandup = true;
-                    Log.e(TAG, "999999999999999" + incomingNumber);
+                    Log.e(TAG, "-----EXTRA_STATE_RINGING=" + incomingNumber);
                     if (!TextUtils.isEmpty(incomingNumber)) {
                         //来电了，响铃中
                         ContentUtils.sendCall(incomingNumber, context);
@@ -77,7 +77,7 @@ public class CallReceiver extends BroadcastReceiver {
                     }
                     if(DeviceTypeUtil.isContainF18(device.getDeviceType()))
                         Watch7018Manager.getWatch7018Manager().sendNoticeToDevice((byte) 0x02,"", UIUtils.getString(R.string.incomingNumber));
-                    Log.e(TAG, "999999999999999 EXTRA_STATE_OFFHOOK" );
+                    Log.e(TAG, "EXTRA_STATE_OFFHOOK EXTRA_STATE_OFFHOOK" );
                     if (isHandup) {
                         isCalling = true;
                     }
